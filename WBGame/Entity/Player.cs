@@ -1,14 +1,14 @@
 ﻿using Otter;
 
-namespace WBGame
+namespace WBGame.Entity
 {
-    class PlayerEntity : Entity
+    class Player : Otter.Entity
     {
         public float MoveSpeed;
         public const float MoveSpeedSlow = 5;
         public const float MoveSpeedFast = 10;
 
-        public PlayerEntity(float x, float y) : base(x, y)
+        public Player(float x, float y) : base(x, y)
         {
             var image = Image.CreateRectangle(32);
             AddGraphic(image);
@@ -16,17 +16,10 @@ namespace WBGame
             MoveSpeed = MoveSpeedSlow;
         }
 
-        public void SetColor()
-        {
-            Graphic.Color = Color.Green;
-        }
 
         public override void Update()
         {
             base.Update();
-
-            if (Input.KeyPressed(Key.G))
-                SetColor();
 
             if (Input.KeyDown(Key.W))
                 Y -= MoveSpeed;
