@@ -1,13 +1,13 @@
 ﻿using Otter;
 
-namespace WBGame.Entity.Snake
+namespace WBGame.Worm
 {
     /// @author Antti Harju
     /// @version 12.06.2020
     /// <summary>
     /// Worm class, creates as long a tail as needed and controls the head
     /// </summary>
-    class Worm : Body
+    class Head : Body
     {
         private int wormLength;
 
@@ -22,7 +22,7 @@ namespace WBGame.Entity.Snake
         /// <param name="size">how thick the worm is (worm is made out of circles and this the diameter of the circle)</param>
         /// <param name="speed">how fast the worm is</param>
         /// <param name="wormLength">how long a worm is</param>
-        public Worm(Scene scene, float x, float y, int size, float speed, int wormLength) : base(x, y, size, speed)
+        public Head(Scene scene, float x, float y, int size, float speed, int wormLength) : base(x, y, size, speed)
         {
             this.wormLength = --wormLength; //-- because head is already 1
 
