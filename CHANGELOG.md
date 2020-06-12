@@ -10,7 +10,7 @@
 
 # 12.06.2020
 - Basic worm (snake) class done
-- Different scenes are in different files
+- Different scenes are in different files 
 
 # 11.06.2020
 - Visual Studio, Otter, ComTest setup done
