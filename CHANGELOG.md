@@ -1,16 +1,11 @@
 # TODO
 - Fix GPU usage issue properly and not with RTSS
-- Entity pooling system
-- Make game speed independent from frame rate (30fps as "ground truth", scales nicely to 60, 120)
-- Scaling to multiple resolutions, maybe 1280x720 as minimum requirement
-
-# Ideas to juice the game up
-- Low internal rendering resolution (think nidhogg, towerfall ascension)
-- Tweening (worm movement)
 
 # 12.06.2020
-- Basic worm (snake) class done
+- Basic WormGame done
 - Different scenes are in different files 
+- Began work on AreaGame (Grid) and Pooling (closely related)
+    - **NOTE:** The names I pick for things seem to often overlap with some premade Otter stuff. Probably if I just wanted to make a game I'd have to do much less work, but the point is not to learn Otter but rather learn keyboard shortcuts (edge, windows, visual studio), git commands / github, markdown, windows terminal and get some practise in OOP.
 
 # 11.06.2020
 - Visual Studio, Otter, ComTest setup done
