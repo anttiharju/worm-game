@@ -1,6 +1,6 @@
 ﻿using Otter;
 
-namespace WBGame.Entity
+namespace WBGame.Test
 {
     class Player : Otter.Entity
     {

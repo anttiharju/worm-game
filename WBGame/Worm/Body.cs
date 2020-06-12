@@ -1,11 +1,11 @@
 ﻿using Otter;
 
-namespace WBGame.Entity.Snake
+namespace WBGame.Worm
 {
     /// @author Antti Harju
     /// @version 12.06.2020
     /// <summary>
-    /// Body class for the worm object. Worm class ("head") inherits this.
+    /// Body class for the worm object. Worm class ("head") also inherits this.
     /// </summary>
     class Body : Otter.Entity
     {
