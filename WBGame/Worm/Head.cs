@@ -1,4 +1,5 @@
 ﻿using Otter;
+using WBGame.Pooling;
 
 namespace WBGame.Worm
 {
@@ -9,10 +10,8 @@ namespace WBGame.Worm
     /// </summary>
     class Head : Body
     {
-        private int wormLength;
+        private int currentLength;
 
-
-        #region Constructor
         /// <summary>
         /// Constructor. Creates the head of the worm (this entity) and the entities for its tail. Also calls the body constructor.
         /// </summary>
@@ -21,22 +20,27 @@ namespace WBGame.Worm
         /// <param name="y">vertical position</param>
         /// <param name="size">how thick the worm is (worm is made out of circles and this the diameter of the circle)</param>
         /// <param name="speed">how fast the worm is</param>
-        /// <param name="wormLength">how long a worm is</param>
-        public Head(Scene scene, float x, float y, int size, float speed, int wormLength) : base(x, y, size, speed)
+        /// <param name="wantedLength">how long a worm is</param>
+        public Head(int x, int y, int size) : base(x, y, size) { }
+
+        public void Spawn(float x, float y, Pooler<Body> bodyPool, int wantedLength, Color color)
         {
-            this.wormLength = --wormLength; //-- because head is already 1
+            Position = new Vector2(x, y);
+            SetTarget(x, y);
+            SetColor(color);
+            currentLength = --wantedLength; //-- because head is already 1
 
             Body currentBody = this;
-            for (int i = 0; i < this.wormLength; i++)
+            for (int i = 0; i < currentLength; i++)
             {
-                Body nextBody = new Body(x, y, size, speed);
-                currentBody.SetNextBody(nextBody);
-                scene.Add(nextBody);
-                currentBody = nextBody;
+                Body tmpBody = bodyPool.TakeOne(x, y);
+                tmpBody.Position = new Vector2(x, y);
+                tmpBody.SetTarget(x, y);
+                tmpBody.SetColor(color);
+                currentBody.SetNextBody(tmpBody);
+                currentBody = tmpBody;
             }
         }
-        #endregion
-
 
         #region Movement
         /// <summary>
@@ -44,12 +48,13 @@ namespace WBGame.Worm
         /// </summary>
         public override void Update()
         {
+            if (Available()) return;
             base.Update();
 
-            Move(Key.W, 0, -GetSize(), Color.Green);
-            Move(Key.S, 0, GetSize(), Color.Red);
-            Move(Key.A, -GetSize(), 0, Color.Blue);
-            Move(Key.D, GetSize(), 0, Color.Yellow);
+            Move(Key.W, 0, -GetSize());
+            Move(Key.S, 0, GetSize());
+            Move(Key.A, -GetSize(), 0);
+            Move(Key.D, GetSize(), 0);
         }
 
 
@@ -60,13 +65,10 @@ namespace WBGame.Worm
         /// <param name="x">horizontal movement</param>
         /// <param name="y">vertical movement</param>
         /// <param name="color">color of the worms head when the key is pressed</param>
-        private void Move(Key key, float x, float y, Color color)
+        private void Move(Key key, float x, float y)
         {
             if (Input.KeyPressed(key))
-            {
-                SetColor(color);
                 MoveWorm(x, y);
-            }
         }
         #endregion
     }
