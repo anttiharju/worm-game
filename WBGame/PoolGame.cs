@@ -23,7 +23,7 @@ namespace WBGame
 
             for (int x = 0; x < width; x++)
                 for (int y = 0; y < height; y++)
-                    blocks.Spawn(x * (cellSize + gap), y * (cellSize + gap));
+                    blocks.TakeOne(x * (cellSize + gap), y * (cellSize + gap));
 
             return scene;
         }

@@ -25,8 +25,10 @@ namespace WBGame.Pooling
         {
             pool = new T[poolSize];
             for (int i = 0; i < pool.Length; i++)
-                pool[i] = (T)Activator.CreateInstance(typeof(T), new object[] { poolableSize });
-
+            {
+                pool[i] = (T)Activator.CreateInstance(typeof(T), new object[] { 0, 0, poolableSize });
+                pool[i].Destroy();
+            }
             scene.AddMultiple(pool);
         }
         #endregion
@@ -39,15 +41,15 @@ namespace WBGame.Pooling
         /// <param name="x">Horizontal position</param>
         /// <param name="y">Vertical position</param>
         /// <returns></returns>
-        public bool Spawn(int x, int y)
+        public T TakeOne(float x = 0, float y = 0)
         {
-            foreach (Poolable poolable in pool)
-                if (poolable.Available())
+            foreach (T entity in pool)
+                if (entity.Available())
                 {
-                    poolable.Spawn(x, y);
-                    return true;
+                    entity.Spawn(x, y);
+                    return entity;
                 }
-            return false;
+            return null;
         }
         #endregion
     }

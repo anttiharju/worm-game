@@ -1,4 +1,5 @@
 ﻿using Otter;
+using WBGame.Pooling;
 using WBGame.Worm;
 
 namespace WBGame
@@ -14,8 +15,14 @@ namespace WBGame
     {
         public Scene Start(Scene scene)
         {
-            Head worm = new Head(scene, 960, 540, 64, 3, 5);
-            scene.Add(worm);
+            Pooler<Body> bodyPool = new Pooler<Body>(scene, 20, 64);
+            Pooler<Head> wormPool = new Pooler<Head>(scene, 4, 64);
+
+            wormPool.TakeOne().Spawn(352, 256, bodyPool, 5, Color.Red);
+            wormPool.TakeOne().Spawn(548, 256, bodyPool, 5, Color.Green);
+            wormPool.TakeOne().Spawn(744, 256, bodyPool, 5, Color.Blue);
+            wormPool.TakeOne().Spawn(940, 256, bodyPool, 5, Color.Yellow);
+
             return scene;
         }
     }
