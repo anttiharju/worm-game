@@ -12,20 +12,11 @@ namespace WBGame.Pooling
         private bool alive;
 
 
-        #region Constructor
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="size">Size of the entity</param>
-        /// TODO: Don't actually use this constructor for the pooled entities (so we can have rectangles, circles, all kinds of shapes and keep this generic)
-        public Poolable(int size) : base(0, 0)
-        {
-            Image image = Image.CreateCircle(size / 2);
-            AddGraphic(image);
-            image.CenterOrigin();
-            Destroy();
-        }
-        #endregion
+        public Poolable(float x, float y) : base(x, y) { }
 
 
         #region Methods
@@ -44,7 +35,7 @@ namespace WBGame.Pooling
         /// </summary>
         /// <param name="x">horizontal position</param>
         /// <param name="y">vertical position</param>
-        public void Spawn(int x, int y)
+        public void Spawn(float x, float y)
         {
             Graphic.Visible = true;
             Position = new Vector2(x, y);
@@ -61,6 +52,12 @@ namespace WBGame.Pooling
             alive = false;
         }
         #endregion
+
+
+        public void SetColor(Color color)
+        {
+            Graphic.Color = color;
+        }
     }
 
     #region Interface
@@ -70,7 +67,7 @@ namespace WBGame.Pooling
     interface IPoolable
     {
         bool Available();
-        void Spawn(int x, int y);
+        void Spawn(float x, float y);
         void Destroy();
     }
     #endregion
