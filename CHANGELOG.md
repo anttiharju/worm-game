@@ -1,6 +1,9 @@
 # TODO
 - Fix GPU usage issue properly and not with RTSS
 
+# 14.06.2020
+- Basic generic entity pooling done
+
 # 12.06.2020
 - Basic WormGame done
 - Different scenes are in different files 

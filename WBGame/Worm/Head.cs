@@ -1,5 +1,4 @@
 ﻿using Otter;
-using SFML.System;
 
 namespace WBGame.Worm
 {
@@ -11,7 +10,7 @@ namespace WBGame.Worm
     class Head : Body
     {
         private int wormLength;
-        private int i = 0;
+
 
         #region Constructor
         /// <summary>
@@ -46,36 +45,11 @@ namespace WBGame.Worm
         public override void Update()
         {
             base.Update();
-            /*
+
             Move(Key.W, 0, -GetSize(), Color.Green);
             Move(Key.S, 0, GetSize(), Color.Red);
             Move(Key.A, -GetSize(), 0, Color.Blue);
             Move(Key.D, GetSize(), 0, Color.Yellow);
-            */
-            string route = "00000222221111133333";
-            if (i >= route.Length) i = 0;
-            char c = route[i];
-            if (c == '0')
-            {
-                MoveWorm(0, -GetSize());
-                SetColor(Color.Green);
-            }
-            if (c == '1')
-            {
-                MoveWorm(0, GetSize());
-                SetColor(Color.Red);
-            }
-            if (c == '2')
-            {
-                MoveWorm(-GetSize(), 0);
-                SetColor(Color.Blue);
-            }
-            if (c == '3')
-            {
-                MoveWorm(GetSize(), 0);
-                SetColor(Color.Yellow);
-            }
-            i++;
         }
 
 
