@@ -4,7 +4,7 @@
 # 12.06.2020
 - Basic WormGame done
 - Different scenes are in different files 
-- Began work on AreaGame (Grid) and Pooling (closely related)
+- Began work on AreaGame (Grid) and Pooling
     - **NOTE:** The names I pick for things seem to often overlap with some premade Otter stuff. Probably if I just wanted to make a game I'd have to do much less work, but the point is not to learn Otter but rather learn keyboard shortcuts (edge, windows, visual studio), git commands / github, markdown, windows terminal and get some practise in OOP.
 
 # 11.06.2020

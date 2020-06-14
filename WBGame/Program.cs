@@ -10,7 +10,9 @@ namespace WBGame
         /// <param name="args"></param>
         static void Main(string[] args)
         {
-            Game game = new Game("Worm bricks", 1280, 720, 72, false);
+            Game game = new Game("Worm bricks", 1280, 720);
+            game.FixedFramerate = false;
+            game.AlwaysUpdate = true;
             Scene scene = new Scene();
             game.MouseVisible = true;
             /** /
@@ -21,7 +23,7 @@ namespace WBGame
             WormGame worm = new WormGame();
             game.Start(worm.Start(scene));
             /**/
-            /**/
+            /** /
             AreaGame grid = new AreaGame();
             game.Start(grid.Start(scene));
             /**/
