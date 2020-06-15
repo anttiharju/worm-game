@@ -1,6 +1,10 @@
 # TODO
 - Fix GPU usage issue properly and not with RTSS
 
+# 15.06.2020
+- Designing new systems (collision, movement) and how they interact
+- Improved pooling system
+
 # 14.06.2020
 - Basic generic entity pooling done
 - Worms now have their body parts in pools
