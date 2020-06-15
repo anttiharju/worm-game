@@ -1,56 +1,57 @@
 ﻿using Otter;
 using System;
+using System.Collections;
 
 namespace WBGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 14.06.2020
+    /// @version 15.06.2020
     /// <summary>
-    /// Class that handles entity pooling
+    /// Object that manages a pool
     /// </summary>
-    /// <typeparam name="T">What type of entity to pool. Has to inherit Poolable.</typeparam>
-    class Pooler<T> where T : Poolable
+    /// <typeparam name="T">What is stored in the pool</typeparam>
+    public class Pooler<T> : IEnumerable where T : Poolable
     {
-        private Poolable[] pool;
+        private readonly Poolable[] pool;
 
 
-        #region Constructor
         /// <summary>
-        /// Constructor.
+        /// Spawns (and disables) the pool entities to the scene
         /// </summary>
-        /// <param name="scene">Scene where we create the pool</param>
-        /// <param name="poolSize">How big the pool should be</param>
-        /// <param name="poolableSize">How big the entities in the pool should be</param>
+        /// <param name="scene">Where the entities should be</param>
+        /// <param name="poolSize">How many entities does the pool need</param>
+        /// <param name="poolSize">How big entities are</param>
         public Pooler(Scene scene, int poolSize, int poolableSize)
         {
             pool = new T[poolSize];
             for (int i = 0; i < pool.Length; i++)
             {
-                pool[i] = (T)Activator.CreateInstance(typeof(T), new object[] { 0, 0, poolableSize });
-                pool[i].Destroy();
+                pool[i] = (T)Activator.CreateInstance(typeof(T), new object[] { poolableSize });
+                pool[i].Disable();
             }
             scene.AddMultiple(pool);
         }
-        #endregion
 
 
-        #region Methods
         /// <summary>
-        /// Spawns a poolable entity from the pool at the desired position
+        /// Gives the first free entity from the pool
         /// </summary>
-        /// <param name="x">Horizontal position</param>
-        /// <param name="y">Vertical position</param>
-        /// <returns></returns>
-        public T TakeOne(float x = 0, float y = 0)
+        /// <returns>Unused entity</returns>
+        public T Next()
         {
             foreach (T entity in pool)
-                if (entity.Available())
-                {
-                    entity.Spawn(x, y);
-                    return entity;
-                }
+                if (!entity.Enabled())
+                    return (T)entity.Enable();
             return null;
         }
-        #endregion
+
+        /// <summary>
+        /// Now we can foreach through the pool
+        /// </summary>
+        /// <returns>pool</returns>
+        public IEnumerator GetEnumerator()
+        {
+            return pool.GetEnumerator();
+        }
     }
 }

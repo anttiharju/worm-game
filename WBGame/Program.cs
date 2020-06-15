@@ -17,14 +17,8 @@ namespace WBGame
             game.AlwaysUpdate = true;
             Scene scene = new Scene();
             game.MouseVisible = true;
-            /**/
             WormGame worm = new WormGame();
             game.Start(worm.Start(scene));
-            /**/
-            /** /
-            PoolGame grid = new PoolGame();
-            game.Start(grid.Start(scene));
-            /**/
         }
     }
 }
