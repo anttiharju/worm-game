@@ -15,13 +15,13 @@ namespace WBGame
     {
         public Scene Start(Scene scene)
         {
-            Pooler<Body> bodyPool = new Pooler<Body>(scene, 20, 64);
-            Pooler<Head> wormPool = new Pooler<Head>(scene, 4, 64);
+            Pooler<Body> bodyPool = new Pooler<Body>(scene, 44, 32);
+            Pooler<Head> headPool = new Pooler<Head>(scene, 4, 32);
 
-            wormPool.TakeOne().Spawn(352, 256, bodyPool, 5, Color.Red);
-            wormPool.TakeOne().Spawn(548, 256, bodyPool, 5, Color.Green);
-            wormPool.TakeOne().Spawn(744, 256, bodyPool, 5, Color.Blue);
-            wormPool.TakeOne().Spawn(940, 256, bodyPool, 5, Color.Yellow);
+            headPool.Next().Spawn(true, 256 + 64 * 0, 256, 10, bodyPool, headPool, Color.Red);
+            headPool.Next().Spawn(true, 256 + 64 * 3, 256, 10, bodyPool, headPool, Color.Green);
+            headPool.Next().Spawn(true, 256 + 64 * 6, 256, 10, bodyPool, headPool, Color.Blue);
+            headPool.Next().Spawn(true, 256 + 64 * 9, 256, 10, bodyPool, headPool, Color.Yellow);
 
             return scene;
         }
