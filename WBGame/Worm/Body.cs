@@ -4,41 +4,32 @@ using WBGame.Pooling;
 namespace WBGame.Worm
 {
     /// @author Antti Harju
-    /// @version 12.06.2020
+    /// @version 15.06.2020
     /// <summary>
     /// Body class for the worm object. Head class ("the worm") also inherits this.
     /// </summary>
     class Body : Poolable
     {
-        #region Fields
         private Body nextBody;
         private Vector2 targetPosition;
         private int speed = 3;
         private int size;
-        #endregion
 
 
-        #region Constructor
         /// <summary>
         /// Constructor. Creates a circle graphic for the entity.
         /// </summary>
-        /// <param name="x">horizontal position</param>
-        /// <param name="y">vertical position</param>
-        /// <param name="size">worms thickness (circle radius)</param>
-        /// <param name="speed">how fast the worm moves between positions</param>
-        public Body(int x, int y, int size) : base(x, y)
+        /// <param name="size">Circle graphic diameter</param>
+        /// <param name="speed">How fast the worm is</param>
+        public Body(int size) : base()
         {
-            SetTarget(new Vector2(x, y));
             this.size = size;
-
             Image image = Image.CreateCircle(size / 2);
             AddGraphic(image);
             image.CenterOrigin();
         }
-        #endregion
 
 
-        #region Movement
         /// <summary>
         /// This method moves the worms head and starts a recursive call that moves its tail
         /// </summary>
@@ -72,10 +63,8 @@ namespace WBGame.Worm
             base.Update();
             Position += (GetTarget() - Position) * 0.1f * GetSpeed();
         }
-        #endregion
 
 
-        #region Setters
         /// <summary>
         /// Sets a new target position
         /// </summary>
@@ -99,19 +88,23 @@ namespace WBGame.Worm
         /// <summary>
         /// Sets the nextBody field. Required to make the tail follow with a recursive method.
         /// </summary>
-        /// <param name="nextBody"></param>
+        /// <param name="nextBody">The body that is after this one</param>
         public void SetNextBody(Body nextBody)
         {
             this.nextBody = nextBody;
         }
-        #endregion
 
 
-        #region Getters
+        public void SetColor(Color color)
+        {
+            Graphic.Color = color;
+        }
+
+
         /// <summary>
         /// Required to set new target positions and to calculate velocity for transitions between positions
         /// </summary>
-        /// <returns>size / thickness (diameter of the circle)</returns>
+        /// <returns>Size / thickness (diameter of the circle)</returns>
         public int GetSize()
         {
             return size;
@@ -121,7 +114,7 @@ namespace WBGame.Worm
         /// <summary>
         /// Required to calculate velocity for transitions between positions
         /// </summary>
-        /// <returns>worms speed</returns>
+        /// <returns>Worms speed</returns>
         public float GetSpeed()
         {
             return speed;
@@ -141,11 +134,10 @@ namespace WBGame.Worm
         /// <summary>
         /// Required for the recursive method to make the tail follow
         /// </summary>
-        /// <returns>next part of the worm</returns>
+        /// <returns>Next body of the worm</returns>
         public Body GetNextBody()
         {
             return nextBody;
         }
-        #endregion
     }
 }
