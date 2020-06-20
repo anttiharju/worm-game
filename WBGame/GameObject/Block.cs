@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using WBGame.Pooling;
+﻿using WBGame.Pooling;
 using Otter;
 
-namespace WBGame.Other
+namespace WBGame.GameObject
 {
     class Block : Poolable
     {
@@ -15,16 +12,12 @@ namespace WBGame.Other
             image.CenterOrigin();
         }
 
+
         public void Spawn(Vector2 position, Color color)
         {
             Enable();
             Position = position;
-            SetColor(color);
-        }
-
-        public void SetColor(Color color)
-        {
-            Graphic.Color = color;
+            Color = color;
         }
     }
 }

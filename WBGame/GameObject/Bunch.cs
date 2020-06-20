@@ -1,18 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using WBGame.Pooling;
+﻿using WBGame.Pooling;
 
-namespace WBGame.Other
+namespace WBGame.GameObject
 {
     class Bunch : Poolable
     {
-        Block[] blocks;
+        private readonly Block[] blocks;
+
 
         public Bunch(int size)
         {
             blocks = new Block[size];
         }
+
 
         public void SetBlock(Block block, int i)
         {

@@ -1,41 +1,41 @@
 ﻿using Otter;
-using WBGame.Worm;
+using System;
+using WBGame.GameObject;
 using WBGame.Pooling;
 
 namespace WBGame.Other
 {
     class Manager
     {
-        private int collisionSize;
-        private Scene scene;
-        private Pooler<Body> bodyPool;
-        private Pooler<Head> headPool;
-        private Pooler<Block> blockPool;
+        private readonly int collisionSize;
+        private readonly Scene scene;
+        private readonly Pooler<Worm> wormPool;
+        private readonly Pooler<Tail> tailPool;
+        private readonly Pooler<Block> blockPool;
 
 
         public Manager(Scene scene, int bodyCount, int headCount, int blockCount, int size)
         {
             this.scene = scene;
-            bodyPool = new Pooler<Body>(scene, bodyCount, size);
-            headPool = new Pooler<Head>(scene, headCount, size);
+            tailPool = new Pooler<Tail>(scene, bodyCount, size);
+            wormPool = new Pooler<Worm>(scene, headCount, size);
             blockPool = new Pooler<Block>(scene, blockCount, size);
             collisionSize = (int)(0.9f * size);
         }
 
-
-        public Head SpawnWorm(int x, int y, int length, Color color)
+        public Worm SpawnWorm(int x, int y, int length, Color color)
         {
-            Head worm = headPool.Next().Spawn(this, x, y, length, Color.Red);
+            Worm worm = wormPool.Next().Spawn(this, x, y, length, Color.Red);
 
             int bodyCount = length - 1; // - 1 because head is already counts as 1
-            Body currentBody = worm;
+            Tail currentBody = worm;
             for (int i = 0; i < bodyCount; i++)
             {
-                Body tmpBody = bodyPool.Next();
+                Tail tmpBody = tailPool.Next();
                 tmpBody.Enable();
                 tmpBody.Position = new Vector2(x, y);
                 tmpBody.SetTarget(x, y);
-                tmpBody.SetColor(color);
+                tmpBody.Color = color;
                 currentBody.SetNextBody(tmpBody);
                 currentBody = tmpBody;
             }
@@ -43,17 +43,18 @@ namespace WBGame.Other
         }
 
 
-        public Player SpawnPlayer(Head worm)
+        public Player SpawnPlayer(Worm worm)
         {
-            Player tmpPlayer = new Player(this, worm);
+            Player tmpPlayer = new Player(this);
             scene.Add(tmpPlayer);
             return tmpPlayer;
         }
 
 
-        public void Blockify(Head worm)
+        public void Blockify(Worm worm)
         {
-            Color color = worm.GetColor();
+            if (worm == null) return;
+            Color color = worm.Color;
             Vector2[] blockPositions = worm.GetPositions(new Vector2[worm.GetLength()]);
             for (int i = 0; i < blockPositions.Length; i++)
             {
@@ -64,13 +65,30 @@ namespace WBGame.Other
         }
 
 
-        public bool CanMove(Head asker, Vector2 newPosition)
+        public Worm Posess(Worm posessed)
         {
-            foreach (Head head in headPool)
-                if (head.Enabled() && Math.RoughlyEquals(head.GetTarget(), newPosition, collisionSize) && head != asker)
+            foreach (Worm worm in wormPool)
+                if (worm.Enabled && worm != posessed)
+                    return worm;
+            return null;
+        }
+
+
+        public void Move()
+        {
+            foreach (Worm worm in wormPool)
+                if (worm.Enabled)
+                    worm.EatQueue();
+        }
+
+
+        public bool CanMove(Worm asker, Vector2 newPosition)
+        {
+            foreach (Worm worm in wormPool)
+                if (worm.Enabled && Math.RoughlyEquals(worm.GetTarget(), newPosition, collisionSize) && worm != asker)
                     return false;
-            foreach (Body body in bodyPool)
-                if (body.Enabled() && Math.RoughlyEquals(body.GetTarget(), newPosition, collisionSize))
+            foreach (Tail body in tailPool)
+                if (body.Enabled && Math.RoughlyEquals(body.GetTarget(), newPosition, collisionSize))
                     return false;
             return true;
         }
