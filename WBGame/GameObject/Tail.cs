@@ -1,29 +1,25 @@
 ﻿using Otter;
 using WBGame.Pooling;
 
-namespace WBGame.Worm
+namespace WBGame.GameObject
 {
     /// @author Antti Harju
-    /// @version 15.06.2020
+    /// @version 20.06.2020
     /// <summary>
-    /// Body class for the worm object. Head class ("the worm") also inherits this.
+    /// Body class for the worm object. Inherited by the Head class.
     /// </summary>
-    class Body : Poolable
+    class Tail : Poolable
     {
-        private Body nextBody;
+        private Tail nextBody;
         private Vector2 targetPosition;
-        private int speed = 3;
-        private int size;
-
 
         /// <summary>
         /// Constructor. Creates a circle graphic for the entity.
         /// </summary>
         /// <param name="size">Circle graphic diameter</param>
         /// <param name="speed">How fast the worm is</param>
-        public Body(int size) : base()
+        public Tail(int size) : base()
         {
-            this.size = size;
             Image image = Image.CreateCircle(size / 2);
             AddGraphic(image);
             image.CenterOrigin();
@@ -72,7 +68,8 @@ namespace WBGame.Worm
         public override void Update()
         {
             base.Update();
-            Position += (GetTarget() - Position) * 0.1f * GetSpeed();
+            if (Enabled)
+                Position += (GetTarget() - Position) * 0.1f * 3;
         }
 
 
@@ -100,39 +97,9 @@ namespace WBGame.Worm
         /// Sets the nextBody field. Required to make the tail follow with a recursive method.
         /// </summary>
         /// <param name="nextBody">The body that is after this one</param>
-        public void SetNextBody(Body nextBody)
+        public void SetNextBody(Tail nextBody)
         {
             this.nextBody = nextBody;
-        }
-
-
-        public void SetColor(Color color)
-        {
-            Graphic.Color = color;
-        }
-
-        public Color GetColor()
-        {
-            return Graphic.Color;
-        }
-
-        /// <summary>
-        /// Required to set new target positions and to calculate velocity for transitions between positions
-        /// </summary>
-        /// <returns>Size / thickness (diameter of the circle)</returns>
-        public int GetSize()
-        {
-            return size;
-        }
-
-
-        /// <summary>
-        /// Required to calculate velocity for transitions between positions
-        /// </summary>
-        /// <returns>Worms speed</returns>
-        public float GetSpeed()
-        {
-            return speed;
         }
 
 
@@ -150,7 +117,7 @@ namespace WBGame.Worm
         /// Required for the recursive method to make the tail follow
         /// </summary>
         /// <returns>Next body of the worm</returns>
-        public Body GetNextBody()
+        public Tail GetNextBody()
         {
             return nextBody;
         }

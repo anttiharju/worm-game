@@ -40,7 +40,7 @@ namespace WBGame.Pooling
         public T Next()
         {
             foreach (T entity in pool)
-                if (!entity.Enabled())
+                if (!entity.Enabled)
                     return (T)entity;
             return null;
         }

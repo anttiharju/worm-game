@@ -15,10 +15,8 @@ namespace WBGame
             Game game = new Game("Worm bricks", 1280, 720);
             game.FixedFramerate = false;
             game.AlwaysUpdate = true;
-            Scene scene = new Scene();
             game.MouseVisible = true;
-            WormGame worm = new WormGame();
-            game.Start(worm.Start(scene));
+            game.Start(new WormScene());
         }
     }
 }
