@@ -1,7 +1,7 @@
 ﻿using Otter;
 using WBGame.Pooling;
 using WBGame.Worm;
-using WBGame.Misc;
+using WBGame.Other;
 
 namespace WBGame
 {
@@ -16,16 +16,10 @@ namespace WBGame
     {
         public Scene Start(Scene scene)
         {
-            Pooler<Body> bodyPool = new Pooler<Body>(scene, 120, 32);
-            Pooler<Head> headPool = new Pooler<Head>(scene, 6, 32);
-            Pooler<Block> blockPool = new Pooler<Block>(scene, 1000, 32);
+            Manager manager = new Manager(scene, 120, 6, 1000, 32);
 
-            headPool.Next().Spawn(true, 256 + 64 * 0, 256, 4, bodyPool, headPool, blockPool, Color.Red);
-            headPool.Next().Spawn(true, 256 + 64 * 3, 256, 4, bodyPool, headPool, blockPool, Color.Green);
-            headPool.Next().Spawn(true, 256 + 64 * 6, 256, 4, bodyPool, headPool, blockPool, Color.Blue);
-            headPool.Next().Spawn(true, 256 + 64 * 9, 256, 4, bodyPool, headPool, blockPool, Color.Yellow);
-            headPool.Next().Spawn(true, 256 + 64 * 12, 256, 4, bodyPool, headPool, blockPool, Color.Cyan);
-            headPool.Next().Spawn(true, 256 + 64 * 15, 256, 4, bodyPool, headPool, blockPool, Color.Orange);
+            Head worm = manager.SpawnWorm(500, 500, 5, Color.Red);
+            manager.SpawnPlayer(worm);
             
             return scene;
         }

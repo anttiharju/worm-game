@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using WBGame.Pooling;
 
-namespace WBGame.Misc
+namespace WBGame.Other
 {
     class Bunch : Poolable
     {
