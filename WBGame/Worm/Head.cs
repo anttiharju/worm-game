@@ -1,6 +1,6 @@
 ﻿using Otter;
 using WBGame.Pooling;
-using WBGame.Misc;
+using WBGame.Other;
 
 namespace WBGame.Worm
 {
@@ -11,11 +11,8 @@ namespace WBGame.Worm
     /// </summary>
     class Head : Body
     {
-        private int currentLength;
-        private bool posessed = false;
-        private Pooler<Body> bodyPool;
-        private Pooler<Head> headPool;
-        private Pooler<Block> blockPool;
+        private Manager manager;
+        private int length;
 
         /// <summary>
         /// Head constructor. The x and y don't really matter because we have Spawn()
@@ -33,30 +30,15 @@ namespace WBGame.Worm
         /// <param name="bodyPool">Required for spawning the tail and collision</param>
         /// <param name="headPool">Required for collision</param>
         /// <param name="color">Worms color</param>
-        public void Spawn(bool posessed, float x, float y, int wantedLength, Pooler<Body> bodyPool, Pooler<Head> headPool, Pooler<Block> blockPool, Color color)
+        public Head Spawn(Manager manager, float x, float y, int length, Color color)
         {
+            this.manager = manager;
             Enable();
-            this.bodyPool = bodyPool;
-            this.headPool = headPool;
-            this.blockPool = blockPool;
-            this.posessed = posessed;
+            this.length = length;
             Position = new Vector2(x, y);
             SetTarget(x, y);
             SetColor(color);
-            currentLength = wantedLength;
-            wantedLength--;
-
-            Body currentBody = this;
-            for (int i = 0; i < wantedLength; i++)
-            {
-                Body tmpBody = bodyPool.Next();
-                tmpBody.Enable();
-                tmpBody.Position = new Vector2(x, y);
-                tmpBody.SetTarget(x, y);
-                tmpBody.SetColor(color);
-                currentBody.SetNextBody(tmpBody);
-                currentBody = tmpBody;
-            }
+            return this;
         }
 
         /// <summary>
@@ -64,27 +46,14 @@ namespace WBGame.Worm
         /// </summary>
         public override void Update()
         {
-            if (!Enabled() || !posessed) return;
+            if (!Enabled()) return;
             base.Update();
 
             Move(Key.W, 0, -GetSize());
             Move(Key.S, 0, GetSize());
             Move(Key.A, -GetSize(), 0);
             Move(Key.D, GetSize(), 0);
-
-            if (Input.KeyPressed(Key.R))
-            {
-                Color color = GetColor();
-                Vector2[] blockPositions = Blockify(new Vector2[currentLength]);
-                for (int i = 0; i < blockPositions.Length; i++)
-                {
-                    Block tmpBlock = blockPool.Next();
-                    if (tmpBlock == null) break;
-                    tmpBlock.Spawn(blockPositions[i], color);
-                }
-            }
         }
-
 
         /// <summary>
         /// Moves the worm when a key is pressed and changes color of the worms head
@@ -95,48 +64,14 @@ namespace WBGame.Worm
         /// <param name="color">color of the worms head when the key is pressed</param>
         private void Move(Key key, float x, float y)
         {
-            Vector2 newPosition = Position + new Vector2(x, y);
-            foreach (Body body in bodyPool)
-                if (RoughlyEquals(body.Position, newPosition, GetSize() * 0.9f))
-                    return;
-            foreach (Head head in headPool)
-                if (RoughlyEquals(head.Position, newPosition, GetSize() * 0.9f))
-                    return;
-
-            if (Input.KeyPressed(key))
-                MoveWorm(x, y);
+            if (manager.CanMove(this, Position + new Vector2(x, y)))
+                if (Input.KeyPressed(key))
+                    MoveWorm(x, y);
         }
 
-
-        /// <summary>
-        /// Area two Vector2s roughly equal (collision)
-        /// TODO: Move to a helper class
-        /// </summary>
-        /// <param name="a">First Vector2</param>
-        /// <param name="b">Second Vector2</param>
-        /// <param name="errorMargin">Accuracy</param>
-        /// <returns></returns>
-        private bool RoughlyEquals(Vector2 a, Vector2 b, float errorMargin)
+        public int GetLength()
         {
-            if (RoughlyEquals(a.X, b.X, errorMargin))
-                if (RoughlyEquals(a.Y, b.Y, errorMargin))
-                    return true;
-            return false;
-        }
-
-
-        /// <summary>
-        /// Are two floats roughly equal
-        /// </summary>
-        /// <param name="a">First float</param>
-        /// <param name="b">Second float</param>
-        /// <param name="errorMargin">Accuracy</param>
-        /// <returns></returns>
-        private bool RoughlyEquals(float a, float b, float errorMargin)
-        {
-            if (b - errorMargin < a && b + errorMargin > a)
-                return true;
-            return false;
+            return length;
         }
     }
 }

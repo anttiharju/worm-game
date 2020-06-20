@@ -56,10 +56,10 @@ namespace WBGame.Worm
         /// <summary>
         /// Recursive method to disable to worm
         /// </summary>
-        public Vector2[] Blockify(Vector2[] blockPositions, int i = 0)
+        public Vector2[] GetPositions(Vector2[] blockPositions, int i = 0)
         {
             if (nextBody != null)
-                nextBody.Blockify(blockPositions, i + 1);
+                nextBody.GetPositions(blockPositions, i + 1);
             Disable();
             blockPositions[i] = GetTarget();
             return blockPositions;
