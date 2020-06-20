@@ -4,7 +4,7 @@ using System.Text;
 using WBGame.Pooling;
 using Otter;
 
-namespace WBGame.Misc
+namespace WBGame.Other
 {
     class Block : Poolable
     {
