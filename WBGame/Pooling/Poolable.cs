@@ -3,7 +3,7 @@
 namespace WBGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 15.6.2020
+    /// @version 20.06.2020
     /// <summary>
     /// Base class for all poolable entities
     /// </summary>
@@ -11,20 +11,7 @@ namespace WBGame.Pooling
     {
         private bool enabled;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public Poolable() { }
-
-
-        /// <summary>
-        /// So we don't pick entities already in use
-        /// </summary>
-        /// <returns>Wheter or not the entity is enabled</returns>
-        public bool Enabled()
-        {
-            return enabled;
-        }
+        public bool Enabled { get { return enabled; } }
 
 
         /// <summary>
@@ -45,6 +32,22 @@ namespace WBGame.Pooling
         {
             Graphic.Visible = false;
             enabled = false;
+        }
+
+
+        /// <summary>
+        /// Doesn't really have anything to do with pooling, but since I pool everything it's okay to have this here
+        /// </summary>
+        public Color Color
+        {
+            get
+            {
+                return Graphic.Color ?? null;
+            }
+            set
+            {
+                Graphic.Color = value;
+            }
         }
     }
 }
