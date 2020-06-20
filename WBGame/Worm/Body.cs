@@ -53,10 +53,21 @@ namespace WBGame.Worm
             targetPosition = newPosition;
         }
 
+        /// <summary>
+        /// Recursive method to disable to worm
+        /// </summary>
+        public Vector2[] Blockify(Vector2[] blockPositions, int i = 0)
+        {
+            if (nextBody != null)
+                nextBody.Blockify(blockPositions, i + 1);
+            Disable();
+            blockPositions[i] = GetTarget();
+            return blockPositions;
+        }
 
         /// <summary>
         /// Makes sure the entity is where it's supposed to be.
-        /// TODO: This is expensive? Not necessary to always calculate?
+        /// TODO: Moving fast can cause the bodyparts to move diagonally, kind of requires some sort of custom update thingy or game speed to fix
         /// </summary>
         public override void Update()
         {
@@ -100,6 +111,10 @@ namespace WBGame.Worm
             Graphic.Color = color;
         }
 
+        public Color GetColor()
+        {
+            return Graphic.Color;
+        }
 
         /// <summary>
         /// Required to set new target positions and to calculate velocity for transitions between positions

@@ -41,7 +41,7 @@ namespace WBGame.Pooling
         {
             foreach (T entity in pool)
                 if (!entity.Enabled())
-                    return (T)entity.Enable();
+                    return (T)entity;
             return null;
         }
 

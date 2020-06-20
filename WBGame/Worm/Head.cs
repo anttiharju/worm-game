@@ -1,5 +1,6 @@
 ﻿using Otter;
 using WBGame.Pooling;
+using WBGame.Misc;
 
 namespace WBGame.Worm
 {
@@ -14,6 +15,7 @@ namespace WBGame.Worm
         private bool posessed = false;
         private Pooler<Body> bodyPool;
         private Pooler<Head> headPool;
+        private Pooler<Block> blockPool;
 
         /// <summary>
         /// Head constructor. The x and y don't really matter because we have Spawn()
@@ -31,20 +33,24 @@ namespace WBGame.Worm
         /// <param name="bodyPool">Required for spawning the tail and collision</param>
         /// <param name="headPool">Required for collision</param>
         /// <param name="color">Worms color</param>
-        public void Spawn(bool posessed, float x, float y, int wantedLength, Pooler<Body> bodyPool, Pooler<Head> headPool, Color color)
+        public void Spawn(bool posessed, float x, float y, int wantedLength, Pooler<Body> bodyPool, Pooler<Head> headPool, Pooler<Block> blockPool, Color color)
         {
+            Enable();
             this.bodyPool = bodyPool;
             this.headPool = headPool;
+            this.blockPool = blockPool;
             this.posessed = posessed;
             Position = new Vector2(x, y);
             SetTarget(x, y);
             SetColor(color);
-            currentLength = --wantedLength; // minus because head is already 1
+            currentLength = wantedLength;
+            wantedLength--;
 
             Body currentBody = this;
-            for (int i = 0; i < currentLength; i++)
+            for (int i = 0; i < wantedLength; i++)
             {
                 Body tmpBody = bodyPool.Next();
+                tmpBody.Enable();
                 tmpBody.Position = new Vector2(x, y);
                 tmpBody.SetTarget(x, y);
                 tmpBody.SetColor(color);
@@ -65,6 +71,18 @@ namespace WBGame.Worm
             Move(Key.S, 0, GetSize());
             Move(Key.A, -GetSize(), 0);
             Move(Key.D, GetSize(), 0);
+
+            if (Input.KeyPressed(Key.R))
+            {
+                Color color = GetColor();
+                Vector2[] blockPositions = Blockify(new Vector2[currentLength]);
+                for (int i = 0; i < blockPositions.Length; i++)
+                {
+                    Block tmpBlock = blockPool.Next();
+                    if (tmpBlock == null) break;
+                    tmpBlock.Spawn(blockPositions[i], color);
+                }
+            }
         }
 
 
