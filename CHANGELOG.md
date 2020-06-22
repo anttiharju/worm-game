@@ -1,7 +1,38 @@
 # TODO
 - Fix GPU usage issue properly and not with RTSS
 
-# 20.05.2020
+# 21.06.2020
+- What got done from yesterdays notes:
+    - Head.cs renamed to Worm.cs and it's no longer bloated.
+    - Still no grid system but I really like the idea of infinite playspace although it seems to require smart design I'm not sure I'm capable of
+    - We have a manager now! It's kind of bloated, but currently don't know how to divide it into nicer bits
+        - Look into: does player, worm and manager handle stuff that only belongs to them?
+    - Still using the same tweening, I don't want to mess with framerate stuff
+        - Although body parts can no longer move diagonally (as much) thanks to Manager.WormUpdate()
+    - We have a queuing system for controls! I tried to optimize it but also made it easier to debug by using chars instead of ints and it's probably not as lightweight as I would like it to be.
+        - I know "premature optimization is root of all evil" but I was already having performance problems, although in hindsight were caused by the collision system
+    - Haven't touched ghosts. They might turn out to be a can of worms performance-wise :s
+
+- Notes for the future:
+    - Current collision system is computationally too heavy. Sometimes worms don't execute all moves from their movement queue (controls).
+    - The problem is that it's going through so many invidual objects, a few ideas to improve:
+        - Divide the game area to some sort of chunks because an individual worm only really needs to be concerned about the worms nearby
+            - I don't know how to do this efficiently (should research)
+        - Use the collision system provided by Otter? Don't know if it really fits here
+        - Make poolers so that we don't go through all pooled objects with foreach, but rather the ones that are enabled
+            - this would involve using lists and don't know if that actually even improves things that much. It would be messier inside but probably nicer on the outside
+        - Pooler for non-entity objects. Right now I'd need it for blocks.
+- Not too happy with the way I have named the new things I've added, I'll think about them later on
+- Now I'm going to clean up, document and add tests where it makes sense.
+- Did some design work (in my head :s) on the blocks (see block.cs and leader.cs)
+    - Idea was to use the same data structure as worms but I can use a better one if I can initialize the manager with a max worm length
+    - Group of blocks would be called Bunch. Bunch can tell if the blocks can fall by one and just moves the blocks where they're needed.
+    - Once the bunch has hit the bottom, it's no longer needed, BUT the blocks would stay on the game area
+        - Putting a pin on this I need to figure out other stuff first
+- Extreme Programming all the way lol (not sure if it makes sense here because I am the customer and the developer)
+- My comments probably have a lot of spelling errors
+
+# 20.06.2020
 - Been doing miscallennous work, time for a more major rework
     - Head.cs has gotten bloated and takes care of a lot of stuff that really should be handled by some sort of a manager
     - Currently no grid system exists and the play area is basically infinite

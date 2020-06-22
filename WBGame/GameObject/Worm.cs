@@ -1,20 +1,20 @@
 ﻿using Otter;
-using System;
 using WBGame.Other;
 
 namespace WBGame.GameObject
 {
     /// @author Antti Harju
-    /// @version 20.06.2020
+    /// @version 21.06.2020
     /// <summary>
-    /// The worm class
+    /// The worm class. Technically it's just the head entity but it does manage the entire worm.
     /// </summary>
     class Worm : Tail
     {
         private Manager manager;
         private int wormLength;
         private readonly int size;
-        private readonly Queue queue;
+        private readonly Controls controls;
+
 
         /// <summary>
         /// Head constructor. Calls Body constructor.
@@ -23,20 +23,21 @@ namespace WBGame.GameObject
         public Worm(int size) : base(size)
         {
             this.size = size;
-            queue = new Queue();
+            controls = new Controls();
         }
 
 
         /// <summary>
-        /// Spawns the head
+        /// Spawns the worm
         /// </summary>
         /// <param name="manager">Manager</param>
         /// <param name="x">Horizontal position</param>
         /// <param name="y">Vertical position</param>
         /// <param name="length">Worms length</param>
         /// <param name="color">Worms color</param>
-        /// <returns></returns>
-        public Worm Spawn(Manager manager, float x, float y, int length, Color color)
+        /// <param name="directions">Movement instructions for the worm</param>
+        /// <returns>The spawned worm</returns>
+        public Worm Spawn(Manager manager, float x, float y, int length, Color color, char[] directions = null)
         {
             this.manager = manager;
             Enable();
@@ -44,37 +45,48 @@ namespace WBGame.GameObject
             Position = new Vector2(x, y);
             SetTarget(x, y);
             Color = color;
+            if (directions != null)
+                controls.AddMultiple(directions);
             return this;
         }
 
-        public Queue GetQueue()
+
+        /// <summary>
+        /// Returns the movement queue of the worm so player can posess the worm
+        /// </summary>
+        /// <returns>Movement queue of the worm</returns>
+        public Controls GrabControls()
         {
-            return queue;
+            return controls;
         }
 
-        internal void EatQueue()
+
+        /// <summary>
+        /// Interprets the movement queue
+        /// </summary>
+        public void Move()
         {
-            switch (queue.Get())
+            switch (controls.Get())
             {
-                case 1:
+                case 'W': // up
                     Move(0, -size);
                     break;
-                case 2:
+                case 'A': // left
                     Move(-size, 0);
                     break;
-                case 3:
+                case 'S': // down
                     Move(0, size);
                     break;
-                case 4:
+                case 'D': // right
                     Move(size, 0);
                     break;
             }
         }
 
+
         /// <summary>
-        /// Moves the worm when a key is pressed and changes color of the worms head
+        /// Moves the worm the desired amount
         /// </summary>
-        /// <param name="key">Key</param>
         /// <param name="x">Horizontal movement</param>
         /// <param name="y">Vertical movement</param>
         private void Move(float x, float y)
@@ -88,9 +100,20 @@ namespace WBGame.GameObject
         /// Required for Manager.Blockify()
         /// </summary>
         /// <returns>Worms length</returns>
+        /// TODO: Impelent as a field?
         public int GetLength()
         {
             return wormLength;
+        }
+
+
+        /// <summary>
+        /// Sets the entire worms color (if you use the attribute worm.color you only set the heads color)
+        /// </summary>
+        /// <param name="color">Desired color</param>
+        public void SetColor(Color color)
+        {
+            RecursiveColor(color);
         }
     }
 }

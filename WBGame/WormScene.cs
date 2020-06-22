@@ -1,32 +1,41 @@
 ﻿using Otter;
 using System.Collections;
-using WBGame.GameObject;
 using WBGame.Other;
 
 namespace WBGame
 {
+    /// @author Antti Harju
+    /// @version 21.6.2020
+    /// <summary>
+    /// Scene for the worm game.
+    /// </summary>
     class WormScene : Scene
     {
         private Manager manager;
+        private readonly int groundTruth = 30;
+        private int round = 0;
 
         public override void Begin()
         {
             base.Begin();
-
-            manager = new Manager(this, 120, 6, 1000, 32);
-
-            Worm worm = manager.SpawnWorm(500, 500, 3, Color.Red);
-            manager.SpawnPlayer(worm);
-            Game.Coroutine.Start(MainRoutine());
+            manager = new Manager(this, 10000, 200, 200, 16);
+            manager.SpawnPlayer(Color.Red);
+            Game.Coroutine.Start(WormRoutine());
         }
 
-        IEnumerator MainRoutine()
+        IEnumerator WormRoutine()
         {
             float second = Game.Framerate;
-            int frequency = (int)(second / 30);
+            int frequency = (int)(second / groundTruth);
             yield return Coroutine.Instance.WaitForFrames(frequency);
-            manager.Move();
-            Game.Coroutine.Start(MainRoutine());
+            manager.WormUpdate();
+            round++;
+            if (round == groundTruth)
+            {
+                round = 0;
+                manager.BlockUpdate();
+            }
+            Game.Coroutine.Start(WormRoutine());
         }
     }
 }

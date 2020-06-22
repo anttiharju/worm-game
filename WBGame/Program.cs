@@ -3,9 +3,9 @@
 namespace WBGame
 {
     /// @author Antti Harju
-    /// @version 14.06.2020
+    /// @version 21.06.2020
     /// <summary>
-    /// Entry point to the program, scenes are set up here and game-specific things elsewhere
+    /// Entry point to the program, scenes and technical things are done / set up here
     /// </summary>
     /// <param name="args"></param>
     class Program

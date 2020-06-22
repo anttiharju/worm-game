@@ -1,51 +1,79 @@
 ﻿using Otter;
-using System;
 using WBGame.Other;
 
 namespace WBGame.GameObject
 {
+    /// <summary>
+    /// Player class. Input is handled here and activates things based on it elsewhere.
+    /// </summary>
     class Player : Entity
     {
         private readonly Manager manager;
-        private Queue queue;
-        private Worm worm;
+        private readonly Color playerColor;
 
-        public Player(Manager manager)
+        private Color oldColor;
+        private Controls queue;
+        private Worm worm;
+        private Worm oldWorm;
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="manager">Manager</param>
+        /// <param name="color">Players color</param>
+        public Player(Manager manager, Color color)
         {
             this.manager = manager;
+            playerColor = color;
         }
 
 
+        /// <summary>
+        /// Posesses next worm
+        /// </summary>
         private void Posess()
         {
+            oldWorm = worm;
             worm = manager.Posess(worm);
-            if (worm != null) queue = worm.GetQueue();
+            if (worm == null) return;
+            if (oldWorm != null)
+                oldWorm.SetColor(oldColor);
+            oldColor = worm.Color;
+            worm.SetColor(playerColor);
+            queue = worm.GrabControls();
         }
 
 
+        /// <summary>
+        /// KeyPresses are handled here
+        /// </summary>
         public override void Update()
         {
             base.Update();
             if (queue != null)
             {
                 if (Input.KeyPressed(Key.W))
-                    queue.Add(1);
+                    queue.Add('W');
                 if (Input.KeyPressed(Key.A))
-                    queue.Add(2);
+                    queue.Add('A');
                 if (Input.KeyPressed(Key.S))
-                    queue.Add(3);
+                    queue.Add('S');
                 if (Input.KeyPressed(Key.D))
-                    queue.Add(4);
+                    queue.Add('D');
             }
 
             if (Input.KeyPressed(Key.Tab))
                 Posess();
 
-            if (Input.KeyPressed(Key.Q))
-                manager.SpawnWorm(500, 500, 5, Color.Red);
-
             if (Input.KeyPressed(Key.R))
+            {
                 manager.Blockify(worm);
+                queue = null;
+                Posess();
+            }
+
+            if (Input.KeyPressed(Key.Q))
+                manager.SpawnWorm(500, 500, 5, Helper.RandomColor(), Helper.GenerateDirections(50));
         }
     }
 }
