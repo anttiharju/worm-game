@@ -4,20 +4,20 @@ using WBGame.Pooling;
 namespace WBGame.GameObject
 {
     /// @author Antti Harju
-    /// @version 20.06.2020
+    /// @version 21.06.2020
     /// <summary>
-    /// Body class for the worm object. Inherited by the Head class.
+    /// The base worm class that by itself acts as the tail entity.
     /// </summary>
     class Tail : Poolable
     {
         private Tail nextBody;
         private Vector2 targetPosition;
 
+
         /// <summary>
         /// Constructor. Creates a circle graphic for the entity.
         /// </summary>
         /// <param name="size">Circle graphic diameter</param>
-        /// <param name="speed">How fast the worm is</param>
         public Tail(int size) : base()
         {
             Image image = Image.CreateCircle(size / 2);
@@ -31,6 +31,7 @@ namespace WBGame.GameObject
         /// </summary>
         /// <param name="xDelta">horizontal movement</param>
         /// <param name="yDelta">vertical movement</param>
+        /// TODO: This should be in Worm.cs?
         public void MoveWorm(float xDelta, float yDelta)
         {
             nextBody.TailFollow(GetTarget());
@@ -39,15 +40,28 @@ namespace WBGame.GameObject
 
 
         /// <summary>
+        /// Required by the SetColor() of Worm.cs
+        /// </summary>
+        /// <param name="color">Worms new color</param>
+        public void RecursiveColor(Color color)
+        {
+            if (nextBody != null)
+                nextBody.RecursiveColor(color);
+            Color = color;
+        }
+
+
+        /// <summary>
         /// Recursive method that makes every part of the tail follow the head
         /// </summary>
-        /// <param name="newPosition">position to move to</param>
+        /// <param name="newPosition">Position to move to</param>
         public void TailFollow(Vector2 newPosition)
         {
             if (nextBody != null)
                 nextBody.TailFollow(GetTarget());
             targetPosition = newPosition;
         }
+
 
         /// <summary>
         /// Recursive method to disable to worm
@@ -61,9 +75,9 @@ namespace WBGame.GameObject
             return blockPositions;
         }
 
+
         /// <summary>
         /// Makes sure the entity is where it's supposed to be.
-        /// TODO: Moving fast can cause the bodyparts to move diagonally, kind of requires some sort of custom update thingy or game speed to fix
         /// </summary>
         public override void Update()
         {
@@ -86,7 +100,8 @@ namespace WBGame.GameObject
         /// <summary>
         /// Sets a new target position
         /// </summary>
-        /// <param name="newPosition">New target position</param>
+        /// <param name="x">Horizontal target position</param>
+        /// <param name="y">Vertical target position</param>
         public void SetTarget(float x, float y)
         {
             SetTarget(new Vector2(x, y));
