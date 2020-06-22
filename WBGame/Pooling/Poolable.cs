@@ -3,7 +3,7 @@
 namespace WBGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 20.06.2020
+    /// @version 21.06.2020
     /// <summary>
     /// Base class for all poolable entities
     /// </summary>
