@@ -1,20 +1,20 @@
 ﻿namespace WBGame.Other
 {
     /// @author Antti Harju
-    /// @version 21.06.2020
+    /// @version 22.06.2020
     /// <summary>
     /// Abstraction layer that allows the same player to control many different worms one at a time.
     /// </summary>
     class Controls
     {
-        private char[] queue;
+        private readonly char[] queue;
         private readonly char empty = '-';
 
         /// <summary>
-        /// Constructor. Queue length of 100 is quite absurd but cool for now.
+        /// Constructor.
         /// </summary>
-        /// <param name="length">how many directions can the queue hold simultaneously</param>
-        public Controls(int length = 100)
+        /// <param name="length">How many directions can the queue hold simultaneously</param>
+        public Controls(int length = 10)
         {
             queue = new char[length];
             for (int i = 0; i < queue.Length; i++)
@@ -55,6 +55,7 @@
         /// Adds multiple directions to the movement queue. Also sorts it just like Add()
         /// </summary>
         /// <param name="directions">Directions to add to the movement queue</param>
+        /// TODO: TrimQueue should take into account directions.Length but is fine for now because this is only called when the queue is empty
         public void AddMultiple(char[] directions)
         {
             TrimQueue();
