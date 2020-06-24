@@ -18,9 +18,15 @@ namespace WBGame
         public override void Begin()
         {
             base.Begin();
-            manager = new Manager(this, 10000, 200, 200, 16);
+            manager = new Manager(this, 100, 10, 800, 16);
             manager.SpawnPlayer(Color.Red);
             Game.Coroutine.Start(WormRoutine());
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            manager.Update();
         }
 
         IEnumerator WormRoutine()

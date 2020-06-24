@@ -1,6 +1,9 @@
 # TODO
 - Fix GPU usage issue properly and not with RTSS
 
+# 22.06.2020
+- Solved the movement queue problem, I was using current position instead of target position when calculating the next target position for the worm
+
 # 21.06.2020
 - What got done from yesterdays notes:
     - Head.cs renamed to Worm.cs and it's no longer bloated.

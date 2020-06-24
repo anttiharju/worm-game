@@ -1,6 +1,5 @@
 ﻿using Otter;
 using WBGame.GameObject;
-using WBGame.Pooling;
 
 namespace WBGame.Other
 {
@@ -11,9 +10,9 @@ namespace WBGame.Other
     {
         private readonly int collisionSize;
         private readonly Scene scene;
-        private readonly Pooler<Worm> wormPool;
-        private readonly Pooler<Tail> tailPool;
-        private readonly Pooler<Block> blockPool;
+        private readonly Pooler<Worm> worms;
+        private readonly Pooler<Tail> tails;
+        private readonly Pooler<Block> blocks;
         private int lastPosessed = 0;
 
 
@@ -21,16 +20,16 @@ namespace WBGame.Other
         /// Constructor
         /// </summary>
         /// <param name="scene">Scene to manage</param>
-        /// <param name="bodyCount">How many bodies to pool</param>
-        /// <param name="headCount">How many heads to pool</param>
+        /// <param name="tailCount">How many bodies to pool</param>
+        /// <param name="wormCount">How many heads to pool</param>
         /// <param name="blockCount">How many blocks to pool</param>
         /// <param name="size">How big should the pooled things be</param>
-        public Manager(Scene scene, int bodyCount, int headCount, int blockCount, int size)
+        public Manager(Scene scene, int wormCount, int maxWormLength, int blockCount, int size)
         {
             this.scene = scene;
-            tailPool = new Pooler<Tail>(scene, bodyCount, size);
-            wormPool = new Pooler<Worm>(scene, headCount, size);
-            blockPool = new Pooler<Block>(scene, blockCount, size);
+            worms = new Pooler<Worm>(scene, wormCount, size);
+            tails = new Pooler<Tail>(scene, wormCount * maxWormLength, size);
+            blocks = new Pooler<Block>(scene, blockCount, size);
             collisionSize = (int)(0.9f * size);
         }
 
@@ -46,7 +45,7 @@ namespace WBGame.Other
         /// <returns>The spawned worm</returns>
         public Worm SpawnWorm(int x, int y, int length, Color color, char[] directions = null)
         {
-            Worm worm = wormPool.Next();
+            Worm worm = worms.Enable();
             if (worm == null) return null;
             worm.Spawn(this, x, y, length, color, directions);
 
@@ -54,12 +53,11 @@ namespace WBGame.Other
             Tail currentBody = worm;
             for (int i = 0; i < bodyCount; i++)
             {
-                Tail tmpBody = tailPool.Next();
+                Tail tmpBody = tails.Enable();
                 if (tmpBody == null) return null;
-                tmpBody.Enable();
                 tmpBody.Position = new Vector2(x, y);
                 tmpBody.SetTarget(x, y);
-                tmpBody.Color = color;
+                tmpBody.Graphic.Color = color;
                 currentBody.SetNextBody(tmpBody);
                 currentBody = tmpBody;
             }
@@ -87,11 +85,11 @@ namespace WBGame.Other
         public void Blockify(Worm worm)
         {
             if (worm == null) return;
-            Vector2[] blockPositions = worm.GetPositions(new Vector2[worm.GetLength()]);
+            Vector2[] blockPositions = worm.GetPositions(new Vector2[worm.Length]);
             Block previousBlock = null;
             for (int i = 0; i < blockPositions.Length; i++)
             {
-                Block tmpBlock = blockPool.Next();
+                Block tmpBlock = blocks.Enable();
                 if (tmpBlock == null) break;
                 if (previousBlock != null)
                     previousBlock.NextBlock = tmpBlock;
@@ -104,28 +102,15 @@ namespace WBGame.Other
         /// <summary>
         /// Returns next unposessed worm. Also keeps track of what worm was last posessed so we cycle through them all.
         /// </summary>
-        /// <param name="posessed">Currently posessed worm.</param>
         /// <returns>Next unposessed worm, null if no unposessed worm was found</returns>
-        /// TODO: Posessed not needed?
-        public Worm Posess(Worm posessed)
+        public Worm Posess()
         {
-            bool firstRound = true;
-            for (int i = lastPosessed; i < wormPool.Length; i++)
-            {
-                Worm worm = wormPool[i];
-                if (worm.Enabled && worm != posessed)
-                {
-                    lastPosessed = i;
-                    return worm;
-                }
-                if (i == wormPool.Length - 1 && firstRound)
-                {
-                    firstRound = false;
-                    i = -1; // -1 because i++ makes it 0
-                }
-            }
-            return null;
+            lastPosessed++;
+            if (lastPosessed == worms.Count) lastPosessed = 0;
+            if (worms.Count < 1) return null;
+            return worms[lastPosessed];
         }
+
 
         /// <summary>
         /// W.I.P. Separate from WormUpdate because we want worms to move faster than bricks fall
@@ -136,36 +121,44 @@ namespace WBGame.Other
 
 
         /// <summary>
-        /// Worm movement is updated here
+        /// Could be done in tail update override but we hate if's right?
+        /// Premature optimization is the root of all evil?
         /// </summary>
-        public void WormUpdate()
+        public void Update()
         {
-            SpawnWorm(640, 360, 5, Helper.RandomColor(), Helper.GenerateDirections(100));
-            foreach (Worm worm in wormPool)
-                if (worm.Enabled)
-                    worm.Move();
+            foreach (Worm worm in worms)
+                worm.Tween();
+            foreach (Tail tail in tails)
+                tail.Tween();
         }
 
 
         /// <summary>
-        /// Collision. Currently commented out because movement queuing (controls.cs) doesn't work properly with this enabled.
+        /// Worm movement is updated here
         /// </summary>
-        /// <param name="asker">Worm that wants to move</param>
+        public void WormUpdate()
+        {
+            foreach (Worm worm in worms)
+                worm.Move();
+        }
+
+
+        /// <summary>
+        /// Collision.
+        /// </summary>
         /// <param name="newPosition">Where the worm wants to move</param>
         /// <returns>If it can or not move to the new position</returns>
-        public bool CanMove(Worm asker, Vector2 newPosition)
-        {   
-            /** /
-            foreach (Worm worm in wormPool)
-                if (worm.Enabled && Helper.RoughlyEquals(worm.GetTarget(), newPosition, collisionSize) && worm != asker)
+        public bool CanMove(Vector2 newPosition)
+        {
+            foreach (Worm worm in worms)
+                if (Helper.RoughlyEquals(worm.GetTarget(), newPosition, collisionSize))
                     return false;
-            foreach (Tail tail in tailPool)
-                if (tail.Enabled && Helper.RoughlyEquals(tail.GetTarget(), newPosition, collisionSize))
+            foreach (Tail tail in tails)
+                if (Helper.RoughlyEquals(tail.GetTarget(), newPosition, collisionSize))
                     return false;
-            foreach (Block block in blockPool)
-                if (block.Enabled && Helper.RoughlyEquals(block.Position, newPosition, collisionSize))
+            foreach (Block block in blocks)
+                if (Helper.RoughlyEquals(block.Position, newPosition, collisionSize))
                     return false;
-            /**/
             return true;
         }
     }

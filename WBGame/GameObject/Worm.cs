@@ -4,7 +4,7 @@ using WBGame.Other;
 namespace WBGame.GameObject
 {
     /// @author Antti Harju
-    /// @version 21.06.2020
+    /// @version 22.06.2020
     /// <summary>
     /// The worm class. Technically it's just the head entity but it does manage the entire worm.
     /// </summary>
@@ -15,6 +15,7 @@ namespace WBGame.GameObject
         private readonly int size;
         private readonly Controls controls;
 
+        public int Length { get { return wormLength; } }
 
         /// <summary>
         /// Head constructor. Calls Body constructor.
@@ -40,11 +41,10 @@ namespace WBGame.GameObject
         public Worm Spawn(Manager manager, float x, float y, int length, Color color, char[] directions = null)
         {
             this.manager = manager;
-            Enable();
             wormLength = length;
             Position = new Vector2(x, y);
             SetTarget(x, y);
-            Color = color;
+            Graphic.Color = color;
             if (directions != null)
                 controls.AddMultiple(directions);
             return this;
@@ -91,24 +91,12 @@ namespace WBGame.GameObject
         /// <param name="y">Vertical movement</param>
         private void Move(float x, float y)
         {
-            if (manager.CanMove(this, Position + new Vector2(x, y)))
+            if (manager.CanMove(GetTarget() + new Vector2(x, y)))
                 MoveWorm(x, y);
         }
 
-
         /// <summary>
-        /// Required for Manager.Blockify()
-        /// </summary>
-        /// <returns>Worms length</returns>
-        /// TODO: Impelent as a field?
-        public int GetLength()
-        {
-            return wormLength;
-        }
-
-
-        /// <summary>
-        /// Sets the entire worms color (if you use the attribute worm.color you only set the heads color)
+        /// Sets the entire worms color (if you use the attribute worm.Color you only set the heads color)
         /// </summary>
         /// <param name="color">Desired color</param>
         public void SetColor(Color color)
