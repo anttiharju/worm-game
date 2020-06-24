@@ -34,11 +34,11 @@ namespace WBGame.GameObject
         private void Posess()
         {
             oldWorm = worm;
-            worm = manager.Posess(worm);
+            worm = manager.Posess();
             if (worm == null) return;
             if (oldWorm != null)
                 oldWorm.SetColor(oldColor);
-            oldColor = worm.Color;
+            oldColor = worm.Graphic.Color;
             worm.SetColor(playerColor);
             queue = worm.GrabControls();
         }
@@ -73,7 +73,7 @@ namespace WBGame.GameObject
             }
 
             if (Input.KeyPressed(Key.Q))
-                manager.SpawnWorm(500, 500, 5, Helper.RandomColor(), Helper.GenerateDirections(50));
+                manager.SpawnWorm(640, 360, 5, Helper.RandomColor());
         }
     }
 }

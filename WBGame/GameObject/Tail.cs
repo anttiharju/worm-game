@@ -1,5 +1,4 @@
 ﻿using Otter;
-using WBGame.Pooling;
 
 namespace WBGame.GameObject
 {
@@ -8,7 +7,7 @@ namespace WBGame.GameObject
     /// <summary>
     /// The base worm class that by itself acts as the tail entity.
     /// </summary>
-    class Tail : Poolable
+    class Tail : Entity
     {
         private Tail nextBody;
         private Vector2 targetPosition;
@@ -47,7 +46,7 @@ namespace WBGame.GameObject
         {
             if (nextBody != null)
                 nextBody.RecursiveColor(color);
-            Color = color;
+            Graphic.Color = color;
         }
 
 
@@ -70,7 +69,7 @@ namespace WBGame.GameObject
         {
             if (nextBody != null)
                 nextBody.GetPositions(blockPositions, i + 1);
-            Disable();
+            Graphic.Visible = false;
             blockPositions[i] = GetTarget();
             return blockPositions;
         }
@@ -79,11 +78,9 @@ namespace WBGame.GameObject
         /// <summary>
         /// Makes sure the entity is where it's supposed to be.
         /// </summary>
-        public override void Update()
+        public void Tween()
         {
-            base.Update();
-            if (Enabled)
-                Position += (GetTarget() - Position) * 0.1f * 3;
+            Position += (GetTarget() - Position) * 0.1f * 3;
         }
 
 

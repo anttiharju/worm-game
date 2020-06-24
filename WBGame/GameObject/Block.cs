@@ -1,12 +1,11 @@
-﻿using WBGame.Pooling;
-using Otter;
+﻿using Otter;
 
 namespace WBGame.GameObject
 {
     /// <summary>
     /// Block class. Very much work in progress.
     /// </summary>
-    class Block : Poolable
+    class Block : Entity
     {
         public Block NextBlock { get; set; }
 
@@ -19,9 +18,8 @@ namespace WBGame.GameObject
 
         public void Spawn(Vector2 position, Color color)
         {
-            Enable();
             Position = position;
-            Color = color;
+            Graphic.Color = color;
         }
     }
 }
