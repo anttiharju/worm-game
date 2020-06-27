@@ -12,12 +12,11 @@ namespace WBGame.GameObject
     {
         private Manager manager;
         private readonly int size;
-        private readonly Controls controls = new Controls();
-
-        public override Color Color { get { return Graphic.Color ?? null; } set { Graphic.Color = value; SetColor(value); } }
 
         public int Length { get; private set; }
-
+        public string Direction { private get; set; }
+        public override Color Color { get { return Graphic.Color ?? null; } set { SetColor(value); } }
+        
         /// <summary>
         /// Head constructor. Calls Body constructor.
         /// </summary>
@@ -25,6 +24,7 @@ namespace WBGame.GameObject
         public Worm(int size) : base(size)
         {
             this.size = size;
+            Direction = "UP";
         }
 
 
@@ -38,46 +38,34 @@ namespace WBGame.GameObject
         /// <param name="color">Worms color</param>
         /// <param name="directions">Movement instructions for the worm</param>
         /// <returns>The spawned worm</returns>
-        public Worm Spawn(Manager manager, float x, float y, int length, Color color, char[] directions = null)
+        public Worm Spawn(Manager manager, float x, float y, int length, Color color)
         {
             this.manager = manager;
             Length = length;
             Position = new Vector2(x, y);
-            SetTarget(x, y);
+            Target = Position;
             Graphic.Color = color;
-            if (directions != null)
-                controls.AddMultiple(directions);
             return this;
         }
 
 
         /// <summary>
-        /// Returns the movement queue of the worm so player can posess the worm
-        /// </summary>
-        /// <returns>Movement queue of the worm</returns>
-        public Controls GrabControls()
-        {
-            return controls;
-        }
-
-
-        /// <summary>
-        /// Interprets the movement queue
+        /// Moves the worm
         /// </summary>
         public void Move()
         {
-            switch (controls.Next())
+            switch (Direction)
             {
-                case 'W': // up
+                case "UP":
                     Move(0, -size);
                     break;
-                case 'A': // left
+                case "LEFT":
                     Move(-size, 0);
                     break;
-                case 'S': // down
+                case "DOWN":
                     Move(0, size);
                     break;
-                case 'D': // right
+                case "RIGHT":
                     Move(size, 0);
                     break;
             }
@@ -91,7 +79,7 @@ namespace WBGame.GameObject
         /// <param name="y">Vertical movement</param>
         private void Move(float x, float y)
         {
-            if (manager.WormCollision(GetTarget() + new Vector2(x, y)))
+            if (manager.WormCollision(Target + new Vector2(x, y)))
                 MoveWorm(x, y);
         }
     }

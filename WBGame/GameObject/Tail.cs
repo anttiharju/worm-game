@@ -10,9 +10,8 @@ namespace WBGame.GameObject
     /// </summary>
     class Tail : Poolable
     {
-        private Tail nextBody;
-        private Vector2 targetPosition;
-
+        public Tail NextBody { private get; set; }
+        public Vector2 Target { get; set; }
 
         /// <summary>
         /// Constructor. Creates a circle graphic for the entity.
@@ -25,29 +24,19 @@ namespace WBGame.GameObject
             image.CenterOrigin();
         }
 
-
-        /// <summary>
-        /// This method moves the worms head and starts a recursive call that moves its tail
-        /// </summary>
-        /// <param name="xDelta">horizontal movement</param>
-        /// <param name="yDelta">vertical movement</param>
-        /// TODO: This should be in Worm.cs?
-        public void MoveWorm(float xDelta, float yDelta)
+        public void Disable()
         {
-            nextBody.TailFollow(GetTarget());
-            SetTarget(GetTarget() + new Vector2(xDelta, yDelta));
+            if (NextBody != null)
+                NextBody.Disable();
+            Enabled = false;
         }
 
-
-        /// <summary>
-        /// Required by the SetColor() of Worm.cs
-        /// </summary>
-        /// <param name="color">Worms new color</param>
-        public void SetColor(Color color)
+        public Vector2[] GetPositions(Vector2[] positions, int i = 0)
         {
-            if (nextBody != null)
-                nextBody.SetColor(color);
-            Graphic.Color = color;
+            if (NextBody != null)
+                NextBody.GetPositions(positions, i + 1);
+            positions[i] = Target;
+            return positions;
         }
 
 
@@ -57,79 +46,43 @@ namespace WBGame.GameObject
         /// <param name="newPosition">Position to move to</param>
         public void TailFollow(Vector2 newPosition)
         {
-            if (nextBody != null)
-                nextBody.TailFollow(GetTarget());
-            targetPosition = newPosition;
-        }
-
-
-        public Tail[] GetBodies(Tail[] bodies, int i = 0)
-        {
-            if (nextBody != null)
-                nextBody.GetBodies(bodies, i + 1);
-            bodies[i] = this;
-            return bodies;
+            if (NextBody != null)
+                NextBody.TailFollow(Target);
+            Target = newPosition;
         }
 
 
         /// <summary>
-        /// Makes sure the entity is where it's supposed to be.
+        /// Recursively moves the whole worm
+        /// </summary>
+        /// <param name="xDelta">horizontal movement</param>
+        /// <param name="yDelta">vertical movement</param>
+        public void MoveWorm(float xDelta, float yDelta)
+        {
+            NextBody.TailFollow(Target);
+            Target += new Vector2(xDelta, yDelta);
+        }
+
+
+        /// <summary>
+        /// Tweening for the individual worm parts
         /// </summary>
         public override void Update()
         {
             if (Enabled)
-                Position += (GetTarget() - Position) * 0.2f;
+                Position += (Target - Position) * 0.2f;
         }
 
 
         /// <summary>
-        /// Sets a new target position
+        /// Recursively changes the whole worms color
         /// </summary>
-        /// <param name="newPosition">New target position</param>
-        public void SetTarget(Vector2 newPosition)
+        /// <param name="color">Worms new color</param>
+        public void SetColor(Color color)
         {
-            targetPosition = newPosition;
-        }
-
-
-        /// <summary>
-        /// Sets a new target position
-        /// </summary>
-        /// <param name="x">Horizontal target position</param>
-        /// <param name="y">Vertical target position</param>
-        public void SetTarget(float x, float y)
-        {
-            SetTarget(new Vector2(x, y));
-        }
-
-
-        /// <summary>
-        /// Sets the nextBody field. Required to make the tail follow with a recursive method.
-        /// </summary>
-        /// <param name="nextBody">The body that is after this one</param>
-        public void SetNextBody(Tail nextBody)
-        {
-            this.nextBody = nextBody;
-        }
-
-
-        /// <summary>
-        /// Worm has to know where it's supposed to be
-        /// </summary>
-        /// <returns>The positions where this part of the worm is supposed to be</returns>
-        public Vector2 GetTarget()
-        {
-            return targetPosition;
-        }
-
-
-        /// <summary>
-        /// Required for the recursive method to make the tail follow
-        /// </summary>
-        /// <returns>Next body of the worm</returns>
-        public Tail GetNextBody()
-        {
-            return nextBody;
+            if (NextBody != null)
+                NextBody.SetColor(color);
+            Graphic.Color = color;
         }
     }
 }
