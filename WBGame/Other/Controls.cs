@@ -1,7 +1,7 @@
 ﻿namespace WBGame.Other
 {
     /// @author Antti Harju
-    /// @version 22.06.2020
+    /// @version 26.06.2020
     /// <summary>
     /// Abstraction layer that allows the same player to control many different worms one at a time.
     /// </summary>
@@ -10,10 +10,11 @@
         private readonly char[] queue;
         private readonly char empty = '-';
 
+
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="length">How many directions can the queue hold simultaneously</param>
+        /// <param name="length">How many instructions the queue can hold</param>
         public Controls(int length = 10)
         {
             queue = new char[length];
@@ -26,7 +27,7 @@
         /// Takes a direction from the queue
         /// </summary>
         /// <returns>Next direction</returns>
-        public char Get()
+        public char Next()
         {
             char tmpChar = empty;
             for (int i = 0; i < queue.Length; i++)
@@ -41,32 +42,30 @@
 
 
         /// <summary>
-        /// Adds a direction to the queue. Also sorts the queue because it's kind of expensive and Get() is called more often.
+        /// Adds an instruction to the queue. Also Trims the queue. Trim is done in Add methods rather than in Next() because in theory it's more expensive.
         /// </summary>
-        /// <param name="direction">Direction to add to the movement queue</param>
-        public void Add(char direction)
+        /// <param name="instruction">Instruction to add to the movement queue</param>
+        public void Add(char instruction)
         {
             TrimQueue();
-            queue[FirstFreeIndex()] = direction;
+            queue[FirstFreeIndex()] = instruction;
         }
 
-
         /// <summary>
-        /// Adds multiple directions to the movement queue. Also sorts it just like Add()
+        /// Adds multiple instructions to the queue. Also Trims the queue just like Add()
         /// </summary>
-        /// <param name="directions">Directions to add to the movement queue</param>
-        /// TODO: TrimQueue should take into account directions.Length but is fine for now because this is only called when the queue is empty
-        public void AddMultiple(char[] directions)
+        /// <param name="instructions">Directions to add to the movement queue</param>
+        public void AddMultiple(char[] instructions)
         {
             TrimQueue();
             int startIndex = FirstFreeIndex();
-            for (int i = startIndex; i < startIndex + directions.Length; i++)
-                queue[i] = directions[i - startIndex];
+            for (int i = startIndex; i < startIndex + instructions.Length; i++)
+                queue[i] = instructions[i - startIndex];
         }
 
 
         /// <summary>
-        /// Sorts the movement queue so it's fully utilized.
+        /// Trims the queue so it's fully utilized
         /// </summary>
         private void TrimQueue()
         {
@@ -86,9 +85,9 @@
 
 
         /// <summary>
-        /// Returns the index of the first free spot at the movement queue
+        /// Returns index of the first free spot in the queue
         /// </summary>
-        /// <returns>First free index of the movement queue</returns>
+        /// <returns>First free index in the queue</returns>
         private int FirstFreeIndex()
         {
             int index = 0;

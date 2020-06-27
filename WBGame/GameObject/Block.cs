@@ -1,11 +1,12 @@
 ﻿using Otter;
+using WBGame.Other;
 
 namespace WBGame.GameObject
 {
     /// <summary>
     /// Block class. Very much work in progress.
     /// </summary>
-    class Block : Entity
+    class Block : Poolable
     {
         public Block NextBlock { get; set; }
 

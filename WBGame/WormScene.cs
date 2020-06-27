@@ -23,12 +23,6 @@ namespace WBGame
             Game.Coroutine.Start(WormRoutine());
         }
 
-        public override void Update()
-        {
-            base.Update();
-            manager.Update();
-        }
-
         IEnumerator WormRoutine()
         {
             float second = Game.Framerate;

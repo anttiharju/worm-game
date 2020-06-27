@@ -1,4 +1,5 @@
 ﻿using Otter;
+using WBGame.Other;
 
 namespace WBGame.GameObject
 {
@@ -7,7 +8,7 @@ namespace WBGame.GameObject
     /// <summary>
     /// The base worm class that by itself acts as the tail entity.
     /// </summary>
-    class Tail : Entity
+    class Tail : Poolable
     {
         private Tail nextBody;
         private Vector2 targetPosition;
@@ -42,10 +43,10 @@ namespace WBGame.GameObject
         /// Required by the SetColor() of Worm.cs
         /// </summary>
         /// <param name="color">Worms new color</param>
-        public void RecursiveColor(Color color)
+        public void SetColor(Color color)
         {
             if (nextBody != null)
-                nextBody.RecursiveColor(color);
+                nextBody.SetColor(color);
             Graphic.Color = color;
         }
 
@@ -62,25 +63,22 @@ namespace WBGame.GameObject
         }
 
 
-        /// <summary>
-        /// Recursive method to disable to worm
-        /// </summary>
-        public Vector2[] GetPositions(Vector2[] blockPositions, int i = 0)
+        public Tail[] GetBodies(Tail[] bodies, int i = 0)
         {
             if (nextBody != null)
-                nextBody.GetPositions(blockPositions, i + 1);
-            Graphic.Visible = false;
-            blockPositions[i] = GetTarget();
-            return blockPositions;
+                nextBody.GetBodies(bodies, i + 1);
+            bodies[i] = this;
+            return bodies;
         }
 
 
         /// <summary>
         /// Makes sure the entity is where it's supposed to be.
         /// </summary>
-        public void Tween()
+        public override void Update()
         {
-            Position += (GetTarget() - Position) * 0.1f * 3;
+            if (Enabled)
+                Position += (GetTarget() - Position) * 0.2f;
         }
 
 
