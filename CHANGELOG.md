@@ -1,6 +1,32 @@
 # TODO
 - Fix GPU usage issue properly and not with RTSS
 
+# 27.06.2020
+- I'm facing a problem:
+    - The new pooling system although is very nice to access elsewhere, has all kinds of nasty side effects. I need back the poolables because entities have to be able to disable themselves because otherwise I'm going to have to compensate WAY TOO MUCH for that in other ways.
+    - I'm going to remove lot of the documentation and go through everything step by step and make sure the foundation is solid for future work.
+    - I'm dying to work on the teris part of the game
+        - I'll probably do the special case for blocks / bunches in the pooler because that's just a more solid foundation
+    - I create a new Vector2 array inside Blockify, I'll get rid of it.
+    - Manager is kind of bloated?
+    - Pooler can't have Poolables accessible via Indexer because it's hacky.
+        - I'm going to have to implement ghosts avoid using Indexer
+
+
+# 26.06.2020
+- Okay so, starting to work on the tetris part of the game and some thoughts:
+    - Because I really want to use pooling so I can avoid any lag spikes at runtime (new is the enemy), I'm kind of locked into using recursion with blocks. With worms it made sense, but with blocks it feels hacky.
+        - I could build some special case into the pooler but that kind of breaks the generic nature of the pooler.
+        - I'll try doing things the recursive way.
+
+# 24.06.2020
+- Pooler now uses two Lists instead of single array.
+    - Now we don't have to if(poolable.enabled) at every point
+    - Code might be messy right now
+- Removed Poolables (now we just pool Entities)
+
+- Plans for the next coding session: start implementing block rotation / controls, see if any problems arise with the current queuing system.
+
 # 22.06.2020
 - Solved the movement queue problem, I was using current position instead of target position when calculating the next target position for the worm
 
