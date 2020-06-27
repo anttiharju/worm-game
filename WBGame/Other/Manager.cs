@@ -9,11 +9,12 @@ namespace WBGame.Other
     class Manager
     {
         private readonly int collisionSize;
+        private readonly int size;
         private readonly Scene scene;
         private readonly Pooler<Worm> worms;
         private readonly Pooler<Tail> tails;
+        private readonly Pooler<Bunch> bunches;
         private readonly Pooler<Block> blocks;
-        private int lastPosessed = 0;
 
 
         /// <summary>
@@ -22,15 +23,17 @@ namespace WBGame.Other
         /// <param name="scene">Scene to manage</param>
         /// <param name="tailCount">How many bodies to pool</param>
         /// <param name="wormCount">How many heads to pool</param>
-        /// <param name="blockCount">How many blocks to pool</param>
+        /// <param name="bunchCount">How many blocks to pool</param>
         /// <param name="size">How big should the pooled things be</param>
-        public Manager(Scene scene, int wormCount, int maxWormLength, int blockCount, int size)
+        public Manager(Scene scene, int wormCount, int maxWormLength, int bunchCount, int size)
         {
             this.scene = scene;
             worms = new Pooler<Worm>(scene, wormCount, size);
             tails = new Pooler<Tail>(scene, wormCount * maxWormLength, size);
-            blocks = new Pooler<Block>(scene, blockCount, size);
+            bunches = new Pooler<Bunch>(scene, bunchCount, size);
+            blocks = new Pooler<Block>(scene, bunchCount * maxWormLength, size);
             collisionSize = (int)(0.9f * size);
+            this.size = size;
         }
 
 
@@ -70,9 +73,9 @@ namespace WBGame.Other
         /// </summary>
         /// <param name="color">Players color</param>
         /// <returns>Spawned player</returns>
-        public Player SpawnPlayer(Color color)
+        public Ghost SpawnPlayer(Color color)
         {
-            Player tmpPlayer = new Player(this, color);
+            Ghost tmpPlayer = new Ghost(0, size, color);
             scene.Add(tmpPlayer);
             return tmpPlayer;
         }
@@ -85,30 +88,23 @@ namespace WBGame.Other
         public void Blockify(Worm worm)
         {
             if (worm == null) return;
-            Vector2[] blockPositions = worm.GetPositions(new Vector2[worm.Length]);
+            Tail[] bodies = worm.GetBodies(new Tail[worm.Length]);
+
+
             Block previousBlock = null;
-            for (int i = 0; i < blockPositions.Length; i++)
+            for (int i = 0; i < bodies.Length; i++)
             {
                 Block tmpBlock = blocks.Enable();
                 if (tmpBlock == null) break;
                 if (previousBlock != null)
                     previousBlock.NextBlock = tmpBlock;
-                tmpBlock.Spawn(blockPositions[i], Color.Gray);
+                tmpBlock.Spawn(bodies[i].GetTarget(), Color.Gray);
                 previousBlock = tmpBlock;
             }
-        }
 
-
-        /// <summary>
-        /// Returns next unposessed worm. Also keeps track of what worm was last posessed so we cycle through them all.
-        /// </summary>
-        /// <returns>Next unposessed worm, null if no unposessed worm was found</returns>
-        public Worm Posess()
-        {
-            lastPosessed++;
-            if (lastPosessed == worms.Count) lastPosessed = 0;
-            if (worms.Count < 1) return null;
-            return worms[lastPosessed];
+            worms.Disable((Worm)bodies[0]);
+            for (int i = 1; i < bodies.Length; i++)
+                tails.Disable(bodies[i]);
         }
 
 
@@ -117,19 +113,9 @@ namespace WBGame.Other
         /// </summary>
         public void BlockUpdate()
         {
-        }
-
-
-        /// <summary>
-        /// Could be done in tail update override but we hate if's right?
-        /// Premature optimization is the root of all evil?
-        /// </summary>
-        public void Update()
-        {
-            foreach (Worm worm in worms)
-                worm.Tween();
-            foreach (Tail tail in tails)
-                tail.Tween();
+            foreach (Bunch bunch in bunches)
+                if (bunch.Enabled)
+                    bunch.Fall();
         }
 
 
@@ -139,7 +125,8 @@ namespace WBGame.Other
         public void WormUpdate()
         {
             foreach (Worm worm in worms)
-                worm.Move();
+                if (worm.Enabled)
+                    worm.Move();
         }
 
 
@@ -148,17 +135,20 @@ namespace WBGame.Other
         /// </summary>
         /// <param name="newPosition">Where the worm wants to move</param>
         /// <returns>If it can or not move to the new position</returns>
-        public bool CanMove(Vector2 newPosition)
+        public bool WormCollision(Vector2 newPosition)
         {
             foreach (Worm worm in worms)
-                if (Helper.RoughlyEquals(worm.GetTarget(), newPosition, collisionSize))
-                    return false;
+                if (worm.Enabled)
+                    if (Helper.RoughlyEquals(worm.GetTarget(), newPosition, collisionSize))
+                        return false;
             foreach (Tail tail in tails)
-                if (Helper.RoughlyEquals(tail.GetTarget(), newPosition, collisionSize))
-                    return false;
+                if (tail.Enabled)
+                    if (Helper.RoughlyEquals(tail.GetTarget(), newPosition, collisionSize))
+                        return false;
             foreach (Block block in blocks)
-                if (Helper.RoughlyEquals(block.Position, newPosition, collisionSize))
-                    return false;
+                if (block.Enabled)
+                    if (Helper.RoughlyEquals(block.Position, newPosition, collisionSize))
+                        return false;
             return true;
         }
     }

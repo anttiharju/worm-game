@@ -11,11 +11,12 @@ namespace WBGame.GameObject
     class Worm : Tail
     {
         private Manager manager;
-        private int wormLength;
         private readonly int size;
-        private readonly Controls controls;
+        private readonly Controls controls = new Controls();
 
-        public int Length { get { return wormLength; } }
+        public override Color Color { get { return Graphic.Color ?? null; } set { Graphic.Color = value; SetColor(value); } }
+
+        public int Length { get; private set; }
 
         /// <summary>
         /// Head constructor. Calls Body constructor.
@@ -24,7 +25,6 @@ namespace WBGame.GameObject
         public Worm(int size) : base(size)
         {
             this.size = size;
-            controls = new Controls();
         }
 
 
@@ -41,7 +41,7 @@ namespace WBGame.GameObject
         public Worm Spawn(Manager manager, float x, float y, int length, Color color, char[] directions = null)
         {
             this.manager = manager;
-            wormLength = length;
+            Length = length;
             Position = new Vector2(x, y);
             SetTarget(x, y);
             Graphic.Color = color;
@@ -66,7 +66,7 @@ namespace WBGame.GameObject
         /// </summary>
         public void Move()
         {
-            switch (controls.Get())
+            switch (controls.Next())
             {
                 case 'W': // up
                     Move(0, -size);
@@ -91,17 +91,8 @@ namespace WBGame.GameObject
         /// <param name="y">Vertical movement</param>
         private void Move(float x, float y)
         {
-            if (manager.CanMove(GetTarget() + new Vector2(x, y)))
+            if (manager.WormCollision(GetTarget() + new Vector2(x, y)))
                 MoveWorm(x, y);
-        }
-
-        /// <summary>
-        /// Sets the entire worms color (if you use the attribute worm.Color you only set the heads color)
-        /// </summary>
-        /// <param name="color">Desired color</param>
-        public void SetColor(Color color)
-        {
-            RecursiveColor(color);
         }
     }
 }

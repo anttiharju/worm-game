@@ -13,6 +13,16 @@ namespace WBGame.Other
         private static readonly Random rand = new Random();
         private static readonly Color[] colors = { Color.Blue, Color.Cyan, Color.Green, Color.Magenta, Color.Orange, Color.Yellow };
 
+        /// <summary>
+        /// Simple version of Math.Abs() because it's enough for me
+        /// </summary>
+        /// <param name="number">number</param>
+        /// <returns>Absolute value of the number</returns>
+        public static float FastAbs(float number)
+        {
+            if (number > 0) return number;
+            return number * -1;
+        }
 
         /// <summary>
         /// Return a random number between a and b, both inclusive
