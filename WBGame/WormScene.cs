@@ -12,30 +12,26 @@ namespace WBGame
     class WormScene : Scene
     {
         private Manager manager;
-        private readonly int groundTruth = 30;
-        private int round = 0;
+        private float wormTimer = 0;
+        private float wormTimerReset = 0.2f;
 
         public override void Begin()
         {
             base.Begin();
             manager = new Manager(this, 100, 10, 800, 16);
+            manager.SpawnWorm(600, 600, 8, Color.Blue);
             manager.SpawnPlayer(Color.Red);
-            Game.Coroutine.Start(WormRoutine());
         }
 
-        IEnumerator WormRoutine()
+        public override void Update()
         {
-            float second = Game.Framerate;
-            int frequency = (int)(second / groundTruth);
-            yield return Coroutine.Instance.WaitForFrames(frequency);
-            manager.WormUpdate();
-            round++;
-            if (round == groundTruth)
+            base.Update();
+            wormTimer += Game.DeltaTime;
+            if (wormTimer >= wormTimerReset)
             {
-                round = 0;
-                manager.BlockUpdate();
+                wormTimer = 0;
+                manager.WormUpdate();
             }
-            Game.Coroutine.Start(WormRoutine());
         }
     }
 }

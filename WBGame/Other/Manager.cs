@@ -4,7 +4,7 @@ using WBGame.GameObject;
 namespace WBGame.Other
 {
     /// <summary>
-    /// Manager. Manages all kinds of things, mainly Poolers. Currently kind of bloated.
+    /// Manager. Manages pooled entities and interactions between them.
     /// </summary>
     class Manager
     {
@@ -15,6 +15,23 @@ namespace WBGame.Other
         private readonly Pooler<Tail> tails;
         private readonly Pooler<Bunch> bunches;
         private readonly Pooler<Block> blocks;
+
+        public Worm NearestWorm(Vector2 player, float range)
+        {
+            Worm nearestWorm = null;
+            float nearestDistance = range;
+            foreach (Worm worm in worms)
+                if (worm.Enabled)
+                {
+                    float distance = Vector2.Distance(player, worm.Position);
+                    if (distance < nearestDistance)
+                    {
+                        nearestWorm = worm;
+                        nearestDistance = distance;
+                    }
+                }
+            return nearestWorm;
+        }
 
 
         /// <summary>
@@ -50,7 +67,7 @@ namespace WBGame.Other
         {
             Worm worm = worms.Enable();
             if (worm == null) return null;
-            worm.Spawn(this, x, y, length, color, directions);
+            worm.Spawn(this, x, y, length, color);
 
             int bodyCount = length - 1; // - 1 because head already counts as 1
             Tail currentBody = worm;
@@ -59,9 +76,9 @@ namespace WBGame.Other
                 Tail tmpBody = tails.Enable();
                 if (tmpBody == null) return null;
                 tmpBody.Position = new Vector2(x, y);
-                tmpBody.SetTarget(x, y);
+                tmpBody.Target = tmpBody.Position;
                 tmpBody.Graphic.Color = color;
-                currentBody.SetNextBody(tmpBody);
+                currentBody.NextBody = tmpBody;
                 currentBody = tmpBody;
             }
             return worm;
@@ -73,9 +90,9 @@ namespace WBGame.Other
         /// </summary>
         /// <param name="color">Players color</param>
         /// <returns>Spawned player</returns>
-        public Ghost SpawnPlayer(Color color)
+        public Player SpawnPlayer(Color color)
         {
-            Ghost tmpPlayer = new Ghost(0, size, color);
+            Player tmpPlayer = new Player(this, 0, color, size);
             scene.Add(tmpPlayer);
             return tmpPlayer;
         }
@@ -85,26 +102,22 @@ namespace WBGame.Other
         /// Turns a worm to blocks
         /// </summary>
         /// <param name="worm">Worm to blockify</param>
-        public void Blockify(Worm worm)
+        public Bunch Blockify(Worm worm)
         {
-            if (worm == null) return;
-            Tail[] bodies = worm.GetBodies(new Tail[worm.Length]);
-
+            Vector2[] positions = worm.GetPositions(new Vector2[worm.Length]);
 
             Block previousBlock = null;
-            for (int i = 0; i < bodies.Length; i++)
+            for (int i = 0; i < positions.Length; i++)
             {
                 Block tmpBlock = blocks.Enable();
                 if (tmpBlock == null) break;
                 if (previousBlock != null)
                     previousBlock.NextBlock = tmpBlock;
-                tmpBlock.Spawn(bodies[i].GetTarget(), Color.Gray);
+                tmpBlock.Spawn(positions[i], Color.Gray);
                 previousBlock = tmpBlock;
             }
 
-            worms.Disable((Worm)bodies[0]);
-            for (int i = 1; i < bodies.Length; i++)
-                tails.Disable(bodies[i]);
+            return null;
         }
 
 
@@ -139,11 +152,11 @@ namespace WBGame.Other
         {
             foreach (Worm worm in worms)
                 if (worm.Enabled)
-                    if (Helper.RoughlyEquals(worm.GetTarget(), newPosition, collisionSize))
+                    if (Helper.RoughlyEquals(worm.Target, newPosition, collisionSize))
                         return false;
             foreach (Tail tail in tails)
                 if (tail.Enabled)
-                    if (Helper.RoughlyEquals(tail.GetTarget(), newPosition, collisionSize))
+                    if (Helper.RoughlyEquals(tail.Target, newPosition, collisionSize))
                         return false;
             foreach (Block block in blocks)
                 if (block.Enabled)

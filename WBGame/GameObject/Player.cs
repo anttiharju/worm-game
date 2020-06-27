@@ -3,26 +3,93 @@ using WBGame.Other;
 
 namespace WBGame.GameObject
 {
-    class Ghost : Poolable
+    class Player : Poolable
     {
         private readonly int playerNumber;
+        private readonly Color playerColor;
         private readonly int axisDeadZone = 10;
         private readonly float speedModifier = 0.05f;
 
-        public Ghost(int playerNumber, int size, Color color)
+        private Manager manager;
+        private Worm worm = null;
+        private Bunch bunch = null;
+        private Color oldColor;
+
+        private float leftX;
+        private float leftY;
+
+        public Player(Manager manager, int playerNumber, Color playerColor, int size)
         {
+            this.manager = manager;
             this.playerNumber = playerNumber;
-            Image image = Image.CreateRectangle(size / 2, size, color);
+            this.playerColor = playerColor;
+            Image image = Image.CreateRectangle(size / 2, size, playerColor);
             AddGraphic(image);
             image.CenterOrigin();
+        }
+
+        private void Posess()
+        {
+            if (worm == null)
+            {
+                worm = manager.NearestWorm(Position, 250);
+                if (worm == null) return;
+                Graphic.Visible = false;
+                oldColor = worm.Color;
+                worm.Color = playerColor;
+            }
+            else
+            {
+                worm.Color = oldColor;
+                Position = worm.Position;
+                worm = null;
+                Graphic.Visible = true;
+            }
+        }
+
+        private void Blockify()
+        {
+            if (worm == null) return;
+            bunch = manager.Blockify(worm);
+            Worm tmp = worm;
+            Posess();
+            tmp.Disable();
+        }
+
+        private void WormControl()
+        {
+            if (worm == null) return;
+            float deadZone = 90;
+            if (leftX < -deadZone)
+                worm.Direction = "LEFT";
+            if (leftX > deadZone)
+                worm.Direction = "RIGHT";
+            if (leftY < -deadZone)
+                worm.Direction = "UP";
+            if (leftY > deadZone)
+                worm.Direction = "DOWN";
+        }
+
+        private void GhostControl()
+        {
+            if (worm != null) return;
+            float deadZone = 10;
+            if (Helper.FastAbs(leftX) > deadZone)
+            {
+                X += leftX * speedModifier;
+            }
+            if (Helper.FastAbs(leftY) > deadZone)
+            {
+                Y += leftY * speedModifier;
+            }
         }
 
         public override void Update()
         {
             #region Mandatory
             base.Update();
-            float leftX = Input.GetAxis(JoyAxis.X, playerNumber);
-            float leftY = Input.GetAxis(JoyAxis.Y, playerNumber);
+            leftX = Input.GetAxis(JoyAxis.X, playerNumber);
+            leftY = Input.GetAxis(JoyAxis.Y, playerNumber);
             float rightX = Input.GetAxis(JoyAxis.U, playerNumber);
             float rightY = Input.GetAxis(JoyAxis.V, playerNumber);
             float dpadX = Input.GetAxis(JoyAxis.PovX, playerNumber);
@@ -31,15 +98,6 @@ namespace WBGame.GameObject
             #endregion
 
             #region Axises
-            // Left stick
-            if (Helper.FastAbs(leftX) > axisDeadZone)
-            {
-                X += leftX * speedModifier;
-            }
-            if (Helper.FastAbs(leftY) > axisDeadZone)
-            {
-                Y += leftY * speedModifier;
-            }
 
             // Right stick
             if (Helper.FastAbs(rightX) > axisDeadZone)
@@ -94,11 +152,11 @@ namespace WBGame.GameObject
             }
             if (Input.ButtonPressed(4, playerNumber)) // LB
             {
-
+                Blockify();
             }
             if (Input.ButtonPressed(5, playerNumber)) // RB
             {
-
+                Posess();
             }
             if (Input.ButtonPressed(6, playerNumber)) // Back
             {
@@ -117,6 +175,9 @@ namespace WBGame.GameObject
 
             }
             #endregion
+
+            WormControl();
+            GhostControl();
         }
     }
 }

@@ -10,12 +10,14 @@ namespace WBGame
     /// <param name="args"></param>
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            Game game = new Game("Worm bricks", 1280, 720);
-            game.FixedFramerate = false;
-            game.AlwaysUpdate = true;
-            game.MouseVisible = true;
+            Game game = new Game("Worm bricks", 1280, 720)
+            {
+                FixedFramerate = false,
+                AlwaysUpdate = true,
+                MouseVisible = true
+            };
             game.Start(new WormScene());
         }
     }

@@ -8,7 +8,6 @@ namespace WBGame.Other
     {
         private readonly T[] pool;
 
-
         public Pooler(Scene scene, int capacity, int entitySize)
         {
             pool = new T[capacity];
