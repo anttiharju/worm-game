@@ -1,5 +1,4 @@
 ﻿using Otter;
-using System.Collections;
 using WBGame.Other;
 
 namespace WBGame
@@ -12,25 +11,33 @@ namespace WBGame
     class WormScene : Scene
     {
         private Manager manager;
+        private readonly float bunchTimerReset = 0.4f;
+        private readonly float wormTimerReset = 0.2f;
+        private float bunchTimer = 0;
         private float wormTimer = 0;
-        private float wormTimerReset = 0.2f;
 
         public override void Begin()
         {
             base.Begin();
             manager = new Manager(this, 100, 10, 800, 16);
-            manager.SpawnWorm(600, 600, 8, Color.Blue);
-            manager.SpawnPlayer(Color.Red);
+            manager.SpawnWorm(640, 712, 5, Color.Blue);
+            manager.SpawnPlayer(640, 376, Color.Red);
         }
 
         public override void Update()
         {
             base.Update();
             wormTimer += Game.DeltaTime;
+            bunchTimer += Game.DeltaTime;
             if (wormTimer >= wormTimerReset)
             {
                 wormTimer = 0;
                 manager.WormUpdate();
+            }
+            if (bunchTimer >= bunchTimerReset)
+            {
+                bunchTimer = 0;
+                manager.BunchUpdate();
             }
         }
     }
