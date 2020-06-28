@@ -167,7 +167,6 @@ namespace WBGame.GameObject
             #endregion
 
             #region Axises
-
             // Right stick
             if (Helper.FastAbs(rightX) > axisDeadZone)
             {
@@ -177,7 +176,6 @@ namespace WBGame.GameObject
             {
 
             }
-
             // Triggers (shared)
             if (Helper.FastAbs(triggers) > axisDeadZone)
             {
