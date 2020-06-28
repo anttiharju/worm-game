@@ -1,6 +1,30 @@
 # TODO
 - Fix GPU usage issue properly and not with RTSS
 
+# 28.06.2020
+- Thoughts:
+    - I've been working on an entity based tetris blocks and while I probably could make it work, I'm worried it won't be very performant..
+    - Took a closer look at Otter examples and surprisingly it has tilemaps which are exactly what I wanted.
+        - I could make the tetris part of the game use tilemaps and probably most of the difficult code I written probably would work with minimal changes, I don't know.
+        - I mean if I'm moving to tilemaps, why not also use it for worms?
+        - I'd like to stick with the entity based approach I've chosen just for the sake of exercise and learning why it might be a bad idea.
+        - Tilemap would solve all of my collision issues and I don't really have a use for infinite playfield that the entity based approach allows.
+            - I should ditch the current (very basic) collision system in favor of chunk based approach.
+                - One chunk would probably be like 8*8, every chunk would know its neighbours and the entities it contains
+                    - It would probably have an array of poolables or I remember reading that Notch really regretted minecraft treating air blocks as null values maybe rather an int array and the integers in that would represent indexes in the chunks Poolable array
+                    - I will probably get rid of tweening for the worm body parts to keep things simple.
+                    - Player ghosts would operate outside of chunk system because they don't have collision.
+                        - But they will still know the chunk they're in so they can posess worms efficiently
+                    - Chunk system will probably have its own manager just to keep the current manager from getting bloated.
+                    - I think worms will still stay intact as is and the chunk system will hook into from where collision is currently done.
+                        - Although worm (head) has to know the chunk it is in to access the collision system but otherwise nothing
+                - It will probably have some overhead, but will scale WAY better than the current system.
+                    - And scalability is what I want. It's way more impressive to show A TON OF WORMS on the screen simultaneously rather than just a few with crappy controls
+    - I should keep changelog more up-to-date with my changes, I've implemented lot of stuff I haven't really mentioned here and it's not a good look.
+    - Before I can really start working on chunk collision I'll have to implement some kind of grid helper so I don't always have to do the math everywhere when I want to put something on the 'grid'
+
+- TL;DR: No to tilemaps, embrace entities, pursue scalability with a chunk based collision system
+
 # 27.06.2020
 - I'm facing a problem:
     - The new pooling system although is very nice to access elsewhere, has all kinds of nasty side effects. I need back the poolables because entities have to be able to disable themselves because otherwise I'm going to have to compensate WAY TOO MUCH for that in other ways.
