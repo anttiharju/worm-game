@@ -24,6 +24,12 @@ namespace WBGame.Other
             return number * -1;
         }
 
+        public static int Smaller(int a, int b)
+        {
+            if (a < b) return a;
+            return b;
+        }
+
         public static float Smaller(float a, float b)
         {
             if (a < b) return a;

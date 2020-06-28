@@ -1,4 +1,5 @@
 ﻿using Otter;
+using SFML.Window;
 using WBGame.Other;
 
 namespace WBGame
@@ -15,13 +16,28 @@ namespace WBGame
         private readonly float wormTimerReset = 0.2f;
         private float bunchTimer = 0;
         private float wormTimer = 0;
+        private int areaWidth = 20;
+        private int areaHeight = 40;
+        private int areaMargin = 2;
 
         public override void Begin()
         {
             base.Begin();
-            manager = new Manager(this, 100, 10, 800, 16);
-            manager.SpawnWorm(640, 712, 5, Color.Blue);
+            int size = Scaling();
+            manager = new Manager(this, 3, 60, 3, size, areaWidth, areaHeight);
+            manager.SpawnWorm(Game.WindowWidth / 2 + size / 2,  Game.WindowHeight / 2 + areaHeight / 2 * size - size / 2, 59, Color.Blue);
             manager.SpawnPlayer(640, 376, Color.Red);
+        }
+
+        private int Scaling()
+        {
+            int xSize = Game.WindowWidth / (areaWidth + areaMargin * 2);
+            int ySize = Game.WindowHeight / (areaHeight + areaMargin * 2);
+            System.Console.WriteLine(xSize + " " + ySize);
+            int size = Helper.Smaller(xSize, ySize);
+            if (size % 2 != 0)
+                size--;
+            return size;
         }
 
         public override void Update()

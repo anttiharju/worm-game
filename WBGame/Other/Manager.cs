@@ -1,5 +1,4 @@
 ﻿using Otter;
-using System;
 using WBGame.GameObject;
 
 namespace WBGame.Other
@@ -16,6 +15,8 @@ namespace WBGame.Other
         private readonly Pooler<Tail> tails;
         private readonly Pooler<Bunch> bunches;
         private readonly Pooler<Block> blocks;
+        private readonly int width;
+        private readonly int height;
 
         public Worm NearestWorm(Vector2 player, float range)
         {
@@ -43,7 +44,7 @@ namespace WBGame.Other
         /// <param name="wormCount">How many heads to pool</param>
         /// <param name="bunchCount">How many blocks to pool</param>
         /// <param name="size">How big should the pooled things be</param>
-        public Manager(Scene scene, int wormCount, int maxWormLength, int bunchCount, int size)
+        public Manager(Scene scene, int wormCount, int maxWormLength, int bunchCount, int size, int width, int height)
         {
             this.scene = scene;
             worms = new Pooler<Worm>(scene, wormCount, size);
@@ -52,6 +53,8 @@ namespace WBGame.Other
             blocks = new Pooler<Block>(scene, bunchCount * maxWormLength, size);
             collisionSize = (int)(0.9f * size);
             this.size = size;
+            this.width = width;
+            this.height = height;
         }
 
 
@@ -134,7 +137,7 @@ namespace WBGame.Other
             // TODO: If player is doing softdrop, don't apply gravity
             foreach (Bunch bunch in bunches)
                 if (bunch.Enabled) { }
-                   // bunch.SoftDrop();
+            // bunch.SoftDrop();
         }
 
 
@@ -156,6 +159,11 @@ namespace WBGame.Other
         /// <returns>If it can or not move to the new position</returns>
         public bool WormCollision(Vector2 newPosition)
         {
+            if (newPosition.Y < scene.Game.WindowHeight / 2 - size * (height / 2) ||
+                newPosition.Y > scene.Game.WindowHeight / 2 + size * (height / 2) ||
+                newPosition.X < scene.Game.WindowWidth / 2 - size * (width / 2) ||
+                newPosition.X > scene.Game.WindowWidth / 2 + size * (width / 2))
+                return false;
             foreach (Worm worm in worms)
                 if (worm.Enabled)
                     if (Helper.RoughlyEquals(worm.Target, newPosition, collisionSize))
