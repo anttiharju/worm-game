@@ -1,4 +1,5 @@
 ﻿using Otter;
+using System;
 using WBGame.GameObject;
 
 namespace WBGame.Other
@@ -90,9 +91,9 @@ namespace WBGame.Other
         /// </summary>
         /// <param name="color">Players color</param>
         /// <returns>Spawned player</returns>
-        public Player SpawnPlayer(Color color)
+        public Player SpawnPlayer(float x, float y, Color color)
         {
-            Player tmpPlayer = new Player(this, 0, color, size);
+            Player tmpPlayer = new Player(this, 0, x, y, color, size);
             scene.Add(tmpPlayer);
             return tmpPlayer;
         }
@@ -106,29 +107,34 @@ namespace WBGame.Other
         {
             Vector2[] positions = worm.GetPositions(new Vector2[worm.Length]);
 
-            Block previousBlock = null;
-            for (int i = 0; i < positions.Length; i++)
+            Bunch bunch = bunches.Enable();
+            if (bunch == null) return null;
+            bunch.Spawn(positions[0], Color.Gray, worm.Length, 712);
+
+            Block tmpBlock = bunch;
+            Block previousBlock = tmpBlock;
+
+            for (int i = 1; i < positions.Length; i++)
             {
-                Block tmpBlock = blocks.Enable();
-                if (tmpBlock == null) break;
-                if (previousBlock != null)
-                    previousBlock.NextBlock = tmpBlock;
+                tmpBlock = blocks.Enable();
+                previousBlock.NextBlock = tmpBlock;
                 tmpBlock.Spawn(positions[i], Color.Gray);
                 previousBlock = tmpBlock;
             }
 
-            return null;
+            return bunch;
         }
 
 
         /// <summary>
-        /// W.I.P. Separate from WormUpdate because we want worms to move faster than bricks fall
+        /// Applies gravity to bunches
         /// </summary>
-        public void BlockUpdate()
+        public void BunchUpdate()
         {
+            // TODO: If player is doing softdrop, don't apply gravity
             foreach (Bunch bunch in bunches)
-                if (bunch.Enabled)
-                    bunch.Fall();
+                if (bunch.Enabled) { }
+                   // bunch.SoftDrop();
         }
 
 
