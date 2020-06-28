@@ -22,7 +22,7 @@
                     - And scalability is what I want. It's way more impressive to show A TON OF WORMS on the screen simultaneously rather than just a few with crappy controls
     - I should keep changelog more up-to-date with my changes, I've implemented lot of stuff I haven't really mentioned here and it's not a good look.
     - Before I can really start working on chunk collision I'll have to implement some kind of grid helper so I don't always have to do the math everywhere when I want to put something on the 'grid'
-
+    
 - TL;DR: No to tilemaps, embrace entities, pursue scalability with a chunk based collision system
 
 # 27.06.2020
