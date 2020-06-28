@@ -47,8 +47,8 @@ namespace WBGame.Other
         public Manager(Scene scene, int wormCount, int maxWormLength, int bunchCount, int size, int width, int height)
         {
             this.scene = scene;
-            worms = new Pooler<Worm>(scene, wormCount, size);
-            tails = new Pooler<Tail>(scene, wormCount * maxWormLength, size);
+            worms = new Pooler<Worm>(scene, 2, size);
+            tails = new Pooler<Tail>(scene, 160 * 90, size);
             bunches = new Pooler<Bunch>(scene, bunchCount, size);
             blocks = new Pooler<Block>(scene, bunchCount * maxWormLength, size);
             collisionSize = (int)(0.9f * size);
@@ -163,7 +163,7 @@ namespace WBGame.Other
                 newPosition.Y > scene.Game.WindowHeight / 2 + size * (height / 2) ||
                 newPosition.X < scene.Game.WindowWidth / 2 - size * (width / 2) ||
                 newPosition.X > scene.Game.WindowWidth / 2 + size * (width / 2))
-                return false;
+                return false;/*
             foreach (Worm worm in worms)
                 if (worm.Enabled)
                     if (Helper.RoughlyEquals(worm.Target, newPosition, collisionSize))
@@ -175,7 +175,7 @@ namespace WBGame.Other
             foreach (Block block in blocks)
                 if (block.Enabled)
                     if (Helper.RoughlyEquals(block.Position, newPosition, collisionSize))
-                        return false;
+                        return false;*/
             return true;
         }
     }

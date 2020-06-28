@@ -12,10 +12,10 @@ namespace WBGame
     {
         static void Main()
         {
-            Game game = new Game("Worm bricks", 1920, 1080)
+            Game game = new Game("Worm bricks", 1280, 720)
             {
-                WindowBorder = false,
                 FixedFramerate = false,
+                WindowBorder = false,
                 AlwaysUpdate = true,
                 MouseVisible = true
             };
