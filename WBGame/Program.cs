@@ -1,25 +1,26 @@
 ﻿using Otter;
 
-namespace WBGame
+namespace WormGame
 {
     /// @author Antti Harju
-    /// @version 21.06.2020
+    /// @version 29.06.2020
     /// <summary>
-    /// Entry point to the program, scenes and technical things are done / set up here
+    /// Program starts here
     /// </summary>
     /// <param name="args"></param>
     class Program
     {
         static void Main()
         {
-            Game game = new Game("Worm bricks", 1280, 720)
+            Game game = new Game("Worm bricks", 1280, 720, 144)
             {
-                FixedFramerate = false,
+                MeasureTimeInFrames = false,
+                WindowResize = false,
                 WindowBorder = false,
                 AlwaysUpdate = true,
                 MouseVisible = true
             };
-            game.Start(new WormScene());
+            game.Start(new WormScene(game));
         }
     }
 }
