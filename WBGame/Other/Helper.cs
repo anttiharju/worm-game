@@ -1,7 +1,7 @@
 ﻿using Otter;
 using System;
 
-namespace WBGame.Other
+namespace WormGame.Other
 {
     /// @author Antti Harju
     /// @version 21.06.2020

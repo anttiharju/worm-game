@@ -2,10 +2,10 @@
 using System;
 using System.Collections;
 
-namespace WBGame.Other
+namespace WormGame.Other
 {
     /// @author anvemaha
-    /// @version 28.6.2020
+    /// @version 28.06.2020
     /// <summary>
     /// Entity pooler. Production ready.
     /// </summary>
@@ -61,7 +61,8 @@ namespace WBGame.Other
 
 
         /// <summary>
-        /// Defragments the pool. This is way cheaper than looping through the entire pool every time something needs to be enabled.
+        /// Defragments the pool. This is way cheaper than looping through the entire pool
+        /// every time something needs to be enabled.
         /// </summary>
         private void Defrag()
         {
@@ -91,7 +92,9 @@ namespace WBGame.Other
 
 
         /// <summary>
-        /// So we can foreach through the pool. Once the project uses the new collision system and we don't need to debug pooling this can be removed.
+        /// So we can foreach through the pool. Once the project uses the new collision 
+        /// system and we don't need to debug pooling this can be removed. Although may 
+        /// be useful to writing tests.
         /// </summary>
         /// <returns>Pool enumerator</returns>
         public IEnumerator GetEnumerator()

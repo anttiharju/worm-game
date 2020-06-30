@@ -1,15 +1,15 @@
 ﻿using Otter;
 using System;
 using System.Timers;
-using WBGame.Other;
+using WormGame.Other;
 
-namespace WBGame.GameObject
+namespace WormGame.GameObject
 {
     // TODO: Generalize things, now this is a unholy mess full of if's
     // ^ i'll do that later on as I don't know how much things will evolve from this
     class Player : Poolable
     {
-        private readonly Manager manager;
+        private readonly WormScene manager;
         private readonly Color playerColor;
         private readonly int playerNumber;
         private readonly int axisDeadZone = 10;
@@ -27,9 +27,9 @@ namespace WBGame.GameObject
         private float dropTimer;
         private bool dropAction = true;
 
-        public Player(Manager manager, int playerNumber, float x, float y, Color playerColor, int size)
+        public Player(WormScene wormGame, int playerNumber, float x, float y, Color playerColor, int size)
         {
-            this.manager = manager;
+            this.manager = wormGame;
             this.playerNumber = playerNumber;
             this.playerColor = playerColor;
             Image image = Image.CreateRectangle(size / 2, size, playerColor);

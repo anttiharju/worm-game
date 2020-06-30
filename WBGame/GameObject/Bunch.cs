@@ -1,8 +1,8 @@
 ﻿using System;
 using Otter;
-using WBGame.Other;
+using WormGame.Other;
 
-namespace WBGame.GameObject
+namespace WormGame.GameObject
 {
     /// <summary>
     /// Bunch class. A manager for blocks but also a block. Very much work in progress.

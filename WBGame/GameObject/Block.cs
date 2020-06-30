@@ -1,8 +1,8 @@
 ﻿using Otter;
 using System.Runtime.InteropServices;
-using WBGame.Other;
+using WormGame.Other;
 
-namespace WBGame.GameObject
+namespace WormGame.GameObject
 {
     /// <summary>
     /// Block class. Very much work in progress.

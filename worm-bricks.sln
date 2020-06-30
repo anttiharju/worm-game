@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Otter", "..\..\..\..\devel\otter\Otter\Otter.csproj", "{8AAB329C-B646-4D09-826A-A84F4E940140}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WBGame", "WBGame\WBGame.csproj", "{CCD35F7F-D5EC-4211-B85F-148C61874E8C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WormGame", "WBGame\WormGame.csproj", "{CCD35F7F-D5EC-4211-B85F-148C61874E8C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
