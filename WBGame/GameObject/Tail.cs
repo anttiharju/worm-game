@@ -1,7 +1,7 @@
 ﻿using Otter;
-using WBGame.Other;
+using WormGame.Other;
 
-namespace WBGame.GameObject
+namespace WormGame.GameObject
 {
     /// @author Antti Harju
     /// @version 21.06.2020
@@ -10,7 +10,7 @@ namespace WBGame.GameObject
     /// </summary>
     class Tail : Poolable
     {
-        public Tail NextBody { private get; set; }
+        public Tail NextBody { get; set; }
         public Vector2 Target { get; set; }
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace WBGame.GameObject
             image.CenterOrigin();
         }
 
-        public void Disable()
+        public override void Disable()
         {
             if (NextBody != null)
                 NextBody.Disable();
@@ -39,6 +39,13 @@ namespace WBGame.GameObject
             return positions;
         }
 
+        public Tail[] GetWorm(ref Tail[] worm, int i = 0)
+        {
+            if (NextBody != null)
+                NextBody.GetWorm(ref worm, i + 1);
+            worm[i] = this;
+            return worm;
+        }
 
         /// <summary>
         /// Recursive method that makes every part of the tail follow the head
@@ -57,7 +64,7 @@ namespace WBGame.GameObject
         /// </summary>
         /// <param name="xDelta">horizontal movement</param>
         /// <param name="yDelta">vertical movement</param>
-        public void MoveWorm(float xDelta, float yDelta)
+        public void Move(float xDelta, float yDelta)
         {
             NextBody.TailFollow(Target);
             Target += new Vector2(xDelta, yDelta);
@@ -70,7 +77,7 @@ namespace WBGame.GameObject
         public override void Update()
         {
             if (Enabled)
-                Position += (Target - Position) * 0.2f;
+                Position += (Target - Position) * 0.15f * (144 / Scene.Game.TargetFramerate);
         }
 
 
