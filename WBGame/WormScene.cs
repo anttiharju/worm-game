@@ -1,44 +1,137 @@
 ﻿using Otter;
-using SFML.Window;
-using WBGame.Other;
+using WormGame.Other;
+using WormGame.GameObject;
 
-namespace WBGame
+namespace WormGame
 {
     /// @author Antti Harju
     /// @version 21.6.2020
     /// <summary>
-    /// Scene for the worm game.
+    /// Main game
     /// </summary>
     class WormScene : Scene
     {
-        private Manager manager;
-        private readonly float bunchTimerReset = 0.4f;
-        private readonly float wormTimerReset = 0.2f;
+        private readonly int wormCount = 40;
+        private readonly int maxWormLength = 3;
+
+        private readonly float bunchTimerReset = 0.6f;
+        private readonly float wormTimerReset = 0.3f;
         private float bunchTimer = 0;
         private float wormTimer = 0;
-        private int areaWidth = 20;
-        private int areaHeight = 40;
-        private int areaMargin = 2;
 
-        public override void Begin()
+        private readonly Pooler<Bunch> bunches;
+        private readonly Pooler<Block> blocks;
+        private readonly Pooler<Tail> tails;
+        private readonly Pooler<Worm> worms;
+        private readonly Collision collision;
+
+        private void EntitySetup(Game game)
         {
-            base.Begin();
-            int size = Scaling();
-            manager = new Manager(this, 3, 60, 3, size, areaWidth, areaHeight);
-            manager.SpawnWorm(Game.WindowWidth / 2 + size / 2,  Game.WindowHeight / 2 + areaHeight / 2 * size - size / 2, 59, Color.Blue);
-            manager.SpawnPlayer(640, 376, Color.Red);
+            SpawnWorm(0, 0, Helper.RandomColor(), 3, "");
+            SpawnWorm(39, 19, Helper.RandomColor(), 3, "");
+            SpawnWorm(20, 10, Helper.RandomColor(), 3, "");
+            SpawnPlayer(game.HalfWidth, game.HalfHeight, Color.Red);
         }
 
-        private int Scaling()
+        public WormScene(Game game)
         {
-            int xSize = Game.WindowWidth / (areaWidth + areaMargin * 2);
-            int ySize = Game.WindowHeight / (areaHeight + areaMargin * 2);
-            System.Console.WriteLine(xSize + " " + ySize);
-            int size = Helper.Smaller(xSize, ySize);
-            if (size % 2 != 0)
-                size--;
-            return size;
+            collision = new Collision(game, 40, 20, 2);
+            worms = new Pooler<Worm>(this, wormCount, collision.Size);
+            tails = new Pooler<Tail>(this, wormCount * maxWormLength, collision.Size);
+            bunches = new Pooler<Bunch>(this, wormCount * 2, collision.Size);
+            blocks = new Pooler<Block>(this, wormCount * 2 * maxWormLength, collision.Size);
+            EntitySetup(game);
         }
+
+
+        public Worm NearestWorm(Vector2 player, float range)
+        {
+            Worm nearestWorm = null;
+            float nearestDistance = range;
+            foreach (Worm worm in worms)
+                if (worm.Enabled)
+                {
+                    float distance = Vector2.Distance(player, worm.Position);
+                    if (distance < nearestDistance)
+                    {
+                        nearestWorm = worm;
+                        nearestDistance = distance;
+                    }
+                }
+            return nearestWorm;
+        }
+
+
+        /// <summary>
+        /// Spawns a worm to the scene
+        /// </summary>
+        /// <param name="gridX">Horizontal position</param>
+        /// <param name="gridY">Vertical position</param>
+        /// <param name="length">Worms length</param>
+        /// <param name="color">Worms color</param>
+        /// <returns>The spawned worm</returns>
+        public Worm SpawnWorm(int gridX, int gridY, Color color, int length, string direction = "")
+        {
+            Worm worm = worms.Enable();
+            if (worm == null) return null;
+            worm.Spawn(collision, gridX, gridY, length, color, direction);
+
+            int bodyCount = length - 1; // - 1 because head already counts as 1
+            Tail currentBody = worm;
+            for (int i = 0; i < bodyCount; i++)
+            {
+                Tail tmpBody = tails.Enable();
+                if (tmpBody == null) return null;
+                tmpBody.Position = new Vector2(collision.X(gridX), collision.Y(gridY));
+                tmpBody.Target = tmpBody.Position;
+                tmpBody.Graphic.Color = color;
+                currentBody.NextBody = tmpBody;
+                currentBody = tmpBody;
+            }
+            return worm;
+        }
+
+
+        /// <summary>
+        /// Spawns player to the scene
+        /// </summary>
+        /// <param name="color">Players color</param>
+        /// <returns>Spawned player</returns>
+        public Player SpawnPlayer(float x, float y, Color color)
+        {
+            Player tmpPlayer = new Player(this, 0, x, y, color, collision.Size);
+            Add(tmpPlayer);
+            return tmpPlayer;
+        }
+
+
+        /// <summary>
+        /// Turns a worm to blocks
+        /// </summary>
+        /// <param name="worm">Worm to blockify</param>
+        public Bunch Blockify(Worm worm)
+        {
+            Vector2[] positions = worm.GetPositions(new Vector2[worm.Length]);
+
+            Bunch bunch = bunches.Enable();
+            if (bunch == null) return null;
+            bunch.Spawn(positions[0], Color.Gray, worm.Length, collision.Y(0));
+
+            Block tmpBlock = bunch;
+            Block previousBlock = tmpBlock;
+
+            for (int i = 1; i < positions.Length; i++)
+            {
+                tmpBlock = blocks.Enable();
+                previousBlock.NextBlock = tmpBlock;
+                tmpBlock.Spawn(positions[i], Color.Gray);
+                previousBlock = tmpBlock;
+            }
+
+            return bunch;
+        }
+
+
 
         public override void Update()
         {
@@ -48,13 +141,37 @@ namespace WBGame
             if (wormTimer >= wormTimerReset)
             {
                 wormTimer = 0;
-                manager.WormUpdate();
+                WormUpdate();
             }
             if (bunchTimer >= bunchTimerReset)
             {
                 bunchTimer = 0;
-                manager.BunchUpdate();
+                BunchUpdate();
             }
+        }
+
+
+        /// <summary>
+        /// Worm movement is updated here
+        /// </summary>
+        public void WormUpdate()
+        {
+            foreach (Worm worm in worms)
+                if (worm.Enabled)
+                    worm.Move();
+        }
+
+
+        /// <summary>
+        /// Applies gravity to bunches
+        /// </summary>
+        public void BunchUpdate()
+        {
+            /** / // TODO: If player is doing softdrop, don't apply gravity
+            foreach (Bunch bunch in bunches)
+                if (bunch.Enabled)
+                    bunch.SoftDrop();
+            /**/
         }
     }
 }

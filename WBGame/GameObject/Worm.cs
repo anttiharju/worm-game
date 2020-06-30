@@ -1,7 +1,8 @@
 ﻿using Otter;
-using WBGame.Other;
+using System;
+using WormGame.Other;
 
-namespace WBGame.GameObject
+namespace WormGame.GameObject
 {
     /// @author Antti Harju
     /// @version 22.06.2020
@@ -10,13 +11,13 @@ namespace WBGame.GameObject
     /// </summary>
     class Worm : Tail
     {
-        private Manager manager;
+        private Collision collision;
         private readonly int size;
 
         public int Length { get; private set; }
         public string Direction { private get; set; }
         public override Color Color { get { return Graphic.Color ?? null; } set { SetColor(value); } }
-        
+
         /// <summary>
         /// Head constructor. Calls Body constructor.
         /// </summary>
@@ -31,20 +32,25 @@ namespace WBGame.GameObject
         /// <summary>
         /// Spawns the worm
         /// </summary>
-        /// <param name="manager">Manager</param>
+        /// <param name="wormGame">Manager</param>
         /// <param name="x">Horizontal position</param>
         /// <param name="y">Vertical position</param>
         /// <param name="length">Worms length</param>
         /// <param name="color">Worms color</param>
         /// <param name="directions">Movement instructions for the worm</param>
         /// <returns>The spawned worm</returns>
-        public Worm Spawn(Manager manager, float x, float y, int length, Color color)
+        public Worm Spawn(Collision collision, int x, int y, int length, Color color, string direction)
         {
-            this.manager = manager;
+            this.collision = collision;
             Length = length;
-            Position = new Vector2(x, y);
+            Direction = direction;
+            Position = new Vector2(collision.X(x), collision.Y(y));
+            Console.WriteLine(x + " " + Position.X + " " + collision.ReverseX((int)Position.X) + " " + collision.X(collision.ReverseX((int)Position.X)));
+            Console.WriteLine(y + " " + Position.Y + " " + collision.ReverseY((int)Position.Y) + " " + collision.Y(collision.ReverseY((int)Position.Y)));
+            Console.WriteLine(" ");
             Target = Position;
             Graphic.Color = color;
+            collision.Set(this);
             return this;
         }
 
@@ -57,16 +63,16 @@ namespace WBGame.GameObject
             switch (Direction)
             {
                 case "UP":
-                    Move(0, -size);
+                    CheckCollision(0, -size);
                     break;
                 case "LEFT":
-                    Move(-size, 0);
+                    CheckCollision(-size, 0);
                     break;
                 case "DOWN":
-                    Move(0, size);
+                    CheckCollision(0, size);
                     break;
                 case "RIGHT":
-                    Move(size, 0);
+                    CheckCollision(size, 0);
                     break;
             }
         }
@@ -75,12 +81,22 @@ namespace WBGame.GameObject
         /// <summary>
         /// Moves the worm the desired amount
         /// </summary>
-        /// <param name="x">Horizontal movement</param>
-        /// <param name="y">Vertical movement</param>
-        private void Move(float x, float y)
+        /// <param name="deltaX">Horizontal movement</param>
+        /// <param name="deltaY">Vertical movement</param>
+        private void CheckCollision(int deltaX, int deltaY)
         {
-            if (manager.WormCollision(Target + new Vector2(x, y)))
-                MoveWorm(x, y);
+            if (collision.WormCheck(this, Position, deltaX, deltaY))
+                Move(deltaX, deltaY);
+        }
+
+
+        public Tail[] GetWorm()
+        {
+            Tail[] tmp = new Tail[Length];
+            if (NextBody != null)
+                NextBody.GetWorm(ref tmp, 1);
+            tmp[0] = this;
+            return tmp;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Otter;
 
-namespace WBGame.Other
+namespace WormGame.Other
 {
     /// @author anvemaha
     /// @version 28.06.2020
@@ -16,15 +16,15 @@ namespace WBGame.Other
 
 
         /// <summary>
-        /// Not related to pooling, but useful. Overridable so multi-entity entities can also use this.
+        /// Not related to pooling, but useful. Overridable so syntax remains the same with multi-entity entities (worms, bunches).
         /// </summary>
         public virtual Color Color { get { return Graphic.Color ?? null; } set { Graphic.Color = value; } }
     
 
         /// <summary>
-        /// Improves code readability.
+        /// Improves code readability. Overridable so syntax remains the same with multi-entity entities (worms, bunches).
         /// </summary>
-        public void Disable()
+        public virtual void Disable()
         {
             Enabled = false;
         }

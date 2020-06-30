@@ -1,5 +1,35 @@
 # TODO
-- Fix GPU usage issue properly and not with RTSS
+- Investigate GPU usage issue
+
+# 30.06.2020
+- Cleaned up the new collision system, it still has bugs but shouldn't crash
+    - I'm going to commit now because I have other things that need my attention and the commit is probably already way too massive
+        - I should get into the habit of smaller commits, as afaik that's the best practise and especially important when working with a team
+
+
+# 29.06.2020
+- ~~Interestingly 100% GPU usage (coil whine) without RTSS is no longer an issue. Not sure what caused it or what fixed it.~~
+    - I guess now that the game has something to calculate it's not running insanely fast.
+    - I should try to reproduce it and open an issue on the Otter2d repo?
+    - I'll keep task manager open just in case
+        - **GPU usage still is around 50 % which still is way too high, I enabled RTSS again and the usage is now below 10% and no coil whine.**
+- I think I finally figured out how to move entities at the a constant speed no matter the framerate
+    - Thank you Game.MeasureTimeInFrames = false;
+- ~~Began work on ~~Field~~ Chunks (I would've called it Grid but Otter already has something called Grid)~~
+    - ~~I'd also like to note that I'd prefer the name PlayArea, but it's too long and Area isn't nice.~~
+    - ~~It just made sense to combine Field and ChunkManager~~
+    - This became the new collision system, see below.
+- Updated Pooler documentation
+    - Pooler got updated yesterday; it now uses defragmenter and should be way more performant at large scales
+- Deleted CONTROLS.md as they're now documented well enough in the Player class
+- Renamed PLANNING.md to CONTEXT.md that I'll use as a brain dump from time to time
+- Renamed methods in Worm so that they better reflect what they do
+- Merged Manager to WormScene
+- **New collision system**
+    - Ditch multiple small chunks in favor of one big chunk that I'll refer to from now on as field.
+    - I'll treat null values as empty, let's see if I'll regret this
+    - The system has to constantly convert floats to ints and it hurts just a little bit, but it's probably fine.
+        - I tried approach where Poolables had extra fields called GridX and GridY which would've been the worms position on the grid as ints and I would convert ints to floats when updating the position, but everything got really messy and confusing.
 
 # 28.06.2020
 - Thoughts:
@@ -25,6 +55,7 @@
     
 - TL;DR: No to tilemaps, embrace entities, pursue scalability with a chunk based collision system
 
+
 # 27.06.2020
 - I'm facing a problem:
     - The new pooling system although is very nice to access elsewhere, has all kinds of nasty side effects. I need back the poolables because entities have to be able to disable themselves because otherwise I'm going to have to compensate WAY TOO MUCH for that in other ways.
@@ -43,6 +74,7 @@
         - I could build some special case into the pooler but that kind of breaks the generic nature of the pooler.
         - I'll try doing things the recursive way.
 
+
 # 24.06.2020
 - Pooler now uses two Lists instead of single array.
     - Now we don't have to if(poolable.enabled) at every point
@@ -51,8 +83,10 @@
 
 - Plans for the next coding session: start implementing block rotation / controls, see if any problems arise with the current queuing system.
 
+
 # 22.06.2020
 - Solved the movement queue problem, I was using current position instead of target position when calculating the next target position for the worm
+
 
 # 21.06.2020
 - What got done from yesterdays notes:
@@ -85,6 +119,7 @@
 - Extreme Programming all the way lol (not sure if it makes sense here because I am the customer and the developer)
 - My comments probably have a lot of spelling errors
 
+
 # 20.06.2020
 - Been doing miscallennous work, time for a more major rework
     - Head.cs has gotten bloated and takes care of a lot of stuff that really should be handled by some sort of a manager
@@ -101,20 +136,24 @@
     - At some point I'm going to have to worry about how to implement the ghosts, but that seems easy enough to retrofit so I'll push that aside for now
 - Apparently I'm now using changelog as some sort of a blog. Deal with it.
 
+
 # 15.06.2020
 - Designing new systems (collision, movement) and how they interact
 - Improved pooling system
+
 
 # 14.06.2020
 - Basic generic entity pooling done
 - Worms now have their body parts in pools
 - **NOTE**: I know I'm probably using too much inheritance and the smart way to do things would be the component system that Otter has. I checked it out and it seems awesome, BUT I'm going to go down the inheritance rabbit hole to see how much problems it's going to cause. Kind of like how I learned that rewriting git history in a branch already pushed to remote is a really bad idea by having tried it. **The goal is to become a better programmer and not to make a game.**
 
+
 # 12.06.2020
 - Basic WormGame done
 - Different scenes are in different files 
 - Began work on AreaGame (Grid) and Pooling
     - **NOTE:** The names I pick for things seem to often overlap with some premade Otter stuff. Probably if I just wanted to make a game I'd have to do much less work, but the point is not to learn Otter but rather learn keyboard shortcuts (web browser, windows, visual studio), git commands / github, markdown, windows terminal and get some practise in OOP.
+
 
 # 11.06.2020
 - Visual Studio, Otter, ComTest setup done
