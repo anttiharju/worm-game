@@ -29,7 +29,7 @@ namespace WormGame.GameObject
             if (NextBody != null)
                 NextBody.Disable();
             Enabled = false;
-            collision.SetNull(Target);
+            collision.SetField(Target, null);
         }
 
         public Vector2[] GetPositions(Vector2[] positions, int i = 0)
