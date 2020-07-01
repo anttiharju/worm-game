@@ -15,18 +15,17 @@ namespace WormGame
         private readonly PlayArea playArea;
         private readonly Collision collision;
 
-        private readonly Pooler<Bunch> bunches;
-        private readonly Pooler<Block> blocks;
+        private readonly Pooler<Bricks> bunches;
+        private readonly Pooler<Brick> blocks;
         private readonly Pooler<Tail> tails;
         private readonly Pooler<Worm> worms;
 
         private readonly int width = 100;
         private readonly int height = 50;
         private readonly int marginMinimum = 2;
-        private readonly int wormCount = 100;
 
         private readonly float bunchTimerReset = 0.6f;
-        private readonly float wormTimerReset = 0.3f;
+        private readonly float wormTimerReset = 0.1f;
         private float bunchTimer = 0;
         private float wormTimer = 0;
 
@@ -41,19 +40,17 @@ namespace WormGame
         {
             playArea = new PlayArea(game, width, height, marginMinimum);
             collision = new Collision(playArea);
-            bunches = new Pooler<Bunch>(this, wormCount * 2, playArea.Size);
-            blocks = new Pooler<Block>(this, wormCount * 2 * Config.maxWormLength, playArea.Size);
-            tails = new Pooler<Tail>(this, wormCount * Config.maxWormLength, playArea.Size);
-            worms = new Pooler<Worm>(this, wormCount, playArea.Size);
+            bunches = new Pooler<Bricks>(this, Config.maxWormAmount * 2, playArea.Size);
+            blocks = new Pooler<Brick>(this, Config.maxWormAmount * 2 * Config.maxWormLength, playArea.Size);
+            tails = new Pooler<Tail>(this, Config.maxWormAmount * Config.maxWormLength, playArea.Size);
+            worms = new Pooler<Worm>(this, Config.maxWormAmount, playArea.Size);
             wormPositions = new Vector2[Config.maxWormLength];
 
             // Entity setup
-            SpawnWorm(0, 0, 5);
-            SpawnWorm(0, height - 1, 5);
-            SpawnWorm(width - 1, height - 1, 5);
-            SpawnWorm(width - 1, 0, 5);
-            for (int x = 0; x < width; x += 2)
-                SpawnWorm(x, 15, 5);
+            int density = 4;
+            for (int x = 0; x < width; x += density)
+                for (int y = 0; y < height; y += density)
+                    SpawnWorm(x, y, 5, Random.Direction());
             SpawnPlayer(game.HalfWidth, game.HalfHeight, Color.Red);
         }
 
@@ -92,7 +89,7 @@ namespace WormGame
         /// <param name="color">Worms color, by default uses a random color from Helper class</param>
         /// <param name="direction">Worms direction: UP, LEFT, DOWN or RIGHT</param>
         /// <returns>Spawned worm</returns>
-        public Worm SpawnWorm(int x, int y, int length = -1, Color color = null, string direction = "")
+        public Worm SpawnWorm(int x, int y, int length = -1, string direction = "", Color color = null)
         {
             if (color == null) color = Random.Color();
             if (length == -1) length = Config.maxWormLength;
@@ -119,21 +116,21 @@ namespace WormGame
 
 
         /// <summary>
-        /// Turns the given worm into a bunch of blocks
+        /// Turns the given worm into a collection of bricks
         /// </summary>
         /// <param name="worm">Worm to transform</param>
-        public Bunch Blockify(Worm worm)
+        public Bricks Brickify(Worm worm)
         {
             wormPositionsLength = worm.Length;
             for (int i = 0; i < wormPositionsLength; i++)
                 wormPositions[i] = worm[i].Target;
 
-            Bunch bunch = bunches.Enable();
+            Bricks bunch = bunches.Enable();
             if (bunch == null) return null;
             bunch.Spawn(wormPositions[0], Color.Gray, worm.Length, playArea.EntityY(0));
 
-            Block tmpBlock = bunch;
-            Block previousBlock = tmpBlock;
+            Brick tmpBlock = bunch;
+            Brick previousBlock = tmpBlock;
 
             for (int i = 1; i < wormPositions.Length; i++)
             {
@@ -176,6 +173,8 @@ namespace WormGame
             foreach (Worm worm in worms)
                 if (worm.Enabled)
                     worm.Move();
+            if (Config.visualizePlayArea)
+                playArea.Visualize();
         }
 
 
