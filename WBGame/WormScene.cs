@@ -27,12 +27,12 @@ namespace WormGame
 
         private void EntitySetup(Game game)
         {
+            int y = 0;
+            SpawnWorm(20, 10, Helper.RandomColor(), 5, "", true);
             for (int x = 0; x < 40; x++)
             {
-                for (int y = 0; y < 20; y++)
-                {
-
-                }
+                SpawnWorm(x, y, Helper.RandomColor(), 5, "", false);
+                if (x % 3 == 0) y++;
             }
             SpawnPlayer(game.HalfWidth, game.HalfHeight, Color.Red);
         }
@@ -78,20 +78,7 @@ namespace WormGame
         {
             Worm worm = worms.Enable();
             if (worm == null) return null;
-            worm.Spawn(collision, gridX, gridY, length, color, direction, noclip);
-
-            int bodyCount = length - 1; // - 1 because head already counts as 1
-            Tail currentBody = worm;
-            for (int i = 0; i < bodyCount; i++)
-            {
-                Tail tmpBody = tails.Enable();
-                if (tmpBody == null) return null;
-                tmpBody.Position = new Vector2(collision.X(gridX), collision.Y(gridY));
-                tmpBody.Target = tmpBody.Position;
-                tmpBody.Graphic.Color = color;
-                currentBody.NextBody = tmpBody;
-                currentBody = tmpBody;
-            }
+            worm.Spawn(tails, collision, gridX, gridY, length, color, direction, noclip);
             return worm;
         }
 
