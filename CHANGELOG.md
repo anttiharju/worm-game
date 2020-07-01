@@ -2,7 +2,7 @@
 - Investigate GPU usage issue
 
 # 01.07.2020
-- Trying to do less massive commits, getting into the habit.
+- Trying to do less massive commits, getting into the good habit of small commits.
     - Pretty sure my professor said during a lecture that small commits are a good practise.
 
 - Improve collision visualizer
@@ -27,6 +27,9 @@
     - Goal is to fix any known bugs and merge to master sometime soon.
     - I've noticed I've (by accident) pushed non-compiling code into the dev branch.
         - Just a note to myself to be more careful
+- Cleanup (**MERGE TO MASTER**)
+    - Woo! Finally documented all the code and merged it to master. TOMORROW I CAN FINALLY START WORKING ON NEW STUFF!
+- Add tests to Mathf
 
 # 30.06.2020
 - Cleaned up the new collision system, it still has bugs but it shouldn't crash.
