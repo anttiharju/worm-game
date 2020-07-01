@@ -1,4 +1,5 @@
 ﻿using Otter;
+using WormGame.Help;
 
 namespace WormGame
 {
@@ -11,14 +12,15 @@ namespace WormGame
     {
         static void Main()
         {
-            Game game = new Game("Worm bricks", 1280, 720, 144)
+            Config config = new Config();
+            Game game = new Game("Worm bricks", 1280, 720, Config.targetFramerate)
             {
                 MeasureTimeInFrames = false,
                 WindowResize = false,
                 AlwaysUpdate = true,
                 MouseVisible = true
             };
-            game.Start(new WormScene(game));
+            game.Start(new WormScene(game, config));
         }
     }
 }

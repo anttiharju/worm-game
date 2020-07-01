@@ -12,17 +12,14 @@ namespace WormGame
     /// </summary>
     class WormScene : Scene
     {
+        private readonly Config config;
         private readonly PlayArea playArea;
         private readonly Collision collision;
 
         private readonly Pooler<Bricks> bunches;
         private readonly Pooler<Brick> blocks;
-        private readonly Pooler<Tail> tails;
+        private readonly Pooler<WormTail> tails;
         private readonly Pooler<Worm> worms;
-
-        private readonly int width = 100;
-        private readonly int height = 50;
-        private readonly int marginMinimum = 2;
 
         private readonly float bunchTimerReset = 0.6f;
         private readonly float wormTimerReset = 0.1f;
@@ -36,21 +33,22 @@ namespace WormGame
         /// Initializes poolers and collision system. Spawns initial entities.
         /// </summary>
         /// <param name="game"></param>
-        public WormScene(Game game)
+        public WormScene(Game game, Config config)
         {
-            playArea = new PlayArea(game, width, height, marginMinimum);
+            this.config = config;
+            playArea = new PlayArea(game, Config.width, Config.height, Config.margin);
             collision = new Collision(playArea);
-            bunches = new Pooler<Bricks>(this, Config.maxWormAmount * 2, playArea.Size);
-            blocks = new Pooler<Brick>(this, Config.maxWormAmount * 2 * Config.maxWormLength, playArea.Size);
-            tails = new Pooler<Tail>(this, Config.maxWormAmount * Config.maxWormLength, playArea.Size);
-            worms = new Pooler<Worm>(this, Config.maxWormAmount, playArea.Size);
+            bunches = new Pooler<Bricks>(this, config.wormAmount, playArea.Size);
+            blocks = new Pooler<Brick>(this, config.tailAmount, playArea.Size);
+            tails = new Pooler<WormTail>(this, config.tailAmount, playArea.Size);
+            worms = new Pooler<Worm>(this, config.wormAmount, playArea.Size);
             wormPositions = new Vector2[Config.maxWormLength];
 
             // Entity setup
             int density = 4;
-            for (int x = 0; x < width; x += density)
-                for (int y = 0; y < height; y += density)
-                    SpawnWorm(x, y, 5, Random.Direction());
+            for (int x = 0; x < Config.width; x += density)
+                for (int y = 0; y < Config.height; y += density)
+                    SpawnWorm(x, y, Config.maxWormLength, Random.Direction());
             SpawnPlayer(game.HalfWidth, game.HalfHeight, Color.Red);
         }
 
@@ -61,7 +59,7 @@ namespace WormGame
         /// </summary>
         /// <param name="position">Point that the worm has to be close to</param>
         /// <param name="range">The worm has to be at least this near</param>
-        /// <returns></returns>
+        /// <returns>Nearest worm</returns>
         public Worm NearestWorm(Vector2 position, float range)
         {
             Worm nearestWorm = null;
@@ -123,11 +121,12 @@ namespace WormGame
         {
             wormPositionsLength = worm.Length;
             for (int i = 0; i < wormPositionsLength; i++)
-                wormPositions[i] = worm[i].Next;
+                wormPositions[i] = worm[i].target;
 
             Bricks bunch = bunches.Enable();
             if (bunch == null) return null;
             bunch.Spawn(wormPositions[0], Color.Gray, worm.Length, playArea.EntityY(0));
+            playArea.Update(bunch);
 
             Brick tmpBlock = bunch;
             Brick previousBlock = tmpBlock;
@@ -137,6 +136,7 @@ namespace WormGame
                 tmpBlock = blocks.Enable();
                 previousBlock.NextBlock = tmpBlock;
                 tmpBlock.Spawn(wormPositions[i], Color.Gray);
+                playArea.Update(tmpBlock);
                 previousBlock = tmpBlock;
             }
 
