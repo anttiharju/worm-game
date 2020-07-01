@@ -39,7 +39,7 @@ namespace WormGame.Other
         /// </summary>
         /// <param name="newPosition">Where the worm wants to move</param>
         /// <returns>If it can or not move to the new position</returns>
-        public bool WormCheck(Worm worm, Vector2 position, int deltaX, int deltaY)
+        public bool WormCheck(Worm worm, Vector2 position, int deltaX, int deltaY, bool noclip)
         {
             Vector2 next = position + new Vector2(deltaX, deltaY);
             int nextReverseX = ReverseX(next.X);
@@ -48,19 +48,23 @@ namespace WormGame.Other
                 nextReverseX >= Width ||
                 nextReverseY <= -1 ||
                 nextReverseY >= Height ||
-                Get(next) != null)
+                (Get(next) != null && !noclip))
                 return false;
 
+            Console.CursorTop = 0;
             Console.CursorLeft = 0;
-            Console.Write(nextReverseX.ToString("00") + " " + nextReverseY.ToString("00"));
+            Console.WriteLine("[" + nextReverseX.ToString("00") + " " + nextReverseY.ToString("00") + "]                                                                           ");
 
-            // Update worm collision data
+            Tail[] wholeWorm = worm.GetWorm();
+            Set(wholeWorm[0], next);
+
+            /*// Update worm collision data
             Tail[] wholeWorm = worm.GetWorm();
             SetNull(wholeWorm[^1].Position);
             for (int i = wholeWorm.Length - 1; i > 0; i--)
                 Set(wholeWorm[i], wholeWorm[i - 1].Position);
             Set(wholeWorm[0], next);
-
+            */
             return true;
         }
 
@@ -119,17 +123,17 @@ namespace WormGame.Other
 
         public void VisualizeField()
         {
-            Console.Clear();
-            for (int y = Height - 1; y >= 0; y--)
+            for (int y = 0; y < Height; y++)
             {
+                Console.CursorTop = Height - y;
                 for (int x = 0; x < Width; x++)
                 {
+                    Console.CursorLeft = x;
                     if (field[x, y] == null)
                         Console.Write(".");
                     else
                         Console.Write("o");
                 }
-                Console.WriteLine();
             }
         }
     }

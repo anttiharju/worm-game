@@ -13,7 +13,7 @@ namespace WormGame.GameObject
     {
         private Collision collision;
         private readonly int size;
-
+        private bool noclip = false;
         public int Length { get; private set; }
         public string Direction { private get; set; }
         public override Color Color { get { return Graphic.Color ?? null; } set { SetColor(value); } }
@@ -39,9 +39,10 @@ namespace WormGame.GameObject
         /// <param name="color">Worms color</param>
         /// <param name="directions">Movement instructions for the worm</param>
         /// <returns>The spawned worm</returns>
-        public Worm Spawn(Collision collision, int x, int y, int length, Color color, string direction)
+        public Worm Spawn(Collision collision, int x, int y, int length, Color color, string direction, bool noclip)
         {
             this.collision = collision;
+            this.noclip = noclip;
             Length = length;
             Direction = direction;
             Position = new Vector2(collision.X(x), collision.Y(y));
@@ -85,7 +86,7 @@ namespace WormGame.GameObject
         /// <param name="deltaY">Vertical movement</param>
         private void CheckCollision(int deltaX, int deltaY)
         {
-            if (collision.WormCheck(this, Position, deltaX, deltaY))
+            if (collision.WormCheck(this, Position, deltaX, deltaY, noclip))
                 Move(deltaX, deltaY);
         }
 

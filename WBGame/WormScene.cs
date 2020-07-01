@@ -11,7 +11,7 @@ namespace WormGame
     /// </summary>
     class WormScene : Scene
     {
-        private readonly int wormCount = 40;
+        private readonly int wormCount = 59;
         private readonly int maxWormLength = 3;
 
         private readonly float bunchTimerReset = 0.6f;
@@ -27,9 +27,13 @@ namespace WormGame
 
         private void EntitySetup(Game game)
         {
-            SpawnWorm(0, 0, Helper.RandomColor(), 3, "");
-            SpawnWorm(39, 19, Helper.RandomColor(), 3, "");
-            SpawnWorm(20, 10, Helper.RandomColor(), 3, "");
+            for (int x = 0; x < 40; x++)
+            {
+                for (int y = 0; y < 20; y++)
+                {
+
+                }
+            }
             SpawnPlayer(game.HalfWidth, game.HalfHeight, Color.Red);
         }
 
@@ -70,11 +74,11 @@ namespace WormGame
         /// <param name="length">Worms length</param>
         /// <param name="color">Worms color</param>
         /// <returns>The spawned worm</returns>
-        public Worm SpawnWorm(int gridX, int gridY, Color color, int length, string direction = "")
+        public Worm SpawnWorm(int gridX, int gridY, Color color, int length, string direction = "", bool noclip = false)
         {
             Worm worm = worms.Enable();
             if (worm == null) return null;
-            worm.Spawn(collision, gridX, gridY, length, color, direction);
+            worm.Spawn(collision, gridX, gridY, length, color, direction, noclip);
 
             int bodyCount = length - 1; // - 1 because head already counts as 1
             Tail currentBody = worm;
@@ -159,6 +163,7 @@ namespace WormGame
             foreach (Worm worm in worms)
                 if (worm.Enabled)
                     worm.Move();
+            collision.VisualizeField();
         }
 
 

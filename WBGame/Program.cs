@@ -16,7 +16,7 @@ namespace WormGame
             {
                 MeasureTimeInFrames = false,
                 WindowResize = false,
-                WindowBorder = false,
+                //WindowBorder = false,
                 AlwaysUpdate = true,
                 MouseVisible = true
             };
