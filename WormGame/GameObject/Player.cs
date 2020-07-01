@@ -1,12 +1,8 @@
 ﻿using Otter;
-using System;
-using System.Timers;
 using WormGame.Other;
 
 namespace WormGame.GameObject
 {
-    // TODO: Generalize things, now this is a unholy mess full of if's
-    // ^ i'll do that later on as I don't know how much things will evolve from this
     class Player : Poolable
     {
         private readonly WormScene manager;

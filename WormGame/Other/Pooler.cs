@@ -4,10 +4,10 @@ using System.Collections;
 
 namespace WormGame.Other
 {
-    /// @author anvemaha
+    /// @author Antti Harju
     /// @version 28.06.2020
     /// <summary>
-    /// Entity pooler. Production ready.
+    /// Entity pooler.
     /// </summary>
     /// <typeparam name="T">Poolable entity type</typeparam>
     public class Pooler<T> : IEnumerable where T : Poolable
@@ -15,7 +15,6 @@ namespace WormGame.Other
         private readonly T[] pool;
         private readonly int lastIndex;
         private int enablingIndex = 0;
-
 
         /// <summary>
         /// Initializes pool and poolable entities.

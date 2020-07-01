@@ -24,12 +24,12 @@ namespace WormGame.GameObject
             image.CenterOrigin();
         }
 
-        public void Disable(Collision collision)
+        public void Disable(PlayArea playArea)
         {
             if (NextBody != null)
                 NextBody.Disable();
             Enabled = false;
-            collision.SetField(Target, null);
+            playArea.Update(Target, null);
         }
 
         public Vector2[] GetPositions(Vector2[] positions, int i = 0)
