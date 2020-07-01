@@ -6,7 +6,7 @@ namespace WormGame.GameObject
 {
     class Player : Poolable
     {
-        private readonly WormScene manager;
+        private readonly WormScene wormScene;
         private readonly Color playerColor;
         private readonly int playerNumber;
         private readonly int axisDeadZone = 10;
@@ -14,7 +14,7 @@ namespace WormGame.GameObject
         private readonly float dropTimerReset = 0.3f;
 
         private Worm worm = null;
-        private Bunch bunch = null;
+        private Bricks bunch = null;
         private Color oldColor;
 
         private float leftX;
@@ -24,9 +24,9 @@ namespace WormGame.GameObject
         private float dropTimer;
         private bool dropAction = true;
 
-        public Player(WormScene wormGame, int playerNumber, float x, float y, Color playerColor, int size)
+        public Player(WormScene wormScene, int playerNumber, float x, float y, Color playerColor, int size)
         {
-            this.manager = wormGame;
+            this.wormScene = wormScene;
             this.playerNumber = playerNumber;
             this.playerColor = playerColor;
             Image image = Image.CreateRectangle(size / 2, size, playerColor);
@@ -47,7 +47,7 @@ namespace WormGame.GameObject
             }
             if (worm == null)
             {
-                worm = manager.NearestWorm(Position, 250);
+                worm = wormScene.NearestWorm(Position, 250);
                 if (worm == null) return;
                 Graphic.Visible = false;
                 oldColor = worm.Color;
@@ -62,10 +62,16 @@ namespace WormGame.GameObject
             }
         }
 
-        private void Blockify()
+        private void KillWorm()
+        {
+            worm.Disable();
+            worm = null;
+        }
+
+        private void Brickify()
         {
             if (worm == null) return;
-            bunch = manager.Blockify(worm);
+            bunch = wormScene.Brickify(worm);
             bunch.Color = worm.Color;
             worm.Disable();
             worm = null;
@@ -104,19 +110,19 @@ namespace WormGame.GameObject
                 }
             }
 
-            if (Input.ButtonPressed(0, playerNumber)) // A rotate counterclockwise
+            if (Input.ButtonPressed(0, playerNumber)) // A
             {
                 bunch.Rotate();
             }
-            if (Input.ButtonPressed(1, playerNumber)) // B rotate clockwise
+            if (Input.ButtonPressed(1, playerNumber)) // B
             {
                 bunch.Rotate(true);
             }
-            if (Input.ButtonPressed(4, playerNumber)) // LB hold
+            if (Input.ButtonPressed(4, playerNumber)) // LB
             {
-                Blockify();
+                Brickify();
             }
-            if (Input.ButtonPressed(5, playerNumber)) // RB hold
+            if (Input.ButtonPressed(5, playerNumber)) // RB
             {
                 Posess();
             }
@@ -134,6 +140,11 @@ namespace WormGame.GameObject
                 worm.Direction = "UP";
             if (leftY > deadZone)
                 worm.Direction = "DOWN";
+
+            if (Input.ButtonPressed(3, playerNumber)) // Y
+            {
+                KillWorm();
+            }
         }
 
         private void GhostControl()
@@ -206,7 +217,7 @@ namespace WormGame.GameObject
             }
             if (Input.ButtonPressed(4, playerNumber)) // LB
             {
-                Blockify();
+                Brickify();
             }
             if (Input.ButtonPressed(5, playerNumber)) // RB
             {

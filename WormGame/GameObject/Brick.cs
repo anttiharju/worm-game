@@ -7,16 +7,16 @@ namespace WormGame.GameObject
     /// <summary>
     /// Block class, work in progress.
     /// </summary>
-    class Block : Poolable
+    class Brick : Poolable
     {
         private readonly int size;
-        public Block NextBlock { get; set; }
+        public Brick NextBlock { get; set; }
 
         /// <summary>
         /// Constructor. Nothing special.
         /// </summary>
         /// <param name="size"></param>
-        public Block(int size) : base()
+        public Brick(int size) : base()
         {
             this.size = size;
             Image image = Image.CreateRectangle(size);
@@ -68,7 +68,7 @@ namespace WormGame.GameObject
         /// <param name="i">wanted block index</param>
         /// <param name="currentI">current block index</param>
         /// <returns>block from wanted index</returns>
-        public Block GetBlock(int i, int currentI = 0)
+        public Brick GetBlock(int i, int currentI = 0)
         {
             if (i > currentI)
                 return NextBlock.GetBlock(i, ++currentI);
