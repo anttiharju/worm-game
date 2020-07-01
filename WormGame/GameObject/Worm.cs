@@ -1,26 +1,26 @@
 ﻿using Otter;
-using System;
-using System.Collections;
+using WormGame.Help;
 using WormGame.Other;
 
 namespace WormGame.GameObject
 {
     /// @author Antti Harju
-    /// @version 22.06.2020
+    /// @version 01.07.2020
     /// <summary>
     /// The worm class. Technically it's just the head entity but it manages the entire worm.
     /// </summary>
     class Worm : Tail
     {
+        private readonly Tail[] worm;
+        private readonly int size;
+
+        private PlayArea playArea;
+        private Collision collision;
+
         public override Color Color { get { return Graphic.Color ?? null; } set { SetColor(value); } }
         public string Direction { private get; set; }
-        public int Length { get; private set; }
-
-        private Collision collision;
-        private PlayArea playArea;
-        private readonly int size;
-        private Tail[] wholeWorm;
         public bool Noclip { private get; set; }
+        public int Length { get; private set; }
 
         /// <summary>
         /// Head constructor. Calls Body constructor.
@@ -30,6 +30,7 @@ namespace WormGame.GameObject
         {
             this.size = size;
             Direction = "UP";
+            worm = new Tail[Config.maxWormLength];
         }
 
 
@@ -45,34 +46,38 @@ namespace WormGame.GameObject
         /// <returns>The spawned worm</returns>
         public Worm Spawn(Pooler<Tail> tails, Collision collision, PlayArea playArea, int x, int y, int length, Color color, string direction)
         {
+            // Tail
+            int tailCount = length - 1; // minus one because head already counts as 1
+            Tail current = this;
+            for (int i = 0; i < tailCount; i++)
+            {
+                worm[i] = current;
+                Tail next = tails.Enable();
+                if (next == null) return null;
+                next.Position = new Vector2(x, y);
+                next.Target = next.Position;
+                current.Next = next;
+                current = next;
+            }
+            worm[tailCount] = current;
+
+            // Head
             this.collision = collision;
             this.playArea = playArea;
+            X = x;
+            Y = y;
             Length = length;
-            Direction = direction;
-            Position = new Vector2(x, y);
             Target = Position;
-            Graphic.Color = color;
+            Direction = direction;
             playArea.Update(Target, this);
+            Color = color;
 
-            int bodyCount = length - 1; // - 1 because head already counts as 1
-            Tail currentBody = this;
-            for (int i = 0; i < bodyCount; i++)
-            {
-                Tail tmpBody = tails.Enable();
-                if (tmpBody == null) return null;
-                tmpBody.Position = new Vector2(x, y);
-                tmpBody.Target = tmpBody.Position;
-                tmpBody.Graphic.Color = color;
-                currentBody.NextBody = tmpBody;
-                currentBody = tmpBody;
-            }
-            wholeWorm = GetWorm();
             return this;
         }
 
 
         /// <summary>
-        /// Moves the worm
+        /// Activates the worm to move
         /// </summary>
         public void Move()
         {
@@ -105,21 +110,18 @@ namespace WormGame.GameObject
                 Move(deltaX, deltaY);
         }
 
+
+        /// <summary>
+        /// Disables the entire worm
+        /// </summary>
         public override void Disable()
         {
-            if (NextBody != null)
-                NextBody.Disable(playArea);
-            Enabled = false;
+            if (Next != null)
+                Next.Disable(playArea);
+            for (int i = 0; i < Length; i++)
+                worm[i] = null;
             playArea.Update(Target, null);
-        }
-
-        public Tail[] GetWorm()
-        {
-            Tail[] tmp = new Tail[Length];
-            if (NextBody != null)
-                NextBody.GetWorm(ref tmp, 1);
-            tmp[0] = this;
-            return tmp;
+            Enabled = false;
         }
 
 
@@ -131,9 +133,9 @@ namespace WormGame.GameObject
         /// <returns>Worms body part at index</returns>
         public Tail this[int i]
         {
-#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
-            get => wholeWorm[i];
-            set => wholeWorm[i] = value;
+            get => worm[i];
+            set => worm[i] = value;
         }
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
     }
 }

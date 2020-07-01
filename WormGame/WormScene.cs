@@ -1,4 +1,5 @@
 ﻿using Otter;
+using WormGame.Help;
 using WormGame.Other;
 using WormGame.GameObject;
 
@@ -23,12 +24,14 @@ namespace WormGame
         private readonly int height = 50;
         private readonly int marginMinimum = 2;
         private readonly int wormCount = 100;
-        private readonly int maxWormLength = 5;
 
         private readonly float bunchTimerReset = 0.6f;
         private readonly float wormTimerReset = 0.3f;
         private float bunchTimer = 0;
         private float wormTimer = 0;
+
+        private readonly Vector2[] wormPositions;
+        private int wormPositionsLength;
 
         /// <summary>
         /// Initializes poolers and collision system. Spawns initial entities.
@@ -39,9 +42,10 @@ namespace WormGame
             playArea = new PlayArea(game, width, height, marginMinimum);
             collision = new Collision(playArea);
             bunches = new Pooler<Bunch>(this, wormCount * 2, playArea.Size);
-            blocks = new Pooler<Block>(this, wormCount * 2 * maxWormLength, playArea.Size);
-            tails = new Pooler<Tail>(this, wormCount * maxWormLength, playArea.Size);
+            blocks = new Pooler<Block>(this, wormCount * 2 * Config.maxWormLength, playArea.Size);
+            tails = new Pooler<Tail>(this, wormCount * Config.maxWormLength, playArea.Size);
             worms = new Pooler<Worm>(this, wormCount, playArea.Size);
+            wormPositions = new Vector2[Config.maxWormLength];
 
             // Entity setup
             SpawnWorm(0, 0, 5);
@@ -91,7 +95,7 @@ namespace WormGame
         public Worm SpawnWorm(int x, int y, int length = -1, Color color = null, string direction = "")
         {
             if (color == null) color = Random.Color();
-            if (length == -1) length = maxWormLength;
+            if (length == -1) length = Config.maxWormLength;
             Worm worm = worms.Enable();
             if (worm == null) return null;
             worm.Spawn(tails, collision, playArea, playArea.EntityX(x), playArea.EntityY(y), length, color, direction);
@@ -120,20 +124,22 @@ namespace WormGame
         /// <param name="worm">Worm to transform</param>
         public Bunch Blockify(Worm worm)
         {
-            Vector2[] positions = worm.GetPositions(new Vector2[worm.Length]);
+            wormPositionsLength = worm.Length;
+            for (int i = 0; i < wormPositionsLength; i++)
+                wormPositions[i] = worm[i].Target;
 
             Bunch bunch = bunches.Enable();
             if (bunch == null) return null;
-            bunch.Spawn(positions[0], Color.Gray, worm.Length, playArea.EntityY(0));
+            bunch.Spawn(wormPositions[0], Color.Gray, worm.Length, playArea.EntityY(0));
 
             Block tmpBlock = bunch;
             Block previousBlock = tmpBlock;
 
-            for (int i = 1; i < positions.Length; i++)
+            for (int i = 1; i < wormPositions.Length; i++)
             {
                 tmpBlock = blocks.Enable();
                 previousBlock.NextBlock = tmpBlock;
-                tmpBlock.Spawn(positions[i], Color.Gray);
+                tmpBlock.Spawn(wormPositions[i], Color.Gray);
                 previousBlock = tmpBlock;
             }
 
