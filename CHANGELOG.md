@@ -23,7 +23,10 @@
 - Divide Helper to Mathf and Random
     - To make the code more readable
     - Also fixed FastAbs()
-
+- Update documentation
+    - Goal is to fix any known bugs and merge to master sometime soon.
+    - I've noticed I've (by accident) pushed non-compiling code into the dev branch.
+        - Just a note to myself to be more careful
 
 # 30.06.2020
 - Cleaned up the new collision system, it still has bugs but it shouldn't crash.
