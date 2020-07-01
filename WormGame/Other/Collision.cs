@@ -66,7 +66,7 @@ namespace WormGame.Other
         {
             int xSize = game.WindowWidth / (Width + margin * 2);
             int ySize = game.WindowHeight / (Height + margin * 2);
-            int size = Helper.Smaller(xSize, ySize);
+            int size = Mathf.Smaller(xSize, ySize);
             if (size % 2 != 0) size--;
             return size;
         }
