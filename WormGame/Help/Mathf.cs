@@ -7,13 +7,20 @@ namespace WormGame.Help
     /// <summary>
     /// Class for miscellaneous mathematical functions.
     /// </summary>
-    static class Mathf
+    public static class Mathf
     {
         /// <summary>
         /// Lightweight version of Math.Abs()
         /// </summary>
         /// <param name="number">Number</param>
         /// <returns>Numbers absolute value</returns>
+        /// <example>
+        /// <pre name="test">
+        ///  FastAbs(1) ~~~ 1;
+        ///  FastAbs(0) ~~~ 0;
+        ///  FastAbs(-1) ~~~ 1;
+        /// </pre>
+        /// </example>
         public static float FastAbs(float number)
         {
             if (number < 0) return -number;
@@ -22,55 +29,48 @@ namespace WormGame.Help
 
 
         /// <summary>
-        /// Rotates vector clockwise
-        /// </summary>
-        /// <param name="v">Vector to rotate</param>
-        /// <returns>Rotated vector</returns>
-        public static Vector2 RotateCW(Vector2 v)
-        {
-            return new Vector2(v.Y, -v.X);
-        }
-
-
-        /// <summary>
         /// Rotates vector counter-clockwise
         /// </summary>
         /// <param name="v">Vector to rotate</param>
         /// <returns>Rotated vector</returns>
+        /// <example>
+        /// <pre name="test">
+        /// Vector2 v = new Vector2(-1, 0);          // Down
+        ///  v = RotateCW(v) === new Vector2(0, -1); // Left
+        ///  v = RotateCW(v) === new Vector2(1, 0);  // Up
+        ///  v = RotateCW(v) === new Vector2(0, 1);  // Right
+        ///  v = RotateCW(v) === new Vector2(-1, 0); // Down
+        /// </pre>
+        /// </example>
+        public static Vector2 RotateCW(Vector2 v)
+        {
+            float x = v.X;
+            v.X = -v.Y;
+            v.Y = x;
+            return v;
+        }
+
+
+        /// <summary>
+        /// Rotates vector clockwise
+        /// </summary>
+        /// <param name="v">Vector to rotate</param>
+        /// <returns>Rotated vector</returns>
+        /// <example>
+        /// <pre name="test">
+        /// Vector2 v = new Vector2(-1, 0);           // Down
+        ///  v = RotateCCW(v) === new Vector2(0, 1);  // Right
+        ///  v = RotateCCW(v) === new Vector2(1, 0);  // Up
+        ///  v = RotateCCW(v) === new Vector2(0, -1); // Left
+        ///  v = RotateCCW(v) === new Vector2(-1, 0); // Down
+        /// </pre>
+        /// </example>
         public static Vector2 RotateCCW(Vector2 v)
         {
-            return new Vector2(-v.Y, v.X);
-        }
-
-
-        /// <summary>
-        /// Area two Vector2s roughly equal (collision)
-        /// </summary>
-        /// <param name="a">First Vector2</param>
-        /// <param name="b">Second Vector2</param>
-        /// <param name="errorMargin">Accuracy</param>
-        /// <returns></returns>
-        public static bool RoughlyEquals(Vector2 a, Vector2 b, float errorMargin)
-        {
-            if (RoughlyEquals(a.X, b.X, errorMargin))
-                if (RoughlyEquals(a.Y, b.Y, errorMargin))
-                    return true;
-            return false;
-        }
-
-
-        /// <summary>
-        /// Are two floats roughly equal
-        /// </summary>
-        /// <param name="a">First float</param>
-        /// <param name="b">Second float</param>
-        /// <param name="errorMargin">Accuracy</param>
-        /// <returns></returns>
-        public static bool RoughlyEquals(float a, float b, float errorMargin)
-        {
-            if (b - errorMargin < a && b + errorMargin > a)
-                return true;
-            return false;
+            float x = v.X;
+            v.X = v.Y;
+            v.Y = -x;
+            return v;
         }
 
 
@@ -80,6 +80,14 @@ namespace WormGame.Help
         /// <param name="a">First value</param>
         /// <param name="b">Second value</param>
         /// <returns>Smaller value</returns>
+        /// <example>
+        /// <pre name="test">
+        ///  Smaller(1, 2)  ===  1;
+        ///  Smaller(2, 1)  ===  1;
+        ///  Smaller(-1, 1) === -1;
+        ///  Smaller(0, 0)  ===  0;
+        /// </pre>
+        /// </example>
         public static int Smaller(int a, int b)
         {
             if (a < b) return a;
@@ -93,6 +101,14 @@ namespace WormGame.Help
         /// <param name="a">First value</param>
         /// <param name="b">Second value</param>
         /// <returns>Smaller value</returns>
+        /// <example>
+        /// <pre name="test">
+        ///  Smaller(1, 2)  ===  1;
+        ///  Smaller(2, 1)  ===  1;
+        ///  Smaller(-1, 1) === -1;
+        ///  Smaller(0, 0)  ===  0;
+        /// </pre>
+        /// </example>
         public static float Smaller(float a, float b)
         {
             if (a < b) return a;
@@ -106,6 +122,14 @@ namespace WormGame.Help
         /// <param name="a">First value</param>
         /// <param name="b">Second value</param>
         /// <returns>Bigger value</returns>
+        /// <example>
+        /// <pre name="test">
+        ///  Bigger(1, 2) === 2;
+        ///  Bigger(2, 1) === 2;
+        ///  Bigger(-1, 1) === 1;
+        ///  Bigger(0, 0) === 0;
+        /// </pre>
+        /// </example>
         public static float Bigger(float a, float b)
         {
             if (b < a) return a;

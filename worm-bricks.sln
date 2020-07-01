@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Otter", "..\..\..\..\devel\otter\Otter\Otter.csproj", "{8AAB329C-B646-4D09-826A-A84F4E940140}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WormGame", "WormGame\WormGame.csproj", "{8311C08A-011D-48D5-9AA3-A932A19DEBDC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WormGame", "WormGame\WormGame.csproj", "{8311C08A-011D-48D5-9AA3-A932A19DEBDC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WormGameTest", "WormGameTest\WormGameTest.csproj", "{0A919C7C-B181-435E-AF3B-EF5A41FF6760}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{8311C08A-011D-48D5-9AA3-A932A19DEBDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8311C08A-011D-48D5-9AA3-A932A19DEBDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8311C08A-011D-48D5-9AA3-A932A19DEBDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A919C7C-B181-435E-AF3B-EF5A41FF6760}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A919C7C-B181-435E-AF3B-EF5A41FF6760}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A919C7C-B181-435E-AF3B-EF5A41FF6760}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A919C7C-B181-435E-AF3B-EF5A41FF6760}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
