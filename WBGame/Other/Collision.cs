@@ -39,9 +39,9 @@ namespace WormGame.Other
         /// </summary>
         /// <param name="newPosition">Where the worm wants to move</param>
         /// <returns>If it can or not move to the new position</returns>
-        public bool WormCheck(Worm worm, Vector2 position, int deltaX, int deltaY, bool noclip)
+        public bool WormCheck(Worm worm, Vector2 target, int deltaX, int deltaY, bool noclip)
         {
-            Vector2 next = position + new Vector2(deltaX, deltaY);
+            Vector2 next = target + new Vector2(deltaX, deltaY);
             int nextReverseX = ReverseX(next.X);
             int nextReverseY = ReverseY(next.Y);
             if (nextReverseX <= -1 ||
@@ -55,16 +55,16 @@ namespace WormGame.Other
             Console.CursorLeft = 0;
             Console.WriteLine("[" + nextReverseX.ToString("00") + " " + nextReverseY.ToString("00") + "]                                                                           ");
 
+            // Update worm collision data
             Tail[] wholeWorm = worm.GetWorm();
+            Set(wholeWorm[0], next);
+            Set(wholeWorm[worm.Length - 1], next);
+
+            SetNull(wholeWorm[^1].Target);
+            for (int i = wholeWorm.Length - 1; i > 0; i--)
+                Set(wholeWorm[i], wholeWorm[i - 1].Target);
             Set(wholeWorm[0], next);
 
-            /*// Update worm collision data
-            Tail[] wholeWorm = worm.GetWorm();
-            SetNull(wholeWorm[^1].Position);
-            for (int i = wholeWorm.Length - 1; i > 0; i--)
-                Set(wholeWorm[i], wholeWorm[i - 1].Position);
-            Set(wholeWorm[0], next);
-            */
             return true;
         }
 
@@ -77,24 +77,19 @@ namespace WormGame.Other
             return size;
         }
 
-        private ref Poolable Get(Vector2 position)
+        private ref Poolable Get(Vector2 target)
         {
-            return ref field[ReverseX(position.X), ReverseY(position.Y)];
+            return ref field[ReverseX(target.X), ReverseY(target.Y)];
         }
 
-        public void Set(Poolable entity)
+        public void Set(Poolable entity, Vector2 target)
         {
-            Get(entity.Position) = entity;
+            Get(target) = entity;
         }
 
-        private void Set(Poolable entity, Vector2 position)
+        public void SetNull(Vector2 target)
         {
-            Get(position) = entity;
-        }
-
-        private void SetNull(Vector2 position)
-        {
-            Get(position) = null;
+            Get(target) = null;
         }
 
 
