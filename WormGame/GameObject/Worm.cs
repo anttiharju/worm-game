@@ -52,7 +52,7 @@ namespace WormGame.GameObject
             Console.WriteLine(" ");
             Target = Position;
             Graphic.Color = color;
-            collision.SetField(this, Target);
+            collision.SetField(Target, this);
 
             int bodyCount = length - 1; // - 1 because head already counts as 1
             Tail currentBody = this;

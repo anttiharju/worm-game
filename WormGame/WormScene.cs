@@ -4,10 +4,10 @@ using WormGame.GameObject;
 
 namespace WormGame
 {
-    /// @author Antti Harju
-    /// @version 21.6.2020
+    /// @author anvemaha
+    /// @version 01.07.2020
     /// <summary>
-    /// Main game
+    /// The main scene for WormGame
     /// </summary>
     class WormScene : Scene
     {
@@ -28,19 +28,11 @@ namespace WormGame
         private readonly Pooler<Worm> worms;
         private readonly Collision collision;
 
-        private void EntitySetup(Game game)
-        {
-            SpawnWorm(0, 0, 5);
-            SpawnWorm(0, height - 1, 5);
-            SpawnWorm(width - 1, height - 1, 5);
-            SpawnWorm(width - 1, 0, 5);
-            for (int x = 0; x < width; x += 2)
-            {
-                SpawnWorm(x, 15, 5);
-            }
-            SpawnPlayer(game.HalfWidth, game.HalfHeight, Color.Red);
-        }
 
+        /// <summary>
+        /// Initializes poolers and collision system. Spawns initial entities.
+        /// </summary>
+        /// <param name="game"></param>
         public WormScene(Game game)
         {
             collision = new Collision(game, width, height, marginMinimum);
@@ -48,18 +40,33 @@ namespace WormGame
             blocks = new Pooler<Block>(this, wormCount * 2 * maxWormLength, collision.Size);
             tails = new Pooler<Tail>(this, wormCount * maxWormLength, collision.Size);
             worms = new Pooler<Worm>(this, wormCount, collision.Size);
-            EntitySetup(game);
+
+            // Entity setup
+            SpawnWorm(0, 0, 5);
+            SpawnWorm(0, height - 1, 5);
+            SpawnWorm(width - 1, height - 1, 5);
+            SpawnWorm(width - 1, 0, 5);
+            for (int x = 0; x < width; x += 2)
+                SpawnWorm(x, 15, 5);
+            SpawnPlayer(game.HalfWidth, game.HalfHeight, Color.Red);
         }
 
 
-        public Worm NearestWorm(Vector2 player, float range)
+        /// <summary>
+        /// Finds the nearest worm to the given position, within given range.
+        /// Used by player class to posess worms.
+        /// </summary>
+        /// <param name="position">Point that the worm has to be close to</param>
+        /// <param name="range">The worm has to be at least this near</param>
+        /// <returns></returns>
+        public Worm NearestWorm(Vector2 position, float range)
         {
             Worm nearestWorm = null;
             float nearestDistance = range;
             foreach (Worm worm in worms)
                 if (worm.Enabled)
                 {
-                    float distance = Vector2.Distance(player, worm.Position);
+                    float distance = Vector2.Distance(position, worm.Position);
                     if (distance < nearestDistance)
                     {
                         nearestWorm = worm;
@@ -71,16 +78,17 @@ namespace WormGame
 
 
         /// <summary>
-        /// Spawns a worm to the scene
+        /// Spawns a worm
         /// </summary>
-        /// <param name="x">Horizontal position</param>
-        /// <param name="y">Vertical position</param>
+        /// <param name="x">Horizontal position (field)</param>
+        /// <param name="y">Vertical postition (field)</param>
         /// <param name="length">Worms length</param>
-        /// <param name="color">Worms color</param>
-        /// <returns>The spawned worm</returns>
+        /// <param name="color">Worms color, by default uses a random color from Helper class</param>
+        /// <param name="direction">Worms direction: UP, LEFT, DOWN or RIGHT</param>
+        /// <returns>Spawned worm</returns>
         public Worm SpawnWorm(int x, int y, int length = -1, Color color = null, string direction = "")
         {
-            if (color == null) color = Helper.RandomColor();
+            if (color == null) color = Random.Color();
             if (length == -1) length = maxWormLength;
             Worm worm = worms.Enable();
             if (worm == null) return null;
@@ -90,8 +98,10 @@ namespace WormGame
 
 
         /// <summary>
-        /// Spawns player to the scene
+        /// Spawn a player
         /// </summary>
+        /// <param name="x">Horizontal position (actual)</param>
+        /// <param name="y">Vertical position (actual)</param>
         /// <param name="color">Players color</param>
         /// <returns>Spawned player</returns>
         public Player SpawnPlayer(float x, float y, Color color)
@@ -103,9 +113,9 @@ namespace WormGame
 
 
         /// <summary>
-        /// Turns a worm to blocks
+        /// Turns the given worm into a bunch of blocks
         /// </summary>
-        /// <param name="worm">Worm to blockify</param>
+        /// <param name="worm">Worm to transform</param>
         public Bunch Blockify(Worm worm)
         {
             Vector2[] positions = worm.GetPositions(new Vector2[worm.Length]);
@@ -129,7 +139,9 @@ namespace WormGame
         }
 
 
-
+        /// <summary>
+        /// Updates timers that control WormUpdate() and BunchUpdate()
+        /// </summary>
         public override void Update()
         {
             base.Update();
@@ -149,14 +161,13 @@ namespace WormGame
 
 
         /// <summary>
-        /// Worm movement is updated here
+        /// Makes every worm move to their next position
         /// </summary>
         public void WormUpdate()
         {
             foreach (Worm worm in worms)
                 if (worm.Enabled)
                     worm.Move();
-            //collision.Visualize();
         }
 
 
