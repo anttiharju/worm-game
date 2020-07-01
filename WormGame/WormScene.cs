@@ -150,7 +150,7 @@ namespace WormGame
             foreach (Worm worm in worms)
                 if (worm.Enabled)
                     worm.Move();
-            collision.VisualizeField();
+            //collision.Visualize();
         }
 
 

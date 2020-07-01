@@ -50,11 +50,11 @@ namespace WormGame.Other
                 nextReverseY >= Height ||
                 (Get(next) != null && !noclip))
                 return false;
-
+            /** /
             Console.CursorTop = 0;
             Console.CursorLeft = 0;
             Console.WriteLine("[" + nextReverseX.ToString("00") + " " + nextReverseY.ToString("00") + "]                                                                           ");
-
+            /**/
             // Update worm collision data
             Tail[] wholeWorm = worm.GetWorm();
             Set(wholeWorm[0], next);
@@ -116,7 +116,7 @@ namespace WormGame.Other
             return (yPreCalc - (int)y) / Size;
         }
 
-        public void VisualizeField()
+        public void Visualize()
         {
             for (int y = 0; y < Height; y++)
             {
