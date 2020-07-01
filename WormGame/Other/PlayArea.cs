@@ -1,5 +1,6 @@
 ﻿using Otter;
 using System;
+using WormGame.GameObject;
 using WormGame.Help;
 
 namespace WormGame.Other
@@ -17,9 +18,9 @@ namespace WormGame.Other
         public int Size { get; private set; }
 
         private readonly Poolable[,] playArea;
-        private readonly int playAreaMargin;
-        private readonly int playAreaLeft;
-        private readonly int playAreaTop;
+        private readonly int margin;
+        private readonly int leftBorder;
+        private readonly int topBorder;
 
         /// <summary>
         /// Initializes the play area which is basically a 2d array of poolables used for collision.
@@ -31,13 +32,13 @@ namespace WormGame.Other
         public PlayArea(Game game, int width, int height, int margin)
         {
             this.game = game;
-            this.playAreaMargin = margin;
+            this.margin = margin;
             Width = width;
             Height = height;
             Size = CalculateSize();
             playArea = new Poolable[Width, Height];
-            playAreaLeft = game.WindowWidth / 2 - Width / 2 * Size + Size / 2;
-            playAreaTop = game.WindowHeight / 2 + Height / 2 * Size - Size / 2;
+            leftBorder = game.WindowWidth / 2 - Width / 2 * Size + Size / 2;
+            topBorder = game.WindowHeight / 2 + Height / 2 * Size - Size / 2;
         }
 
 
@@ -47,8 +48,8 @@ namespace WormGame.Other
         /// <returns>Entity size</returns>
         private int CalculateSize()
         {
-            int xSize = game.WindowWidth / (Width + playAreaMargin * 2);
-            int ySize = game.WindowHeight / (Height + playAreaMargin * 2);
+            int xSize = game.WindowWidth / (Width + margin * 2);
+            int ySize = game.WindowHeight / (Height + margin * 2);
             int size = Mathf.Smaller(xSize, ySize);
             if (size % 2 != 0) size--;
             return size;
@@ -63,6 +64,20 @@ namespace WormGame.Other
         public ref Poolable Get(Vector2 target)
         {
             return ref playArea[X(target.X), Y(target.Y)];
+        }
+
+
+        /// <summary>
+        /// Update play area through this method.
+        /// </summary>
+        /// <param name="entity">Entity</param>
+        public void Update(Poolable entity = null)
+        {
+#if DEBUG
+            if (entity is WormTail)
+                throw new Exception("Update(entity) is not valid for worms. Use Update(target, entity) instead.");
+#endif
+            Update(entity.Position, entity);
         }
 
 
@@ -84,7 +99,7 @@ namespace WormGame.Other
         /// <returns>Play areas horizontal position</returns>
         public int X(float x)
         {
-            return (((int)x - playAreaLeft) / Size);
+            return (((int)x - leftBorder) / Size);
         }
 
 
@@ -95,7 +110,7 @@ namespace WormGame.Other
         /// <returns>Play areas vertical position</returns>
         public int Y(float y)
         {
-            return (playAreaTop - (int)y) / Size;
+            return (topBorder - (int)y) / Size;
         }
 
 
@@ -106,7 +121,7 @@ namespace WormGame.Other
         /// <returns>Horizontal entity position</returns>
         public int EntityX(int x)
         {
-            return playAreaLeft + Size * x;
+            return leftBorder + Size * x;
         }
 
 
@@ -117,7 +132,7 @@ namespace WormGame.Other
         /// <returns>Vertical entity position</returns>
         public int EntityY(int y)
         {
-            return playAreaTop - Size * y;
+            return topBorder - Size * y;
         }
 
 

@@ -4,6 +4,9 @@ using WormGame.Help;
 
 namespace WormGame.GameObject
 {
+    /// <summary>
+    /// Player class (Ghost class). Very much work in progress.
+    /// </summary>
     class Player : Poolable
     {
         private readonly WormScene wormScene;
@@ -13,8 +16,8 @@ namespace WormGame.GameObject
         private readonly float speedModifier = 0.05f;
         private readonly float dropTimerReset = 0.3f;
 
-        private Worm worm = null;
-        private Bricks bunch = null;
+        private Worm worm;
+        private Bricks bricks;
         private Color oldColor;
 
         private float leftX;
@@ -24,6 +27,16 @@ namespace WormGame.GameObject
         private float dropTimer;
         private bool dropAction = true;
 
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="wormScene">Scene where the player should be</param>
+        /// <param name="playerNumber">1-4</param>
+        /// <param name="x">Ghost horizontal position</param>
+        /// <param name="y">Ghost vertical position</param>
+        /// <param name="playerColor">Ghost color</param>
+        /// <param name="size">Ghost size</param>
         public Player(WormScene wormScene, int playerNumber, float x, float y, Color playerColor, int size)
         {
             this.wormScene = wormScene;
@@ -36,98 +49,102 @@ namespace WormGame.GameObject
             Y = y;
         }
 
+
+        /// <summary>
+        /// Handles posessing at different states of being
+        /// </summary>
         private void Posess()
         {
-            if (bunch != null)
+            if (bricks != null)
             {
-                bunch.Color = oldColor;
-                Position = bunch.Position;
-                bunch = null;
+                bricks.Color = oldColor;
+                Position = bricks.Position;
+                bricks = null;
                 Graphic.Visible = true;
             }
-            if (worm == null)
+            if (worm != null)
+            {
+                worm.Color = oldColor;
+                Position = worm.Position;
+                worm.Posessed = false;
+                worm = null;
+                Graphic.Visible = true;
+            }
+            else
             {
                 worm = wormScene.NearestWorm(Position, 250);
                 if (worm == null) return;
+                worm.Posessed = true;
                 Graphic.Visible = false;
                 oldColor = worm.Color;
                 worm.Color = playerColor;
             }
-            else
-            {
-                worm.Color = oldColor;
-                Position = worm.Position;
-                worm = null;
-                Graphic.Visible = true;
-            }
         }
 
+
+        /// <summary>
+        /// Kills the posessed worm
+        /// </summary>
         private void KillWorm()
         {
             worm.Disable();
             worm = null;
         }
 
+
+        /// <summary>
+        /// Turns a worm into a collection of bricks
+        /// </summary>
         private void Brickify()
         {
             if (worm == null) return;
-            bunch = wormScene.Brickify(worm);
-            bunch.Color = worm.Color;
             worm.Disable();
+            bricks = wormScene.Brickify(worm);
+            bricks.Color = worm.Color;
             worm = null;
         }
 
-        private void BunchControl()
+
+        /// <summary>
+        /// Bricks' controls
+        /// </summary>
+        private void BrickControl()
         {
-            if (bunch == null) return;
+            if (bricks == null) return;
 
             float dpadDeadZone = 80;
 
-            // D-pad
-            if (Mathf.FastAbs(dpadX) > dpadDeadZone)
-            {
-                if (dpadX < 0)
-                {
-                }
-                if (dpadX > 0)
-                {
-                }
-            }
             if (dropAction)
-            {
                 if (Mathf.FastAbs(dpadY) > dpadDeadZone) //up hard, down soft, horizontal move
                 {
                     if (dpadY > 0)
                     {
-                        bunch.SoftDrop();
+                        bricks.SoftDrop();
                         dropAction = false;
                     }
                     if (dpadY < 0)
                     {
-                        bunch.HardDrop();
+                        bricks.HardDrop();
                         dropAction = false;
                     }
                 }
-            }
 
             if (Input.ButtonPressed(0, playerNumber)) // A
-            {
-                bunch.Rotate();
-            }
+                bricks.Rotate();
             if (Input.ButtonPressed(1, playerNumber)) // B
-            {
-                bunch.Rotate(true);
-            }
+                bricks.Rotate(true);
+
             if (Input.ButtonPressed(4, playerNumber)) // LB
-            {
                 Brickify();
-            }
+
             if (Input.ButtonPressed(5, playerNumber)) // RB
-            {
                 Posess();
-            }
         }
 
+
+        /// <summary>
+        /// Worms controls
+        /// </summary>
         private void WormControl()
         {
             if (worm == null) return;
@@ -142,25 +159,27 @@ namespace WormGame.GameObject
                 worm.Direction = "DOWN";
 
             if (Input.ButtonPressed(3, playerNumber)) // Y
-            {
                 KillWorm();
-            }
         }
 
+
+        /// <summary>
+        /// Ghosts controls
+        /// </summary>
         private void GhostControl()
         {
-            if (worm != null || bunch != null) return;
+            if (worm != null || bricks != null) return;
             float deadZone = 10;
             if (Mathf.FastAbs(leftX) > deadZone)
-            {
                 X += leftX * speedModifier;
-            }
             if (Mathf.FastAbs(leftY) > deadZone)
-            {
                 Y += leftY * speedModifier;
-            }
         }
 
+
+        /// <summary>
+        /// Examples of all kinds of Input. Work in progress.
+        /// </summary>
         public override void Update()
         {
             #region Mandatory
@@ -243,10 +262,14 @@ namespace WormGame.GameObject
 
             GhostControl();
             WormControl();
-            BunchControl();
+            BrickControl();
             Timers();
         }
 
+
+        /// <summary>
+        /// Timers to slow down inputs when holding dpad down
+        /// </summary>
         private void Timers()
         {
             if (-10 < dpadY && dpadY < 10)

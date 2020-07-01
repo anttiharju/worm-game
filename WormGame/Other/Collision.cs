@@ -21,26 +21,26 @@ namespace WormGame.Other
         /// Checks worms collision
         /// </summary>
         /// <param name="worm"></param>
-        /// <param name="next"></param>
+        /// <param name="nextTarget"></param>
         /// <param name="noclip"></param>
         /// <returns></returns>
-        public bool WormCheck(Worm worm, Vector2 next, bool noclip)
+        public bool WormCheck(Worm worm, Vector2 nextTarget, bool noclip)
         {
             // Actual collision detection
-            int nextReverseX = playArea.X(next.X);
-            int nextReverseY = playArea.Y(next.Y);
+            int nextReverseX = playArea.X(nextTarget.X);
+            int nextReverseY = playArea.Y(nextTarget.Y);
             if (nextReverseX <= -1 ||
                 nextReverseX >= playArea.Width ||
                 nextReverseY <= -1 ||
                 nextReverseY >= playArea.Height ||
-                (playArea.Get(next) != null && !noclip))
+                (playArea.Get(nextTarget) != null && !noclip))
                 return false;
 
             // Update collision data
-            playArea.Update(worm[^1].Next, null);
+            playArea.Update(worm[^1].target, null);
             for (int i = worm.Length - 1; i > 0; i--)
-                playArea.Update(worm[i - 1].Next, worm[i]);
-            playArea.Update(next, worm[0]);
+                playArea.Update(worm[i - 1].target, worm[i]);
+            playArea.Update(nextTarget, worm[0]);
             return true;
         }
     }
