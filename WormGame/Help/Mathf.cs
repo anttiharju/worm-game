@@ -1,12 +1,11 @@
 ﻿using Otter;
-using System;
 
-namespace WormGame.Other
+namespace WormGame.Help
 {
     /// @author anvemaha
     /// @version 01.07.2020
     /// <summary>
-    /// Class for miscellaneous math functions.
+    /// Class for miscellaneous mathematical functions.
     /// </summary>
     static class Mathf
     {
@@ -19,6 +18,28 @@ namespace WormGame.Other
         {
             if (number < 0) return -number;
             return number;
+        }
+
+
+        /// <summary>
+        /// Rotates vector clockwise
+        /// </summary>
+        /// <param name="v">Vector to rotate</param>
+        /// <returns>Rotated vector</returns>
+        public static Vector2 RotateCW(Vector2 v)
+        {
+            return new Vector2(v.Y, -v.X);
+        }
+
+
+        /// <summary>
+        /// Rotates vector counter-clockwise
+        /// </summary>
+        /// <param name="v">Vector to rotate</param>
+        /// <returns>Rotated vector</returns>
+        public static Vector2 RotateCCW(Vector2 v)
+        {
+            return new Vector2(-v.Y, v.X);
         }
 
 
