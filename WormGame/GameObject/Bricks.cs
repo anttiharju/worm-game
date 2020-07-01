@@ -6,7 +6,7 @@ namespace WormGame.GameObject
     /// <summary>
     /// Bunch class, work in progress. A manager for blocks but also a block.
     /// </summary>
-    class Bunch : Block
+    class Bricks : Brick
     {
         private readonly int size;
         private int count;
@@ -17,7 +17,7 @@ namespace WormGame.GameObject
         /// Constructor. Nothing special.
         /// </summary>
         /// <param name="size"></param>
-        public Bunch(int size) : base(size)
+        public Bricks(int size) : base(size)
         {
             this.size = size;
         }
@@ -45,12 +45,12 @@ namespace WormGame.GameObject
         public void Rotate(bool clockwise = false)
         {
             int anchorIndex = count / 2;
-            Block anchor = GetBlock(anchorIndex);
+            Brick anchor = GetBlock(anchorIndex);
             for (int i = 0; i < count; i++)
             {
                 if (i == anchorIndex)
                     i++;
-                Block current = GetBlock(i);
+                Brick current = GetBlock(i);
                 Vector2 anchorToCurrent = current.Position - anchor.Position;
                 if (clockwise)
                     anchorToCurrent = Mathf.RotateCW(anchorToCurrent);
