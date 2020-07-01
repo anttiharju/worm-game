@@ -123,7 +123,7 @@ namespace WormGame
         {
             wormPositionsLength = worm.Length;
             for (int i = 0; i < wormPositionsLength; i++)
-                wormPositions[i] = worm[i].Target;
+                wormPositions[i] = worm[i].Next;
 
             Bricks bunch = bunches.Enable();
             if (bunch == null) return null;

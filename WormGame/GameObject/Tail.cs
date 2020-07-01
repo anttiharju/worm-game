@@ -10,8 +10,14 @@ namespace WormGame.GameObject
     /// </summary>
     class Tail : Poolable
     {
-        public Tail Next { get; set; }
-        public Vector2 Target { get; set; }
+        public Tail NextTail { get; set; }
+        public Vector2 Next { get; set; }
+        
+        public struct Target
+        {
+            public float X { get; set; }
+            public float Y { get; set; }
+        }
 
         /// <summary>
         /// Constructor. Creates a circle graphic for the entity.
@@ -31,9 +37,9 @@ namespace WormGame.GameObject
         /// <param name="newPosition">Position to move to</param>
         public void TailFollow(Vector2 newPosition)
         {
-            if (Next != null)
-                Next.TailFollow(Target);
-            Target = newPosition;
+            if (NextTail != null)
+                NextTail.TailFollow(Next);
+            Next = newPosition;
         }
 
 
@@ -44,8 +50,10 @@ namespace WormGame.GameObject
         /// <param name="yDelta">vertical movement</param>
         public void Move(float xDelta, float yDelta)
         {
-            Next.TailFollow(Target);
-            Target += new Vector2(xDelta, yDelta);
+            NextTail.TailFollow(Next);
+            Next += new Vector2(xDelta, yDelta);
+            Point point = new Point();
+            point.X += (int)xDelta;
         }
 
 
@@ -54,7 +62,7 @@ namespace WormGame.GameObject
         /// </summary>
         public override void Update()
         {
-            Position += (Target - Position) * 0.15f * (144 / Scene.Game.TargetFramerate);
+            Position += (Next - Position) * 0.15f * (144 / Scene.Game.TargetFramerate);
         }
 
 
@@ -64,10 +72,10 @@ namespace WormGame.GameObject
         /// <param name="playArea">Play area</param>
         public void Disable(PlayArea playArea)
         {
-            if (Next != null)
-                Next.Disable();
+            if (NextTail != null)
+                NextTail.Disable();
             Enabled = false;
-            playArea.Update(Target, null);
+            playArea.Update(Next, null);
         }
 
 
@@ -77,8 +85,8 @@ namespace WormGame.GameObject
         /// <param name="color">Worms new color</param>
         public void SetColor(Color color)
         {
-            if (Next != null)
-                Next.SetColor(color);
+            if (NextTail != null)
+                NextTail.SetColor(color);
             Graphic.Color = color;
         }
     }

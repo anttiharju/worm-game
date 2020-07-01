@@ -16,6 +16,7 @@ namespace WormGame.GameObject
 
         private PlayArea playArea;
         private Collision collision;
+        private Vector2 next;
 
         public override Color Color { get { return Graphic.Color ?? null; } set { SetColor(value); } }
         public string Direction { private get; set; }
@@ -31,6 +32,7 @@ namespace WormGame.GameObject
             this.size = size;
             Direction = "UP";
             worm = new Tail[Config.maxWormLength];
+            next = new Vector2();
         }
 
 
@@ -54,9 +56,10 @@ namespace WormGame.GameObject
                 worm[i] = current;
                 Tail next = tails.Enable();
                 if (next == null) return null;
-                next.Position = new Vector2(x, y);
-                next.Target = next.Position;
-                current.Next = next;
+                next.X = x;
+                next.Y = y;
+                next.Next = next.Position;
+                current.NextTail = next;
                 current = next;
             }
             worm[tailCount] = current;
@@ -67,9 +70,9 @@ namespace WormGame.GameObject
             X = x;
             Y = y;
             Length = length;
-            Target = Position;
+            Next = Position;
             Direction = direction;
-            playArea.Update(Target, this);
+            playArea.Update(Next, this);
             Color = color;
 
             return this;
@@ -106,7 +109,10 @@ namespace WormGame.GameObject
         /// <param name="deltaY">Vertical movement</param>
         private void CheckCollision(int deltaX, int deltaY)
         {
-            if (collision.WormCheck(this, Target, deltaX, deltaY, Noclip))
+            // I don't want any new calls but I'm not sure if this is just an abstraction for one.
+            next.X = Next.X + deltaX; next.Y = Next.Y + deltaY;
+
+            if (collision.WormCheck(this, next, Noclip))
                 Move(deltaX, deltaY);
             else
                 Direction = Random.Direction();
@@ -118,9 +124,9 @@ namespace WormGame.GameObject
         /// </summary>
         public override void Disable()
         {
-            if (Next != null)
-                Next.Disable(playArea);
-            playArea.Update(Target, null);
+            if (NextTail != null)
+                NextTail.Disable(playArea);
+            playArea.Update(Next, null);
             Enabled = false;
         }
 
