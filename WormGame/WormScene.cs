@@ -11,8 +11,11 @@ namespace WormGame
     /// </summary>
     class WormScene : Scene
     {
-        private readonly int wormCount = 59;
-        private readonly int maxWormLength = 3;
+        private readonly int width = 100;
+        private readonly int height = 50;
+        private readonly int marginMinimum = 2;
+        private readonly int wormCount = 100;
+        private readonly int maxWormLength = 5;
 
         private readonly float bunchTimerReset = 0.6f;
         private readonly float wormTimerReset = 0.3f;
@@ -27,23 +30,24 @@ namespace WormGame
 
         private void EntitySetup(Game game)
         {
-            int y = 0;
-            SpawnWorm(20, 10, Helper.RandomColor(), 5, "", true);
-            for (int x = 0; x < 40; x++)
+            SpawnWorm(0, 0, 5);
+            SpawnWorm(0, height - 1, 5);
+            SpawnWorm(width - 1, height - 1, 5);
+            SpawnWorm(width - 1, 0, 5);
+            for (int x = 0; x < width; x += 2)
             {
-                SpawnWorm(x, y, Helper.RandomColor(), 5, "", false);
-                if (x % 3 == 0) y++;
+                SpawnWorm(x, 15, 5);
             }
             SpawnPlayer(game.HalfWidth, game.HalfHeight, Color.Red);
         }
 
         public WormScene(Game game)
         {
-            collision = new Collision(game, 40, 20, 2);
-            worms = new Pooler<Worm>(this, wormCount, collision.Size);
-            tails = new Pooler<Tail>(this, wormCount * maxWormLength, collision.Size);
+            collision = new Collision(game, width, height, marginMinimum);
             bunches = new Pooler<Bunch>(this, wormCount * 2, collision.Size);
             blocks = new Pooler<Block>(this, wormCount * 2 * maxWormLength, collision.Size);
+            tails = new Pooler<Tail>(this, wormCount * maxWormLength, collision.Size);
+            worms = new Pooler<Worm>(this, wormCount, collision.Size);
             EntitySetup(game);
         }
 
@@ -69,16 +73,18 @@ namespace WormGame
         /// <summary>
         /// Spawns a worm to the scene
         /// </summary>
-        /// <param name="gridX">Horizontal position</param>
-        /// <param name="gridY">Vertical position</param>
+        /// <param name="x">Horizontal position</param>
+        /// <param name="y">Vertical position</param>
         /// <param name="length">Worms length</param>
         /// <param name="color">Worms color</param>
         /// <returns>The spawned worm</returns>
-        public Worm SpawnWorm(int gridX, int gridY, Color color, int length, string direction = "", bool noclip = false)
+        public Worm SpawnWorm(int x, int y, int length = -1, Color color = null, string direction = "")
         {
+            if (color == null) color = Helper.RandomColor();
+            if (length == -1) length = maxWormLength;
             Worm worm = worms.Enable();
             if (worm == null) return null;
-            worm.Spawn(tails, collision, gridX, gridY, length, color, direction, noclip);
+            worm.Spawn(tails, collision, x, y, length, color, direction);
             return worm;
         }
 

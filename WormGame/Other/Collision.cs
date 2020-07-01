@@ -18,8 +18,8 @@ namespace WormGame.Other
         private readonly Game game;
         private readonly Poolable[,] field;
         private readonly int margin;
-        private readonly int xPreCalc;
-        private readonly int yPreCalc;
+        private readonly int fieldLeft;
+        private readonly int fieldTop;
 
         public Collision(Game game, int width, int height, int margin)
         {
@@ -29,8 +29,8 @@ namespace WormGame.Other
             Height = height;
             Size = CalculateSize();
             field = new Poolable[Width, Height];
-            xPreCalc = game.WindowWidth / 2 - Width / 2 * Size + Size / 2;
-            yPreCalc = game.WindowHeight / 2 + Height / 2 * Size - Size / 2;
+            fieldLeft = game.WindowWidth / 2 - Width / 2 * Size + Size / 2;
+            fieldTop = game.WindowHeight / 2 + Height / 2 * Size - Size / 2;
         }
 
 
@@ -41,6 +41,7 @@ namespace WormGame.Other
         /// <returns>If it can or not move to the new position</returns>
         public bool WormCheck(Worm worm, Vector2 target, int deltaX, int deltaY, bool noclip)
         {
+            // Actual collision
             Vector2 next = target + new Vector2(deltaX, deltaY);
             int nextReverseX = ReverseX(next.X);
             int nextReverseY = ReverseY(next.Y);
@@ -50,21 +51,14 @@ namespace WormGame.Other
                 nextReverseY >= Height ||
                 (Get(next) != null && !noclip))
                 return false;
-            /** /
-            Console.CursorTop = 0;
-            Console.CursorLeft = 0;
-            Console.WriteLine("[" + nextReverseX.ToString("00") + " " + nextReverseY.ToString("00") + "]                                                                           ");
-            /**/
+
             // Update worm collision data
-            Tail[] wholeWorm = worm.GetWorm();
-            Set(wholeWorm[0], next);
-            Set(wholeWorm[worm.Length - 1], next);
-
-            SetNull(wholeWorm[^1].Target);
-            for (int i = wholeWorm.Length - 1; i > 0; i--)
-                Set(wholeWorm[i], wholeWorm[i - 1].Target);
-            Set(wholeWorm[0], next);
-
+            SetField(next, worm[0]);
+            SetField(next, worm[^1]);
+            SetField(worm[^1].Target, null);
+            for (int i = worm.Length - 1; i > 0; i--)
+                SetField(worm[i - 1].Target, worm[i]);
+            SetField(next, worm[0]);
             return true;
         }
 
@@ -82,54 +76,33 @@ namespace WormGame.Other
             return ref field[ReverseX(target.X), ReverseY(target.Y)];
         }
 
-        public void Set(Poolable entity, Vector2 target)
+        public void SetField(Vector2 target, Poolable entity)
         {
             Get(target) = entity;
-        }
-
-        public void SetNull(Vector2 target)
-        {
-            Get(target) = null;
         }
 
 
         public int X(int x)
         {
-            return xPreCalc + Size * x;
+            return fieldLeft + Size * x;
         }
 
 
         public int Y(int y)
         {
-            return yPreCalc - Size * y;
+            return fieldTop - Size * y;
         }
 
 
         public int ReverseX(float x)
         {
-            return (((int)x - xPreCalc) / Size);
+            return (((int)x - fieldLeft) / Size);
         }
 
 
         public int ReverseY(float y)
         {
-            return (yPreCalc - (int)y) / Size;
-        }
-
-        public void Visualize()
-        {
-            for (int y = 0; y < Height; y++)
-            {
-                Console.CursorTop = Height - y;
-                for (int x = 0; x < Width; x++)
-                {
-                    Console.CursorLeft = x;
-                    if (field[x, y] == null)
-                        Console.Write(".");
-                    else
-                        Console.Write("o");
-                }
-            }
+            return (fieldTop - (int)y) / Size;
         }
     }
 }

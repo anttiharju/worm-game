@@ -10,7 +10,7 @@ namespace WormGame.GameObject
     /// <summary>
     /// The worm class. Technically it's just the head entity but it manages the entire worm.
     /// </summary>
-    class Worm : Tail, IEnumerable
+    class Worm : Tail
     {
         public override Color Color { get { return Graphic.Color ?? null; } set { SetColor(value); } }
         public string Direction { private get; set; }
@@ -19,7 +19,7 @@ namespace WormGame.GameObject
         private Collision collision;
         private readonly int size;
         private Tail[] wholeWorm;
-        private bool noclip = false;
+        public bool Noclip { private get; set; }
         /// <summary>
         /// Head constructor. Calls Body constructor.
         /// </summary>
@@ -41,10 +41,9 @@ namespace WormGame.GameObject
         /// <param name="color">Worms color</param>
         /// <param name="directions">Movement instructions for the worm</param>
         /// <returns>The spawned worm</returns>
-        public Worm Spawn(Pooler<Tail> tails, Collision collision, int x, int y, int length, Color color, string direction, bool noclip)
+        public Worm Spawn(Pooler<Tail> tails, Collision collision, int x, int y, int length, Color color, string direction)
         {
             this.collision = collision;
-            this.noclip = noclip;
             Length = length;
             Direction = direction;
             Position = new Vector2(collision.X(x), collision.Y(y));
@@ -53,7 +52,7 @@ namespace WormGame.GameObject
             Console.WriteLine(" ");
             Target = Position;
             Graphic.Color = color;
-            collision.Set(this, Target);
+            collision.SetField(this, Target);
 
             int bodyCount = length - 1; // - 1 because head already counts as 1
             Tail currentBody = this;
@@ -102,7 +101,7 @@ namespace WormGame.GameObject
         /// <param name="deltaY">Vertical movement</param>
         private void CheckCollision(int deltaX, int deltaY)
         {
-            if (collision.WormCheck(this, Target, deltaX, deltaY, noclip))
+            if (collision.WormCheck(this, Target, deltaX, deltaY, Noclip))
                 Move(deltaX, deltaY);
         }
 
@@ -111,7 +110,7 @@ namespace WormGame.GameObject
             if (NextBody != null)
                 NextBody.Disable(collision);
             Enabled = false;
-            collision.SetNull(Target);
+            collision.SetField(Target, null);
         }
 
         public Tail[] GetWorm()
@@ -123,9 +122,12 @@ namespace WormGame.GameObject
             return tmp;
         }
 
-        public IEnumerator GetEnumerator()
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
+        public Tail this[int i]
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
         {
-            return wholeWorm.GetEnumerator();
+            get => wholeWorm[i];
+            set => wholeWorm[i] = value;
         }
     }
 }
