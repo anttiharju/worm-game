@@ -9,17 +9,18 @@ namespace WormGame.GameObject
     /// <summary>
     /// The worm class. Technically it's just the head entity but it manages the entire worm.
     /// </summary>
-    class Worm : Tail
+    class Worm : WormTail
     {
-        private readonly Tail[] worm;
+        private readonly WormTail[] worm;
         private readonly int size;
 
         private PlayArea playArea;
         private Collision collision;
-        private Vector2 next;
+        private Vector2 newTarget;
 
         public override Color Color { get { return Graphic.Color ?? null; } set { SetColor(value); } }
         public string Direction { private get; set; }
+        public bool Posessed { get; set; }
         public bool Noclip { private get; set; }
         public int Length { get; private set; }
 
@@ -31,8 +32,8 @@ namespace WormGame.GameObject
         {
             this.size = size;
             Direction = "UP";
-            worm = new Tail[Config.maxWormLength];
-            next = new Vector2();
+            worm = new WormTail[Config.maxWormLength];
+            newTarget = new Vector2();
         }
 
 
@@ -46,20 +47,20 @@ namespace WormGame.GameObject
         /// <param name="color">Worms color</param>
         /// <param name="directions">Movement instructions for the worm</param>
         /// <returns>The spawned worm</returns>
-        public Worm Spawn(Pooler<Tail> tails, Collision collision, PlayArea playArea, int x, int y, int length, Color color, string direction)
+        public Worm Spawn(Pooler<WormTail> tails, Collision collision, PlayArea playArea, int x, int y, int length, Color color, string direction)
         {
             // Tail
             int tailCount = length - 1; // minus one because head already counts as 1
-            Tail current = this;
+            WormTail current = this;
             for (int i = 0; i < tailCount; i++)
             {
                 worm[i] = current;
-                Tail next = tails.Enable();
+                WormTail next = tails.Enable();
                 if (next == null) return null;
                 next.X = x;
                 next.Y = y;
-                next.Next = next.Position;
-                current.NextTail = next;
+                next.target = next.Position;
+                current.Next = next;
                 current = next;
             }
             worm[tailCount] = current;
@@ -70,9 +71,9 @@ namespace WormGame.GameObject
             X = x;
             Y = y;
             Length = length;
-            Next = Position;
+            target = Position;
             Direction = direction;
-            playArea.Update(Next, this);
+            playArea.Update(target, this);
             Color = color;
 
             return this;
@@ -109,25 +110,36 @@ namespace WormGame.GameObject
         /// <param name="deltaY">Vertical movement</param>
         private void CheckCollision(int deltaX, int deltaY)
         {
-            // I don't want any new calls but I'm not sure if this is just an abstraction for one.
-            next.X = Next.X + deltaX; next.Y = Next.Y + deltaY;
+            newTarget.X = target.X + deltaX; newTarget.Y = target.Y + deltaY;
 
-            if (collision.WormCheck(this, next, Noclip))
+            if (collision.WormCheck(this, newTarget, Noclip))
                 Move(deltaX, deltaY);
-            else
+            else if (!Posessed)
                 Direction = Random.Direction();
         }
 
 
         /// <summary>
-        /// Disables the entire worm
+        /// Disables the worm
         /// </summary>
         public override void Disable()
         {
-            if (NextTail != null)
-                NextTail.Disable(playArea);
-            playArea.Update(Next, null);
-            Enabled = false;
+            for (int i = 0; i < worm.Length; i++)
+            {
+                playArea.Update(target, null);
+                worm[i].Enabled = false;
+            }
+        }
+
+
+        /// <summary>
+        /// Sets worms color
+        /// </summary>
+        /// <param name="color"></param>
+        public void SetColor(Color color)
+        {
+            for (int i = 0; i < worm.Length; i++)
+                worm[i].Graphic.Color = color;
         }
 
 
@@ -137,7 +149,7 @@ namespace WormGame.GameObject
         /// </summary>
         /// <param name="i">index</param>
         /// <returns>Worms body part at index</returns>
-        public Tail this[int i]
+        public WormTail this[int i]
         {
             get => worm[i];
             set => worm[i] = value;
