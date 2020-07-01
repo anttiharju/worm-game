@@ -1,8 +1,8 @@
 ﻿using Otter;
 
-namespace WormGame.Other
+namespace WormGame.Help
 {
-    /// @author anvemaha
+    /// @author Antti Harju
     /// @version 01.07.2020
     /// <summary>
     /// Random class for randomizing things.
@@ -12,7 +12,6 @@ namespace WormGame.Other
         private static readonly System.Random randomNumber = new System.Random();
         private static readonly Color[] colors = { Otter.Color.Blue, Otter.Color.Cyan, Otter.Color.Green, Otter.Color.Magenta, Otter.Color.Orange, Otter.Color.Yellow };
         private static readonly string[] directions = { "UP", "LEFT", "DOWN", "RIGHT" };
-
 
         /// <summary>
         /// Returns a random number between a and b, b exclusive.

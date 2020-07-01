@@ -4,13 +4,21 @@ using WormGame.GameObject;
 
 namespace WormGame
 {
-    /// @author anvemaha
+    /// @author Antti Harju
     /// @version 01.07.2020
     /// <summary>
     /// The main scene for WormGame
     /// </summary>
     class WormScene : Scene
     {
+        private readonly PlayArea playArea;
+        private readonly Collision collision;
+
+        private readonly Pooler<Bunch> bunches;
+        private readonly Pooler<Block> blocks;
+        private readonly Pooler<Tail> tails;
+        private readonly Pooler<Worm> worms;
+
         private readonly int width = 100;
         private readonly int height = 50;
         private readonly int marginMinimum = 2;
@@ -22,24 +30,18 @@ namespace WormGame
         private float bunchTimer = 0;
         private float wormTimer = 0;
 
-        private readonly Pooler<Bunch> bunches;
-        private readonly Pooler<Block> blocks;
-        private readonly Pooler<Tail> tails;
-        private readonly Pooler<Worm> worms;
-        private readonly Collision collision;
-
-
         /// <summary>
         /// Initializes poolers and collision system. Spawns initial entities.
         /// </summary>
         /// <param name="game"></param>
         public WormScene(Game game)
         {
-            collision = new Collision(game, width, height, marginMinimum);
-            bunches = new Pooler<Bunch>(this, wormCount * 2, collision.Size);
-            blocks = new Pooler<Block>(this, wormCount * 2 * maxWormLength, collision.Size);
-            tails = new Pooler<Tail>(this, wormCount * maxWormLength, collision.Size);
-            worms = new Pooler<Worm>(this, wormCount, collision.Size);
+            playArea = new PlayArea(game, width, height, marginMinimum);
+            collision = new Collision(playArea);
+            bunches = new Pooler<Bunch>(this, wormCount * 2, playArea.Size);
+            blocks = new Pooler<Block>(this, wormCount * 2 * maxWormLength, playArea.Size);
+            tails = new Pooler<Tail>(this, wormCount * maxWormLength, playArea.Size);
+            worms = new Pooler<Worm>(this, wormCount, playArea.Size);
 
             // Entity setup
             SpawnWorm(0, 0, 5);
@@ -80,8 +82,8 @@ namespace WormGame
         /// <summary>
         /// Spawns a worm
         /// </summary>
-        /// <param name="x">Horizontal position (field)</param>
-        /// <param name="y">Vertical postition (field)</param>
+        /// <param name="x">Horizontal position (playArea)</param>
+        /// <param name="y">Vertical postition (playArea)</param>
         /// <param name="length">Worms length</param>
         /// <param name="color">Worms color, by default uses a random color from Helper class</param>
         /// <param name="direction">Worms direction: UP, LEFT, DOWN or RIGHT</param>
@@ -92,7 +94,7 @@ namespace WormGame
             if (length == -1) length = maxWormLength;
             Worm worm = worms.Enable();
             if (worm == null) return null;
-            worm.Spawn(tails, collision, x, y, length, color, direction);
+            worm.Spawn(tails, collision, playArea, playArea.EntityX(x), playArea.EntityY(y), length, color, direction);
             return worm;
         }
 
@@ -106,7 +108,7 @@ namespace WormGame
         /// <returns>Spawned player</returns>
         public Player SpawnPlayer(float x, float y, Color color)
         {
-            Player tmpPlayer = new Player(this, 0, x, y, color, collision.Size);
+            Player tmpPlayer = new Player(this, 0, x, y, color, playArea.Size);
             Add(tmpPlayer);
             return tmpPlayer;
         }
@@ -122,7 +124,7 @@ namespace WormGame
 
             Bunch bunch = bunches.Enable();
             if (bunch == null) return null;
-            bunch.Spawn(positions[0], Color.Gray, worm.Length, collision.Y(0));
+            bunch.Spawn(positions[0], Color.Gray, worm.Length, playArea.EntityY(0));
 
             Block tmpBlock = bunch;
             Block previousBlock = tmpBlock;

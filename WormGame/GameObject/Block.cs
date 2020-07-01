@@ -1,17 +1,20 @@
 ﻿using Otter;
-using System.Runtime.InteropServices;
 using WormGame.Other;
 
 namespace WormGame.GameObject
 {
     /// <summary>
-    /// Block class. Very much work in progress.
+    /// Block class, work in progress.
     /// </summary>
     class Block : Poolable
     {
-        private int size;
+        private readonly int size;
         public Block NextBlock { get; set; }
 
+        /// <summary>
+        /// Constructor. Nothing special.
+        /// </summary>
+        /// <param name="size"></param>
         public Block(int size) : base()
         {
             this.size = size;
@@ -20,17 +23,23 @@ namespace WormGame.GameObject
             image.CenterOrigin();
         }
 
+
+        /// <summary>
+        /// Spawns the block. Nothing special.
+        /// </summary>
+        /// <param name="position">Position</param>
+        /// <param name="color">Block color</param>
         public void Spawn(Vector2 position, Color color)
         {
             Position = position;
             Graphic.Color = color;
         }
 
-        public virtual void HardDrop()
-        {
 
-        }
-
+        /// <summary>
+        /// Recursive method to drop all blocks by one.
+        /// </summary>
+        /// <param name="up"></param>
         public virtual void SoftDrop(int up = 1)
         {
             if (NextBlock != null)
@@ -38,6 +47,12 @@ namespace WormGame.GameObject
             Y += size * up;
         }
 
+
+        /// <summary>
+        /// Recursive method that returns the lowest vertical block position in the bunch.
+        /// </summary>
+        /// <param name="biggest"></param>
+        /// <returns>Lowest vertical block position in the bunch</returns>
         public float Lowest(float biggest)
         {
             if (NextBlock != null)
@@ -45,6 +60,13 @@ namespace WormGame.GameObject
             return biggest;
         }
 
+
+        /// <summary>
+        /// Kind of like an indexer.
+        /// </summary>
+        /// <param name="i">wanted block index</param>
+        /// <param name="currentI">current block index</param>
+        /// <returns>block from wanted index</returns>
         public Block GetBlock(int i, int currentI = 0)
         {
             if (i > currentI)
@@ -53,8 +75,9 @@ namespace WormGame.GameObject
                 return this;
         }
 
+
         /// <summary>
-        /// Recursively changes color of the whole bunch
+        /// Recursively changes color of all the blocks in the bunch.
         /// </summary>
         /// <param name="color">Worms new color</param>
         public void SetColor(Color color)
