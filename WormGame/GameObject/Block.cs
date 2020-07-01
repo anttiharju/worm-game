@@ -41,7 +41,7 @@ namespace WormGame.GameObject
         public float Lowest(float biggest)
         {
             if (NextBlock != null)
-                biggest = NextBlock.Lowest(Helper.Bigger(Y, biggest));
+                biggest = NextBlock.Lowest(Mathf.Bigger(Y, biggest));
             return biggest;
         }
 

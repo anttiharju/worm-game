@@ -81,7 +81,7 @@ namespace WormGame.GameObject
             float dpadDeadZone = 80;
 
             // D-pad
-            if (Helper.FastAbs(dpadX) > dpadDeadZone)
+            if (Mathf.FastAbs(dpadX) > dpadDeadZone)
             {
                 if (dpadX < 0)
                 {
@@ -92,7 +92,7 @@ namespace WormGame.GameObject
             }
             if (dropAction)
             {
-                if (Helper.FastAbs(dpadY) > dpadDeadZone) //up hard, down soft, horizontal move
+                if (Mathf.FastAbs(dpadY) > dpadDeadZone) //up hard, down soft, horizontal move
                 {
                     if (dpadY > 0)
                     {
@@ -143,11 +143,11 @@ namespace WormGame.GameObject
         {
             if (worm != null || bunch != null) return;
             float deadZone = 10;
-            if (Helper.FastAbs(leftX) > deadZone)
+            if (Mathf.FastAbs(leftX) > deadZone)
             {
                 X += leftX * speedModifier;
             }
-            if (Helper.FastAbs(leftY) > deadZone)
+            if (Mathf.FastAbs(leftY) > deadZone)
             {
                 Y += leftY * speedModifier;
             }
@@ -168,16 +168,16 @@ namespace WormGame.GameObject
 
             #region Axises
             // Right stick
-            if (Helper.FastAbs(rightX) > axisDeadZone)
+            if (Mathf.FastAbs(rightX) > axisDeadZone)
             {
 
             }
-            if (Helper.FastAbs(rightY) > axisDeadZone)
+            if (Mathf.FastAbs(rightY) > axisDeadZone)
             {
 
             }
             // Triggers (shared)
-            if (Helper.FastAbs(triggers) > axisDeadZone)
+            if (Mathf.FastAbs(triggers) > axisDeadZone)
             {
                 if (triggers > 0) // Left
                 {

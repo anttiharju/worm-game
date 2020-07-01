@@ -18,6 +18,11 @@
         - It's probably not a good practise rename entire folders, but at least I know to pick better ones from the start in future projects
 - Delete CONTEXT.md
     - Changelog is all I need, plus I have some designs on actual papers.
+- Fix worm indexer
+    - I had confused enumerator and indexer, now I know which is which.
+- Divide Helper to Mathf and Random
+    - To make the code more readable
+    - Also fixed FastAbs()
 
 
 # 30.06.2020
