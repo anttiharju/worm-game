@@ -1,4 +1,5 @@
 ﻿using Otter;
+using System;
 using WormGame.Help;
 
 namespace WormGame.Other
@@ -117,6 +118,26 @@ namespace WormGame.Other
         public int EntityY(int y)
         {
             return playAreaTop - Size * y;
+        }
+
+
+        /// <summary>
+        /// Mainly used for debugging, but also looks kind of cool
+        /// </summary>
+        public void Visualize()
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                Console.CursorTop = Height - y;
+                for (int x = 0; x < Width; x++)
+                {
+                    Console.CursorLeft = x;
+                    if (playArea[x, y] == null)
+                        Console.Write(".");
+                    else
+                        Console.Write("o");
+                }
+            }
         }
     }
 }

@@ -41,7 +41,7 @@ namespace WormGame.Help
         /// <returns>Random color</returns>
         public static string Direction()
         {
-            return directions[Range(0, colors.Length)];
+            return directions[Range(0, directions.Length)];
         }
     }
 }

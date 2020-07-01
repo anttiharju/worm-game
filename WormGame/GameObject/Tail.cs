@@ -54,8 +54,7 @@ namespace WormGame.GameObject
         /// </summary>
         public override void Update()
         {
-            if (Enabled)
-                Position += (Target - Position) * 0.15f * (144 / Scene.Game.TargetFramerate);
+            Position += (Target - Position) * 0.15f * (144 / Scene.Game.TargetFramerate);
         }
 
 

@@ -108,6 +108,8 @@ namespace WormGame.GameObject
         {
             if (collision.WormCheck(this, Target, deltaX, deltaY, Noclip))
                 Move(deltaX, deltaY);
+            else
+                Direction = Random.Direction();
         }
 
 
@@ -118,8 +120,6 @@ namespace WormGame.GameObject
         {
             if (Next != null)
                 Next.Disable(playArea);
-            for (int i = 0; i < Length; i++)
-                worm[i] = null;
             playArea.Update(Target, null);
             Enabled = false;
         }

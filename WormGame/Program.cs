@@ -11,7 +11,7 @@ namespace WormGame
     {
         static void Main()
         {
-            Game game = new Game("Worm bricks", 1280, 720, 144)
+            Game game = new Game("Worm bricks", 1920, 1080, 144, true)
             {
                 MeasureTimeInFrames = false,
                 WindowResize = false,
