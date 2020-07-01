@@ -2,7 +2,7 @@
 
 namespace WormGame
 {
-    /// @author anvemaha
+    /// @author Antti Harju
     /// @version 01.07.2020
     /// <summary>
     /// Program starts here

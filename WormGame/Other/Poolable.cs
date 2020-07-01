@@ -2,10 +2,10 @@
 
 namespace WormGame.Other
 {
-    /// @author anvemaha
+    /// @author Antti Harju
     /// @version 28.06.2020
     /// <summary>
-    /// Class that all poolable entities inherit. Production ready, although may get new features.
+    /// Class that all poolable entities must inherit.
     /// </summary>
     public class Poolable : Entity
     {
