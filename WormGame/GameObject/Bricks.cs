@@ -53,9 +53,9 @@ namespace WormGame.GameObject
                 Brick current = GetBlock(i);
                 Vector2 anchorToCurrent = current.Position - anchor.Position;
                 if (clockwise)
-                    anchorToCurrent = Mathf.RotateCW(anchorToCurrent);
-                else
                     anchorToCurrent = Mathf.RotateCCW(anchorToCurrent);
+                else
+                    anchorToCurrent = Mathf.RotateCW(anchorToCurrent);
                 current.Position = anchor.Position + anchorToCurrent;
             }
         }
