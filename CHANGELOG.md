@@ -1,8 +1,27 @@
 # TODO
 - Investigate GPU usage issue
 
+# 01.07.2020
+- Trying to do less massive commits, getting into the habit.
+    - Pretty sure my professor said during a lecture that small commits are a good practise.
+
+- Improve collision visualizer
+    - Use Console.Top and Console.Left to avoid freeze from Console.Clear()
+- Add indexing to worms
+    - I can now refer to worms body parts with an indexer, achieving cleaner code
+- Fix collision system inaccuracy
+    - I was using current position (tweened) instead of target position
+- Rename project folder
+    - Delete old project folder
+        - I had to do a separate commit because I forgot to delete it lol
+    - I just wanted to get rid of WBGame because it reminds me of Warner Bros and rocksteadys Arkham games
+        - It's probably not a good practise rename entire folders, but at least I know to pick better ones from the start in future projects
+- Delete CONTEXT.md
+    - Changelog is all I need, plus I have some designs on actual papers.
+
+
 # 30.06.2020
-- Cleaned up the new collision system, it still has bugs but shouldn't crash
+- Cleaned up the new collision system, it still has bugs but it shouldn't crash.
     - I'm going to commit now because I have other things that need my attention and the commit is probably already way too massive
         - I should get into the habit of smaller commits, as afaik that's the best practise and especially important when working with a team
 
