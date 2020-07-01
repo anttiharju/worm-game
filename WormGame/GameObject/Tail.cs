@@ -4,13 +4,13 @@ using WormGame.Other;
 namespace WormGame.GameObject
 {
     /// @author Antti Harju
-    /// @version 21.06.2020
+    /// @version 01.07.2020
     /// <summary>
-    /// The base worm class that by itself acts as the tail entity.
+    /// Tail class. Acts as the foundation for the entire worm. Managed by worm class (which is the head of the worm).
     /// </summary>
     class Tail : Poolable
     {
-        public Tail NextBody { get; set; }
+        public Tail Next { get; set; }
         public Vector2 Target { get; set; }
 
         /// <summary>
@@ -24,29 +24,6 @@ namespace WormGame.GameObject
             image.CenterOrigin();
         }
 
-        public void Disable(PlayArea playArea)
-        {
-            if (NextBody != null)
-                NextBody.Disable();
-            Enabled = false;
-            playArea.Update(Target, null);
-        }
-
-        public Vector2[] GetPositions(Vector2[] positions, int i = 0)
-        {
-            if (NextBody != null)
-                NextBody.GetPositions(positions, i + 1);
-            positions[i] = Target;
-            return positions;
-        }
-
-        public Tail[] GetWorm(ref Tail[] worm, int i = 0)
-        {
-            if (NextBody != null)
-                NextBody.GetWorm(ref worm, i + 1);
-            worm[i] = this;
-            return worm;
-        }
 
         /// <summary>
         /// Recursive method that makes every part of the tail follow the head
@@ -54,20 +31,20 @@ namespace WormGame.GameObject
         /// <param name="newPosition">Position to move to</param>
         public void TailFollow(Vector2 newPosition)
         {
-            if (NextBody != null)
-                NextBody.TailFollow(Target);
+            if (Next != null)
+                Next.TailFollow(Target);
             Target = newPosition;
         }
 
 
         /// <summary>
-        /// Recursively moves the whole worm
+        /// Recursively moves the entire worm
         /// </summary>
         /// <param name="xDelta">horizontal movement</param>
         /// <param name="yDelta">vertical movement</param>
         public void Move(float xDelta, float yDelta)
         {
-            NextBody.TailFollow(Target);
+            Next.TailFollow(Target);
             Target += new Vector2(xDelta, yDelta);
         }
 
@@ -83,13 +60,26 @@ namespace WormGame.GameObject
 
 
         /// <summary>
+        /// Disables the worm. Should only be used by Worm.Disable().
+        /// </summary>
+        /// <param name="playArea">Play area</param>
+        public void Disable(PlayArea playArea)
+        {
+            if (Next != null)
+                Next.Disable();
+            Enabled = false;
+            playArea.Update(Target, null);
+        }
+
+
+        /// <summary>
         /// Recursively changes the whole worms color
         /// </summary>
         /// <param name="color">Worms new color</param>
         public void SetColor(Color color)
         {
-            if (NextBody != null)
-                NextBody.SetColor(color);
+            if (Next != null)
+                Next.SetColor(color);
             Graphic.Color = color;
         }
     }
