@@ -21,7 +21,6 @@ namespace WormGame.GameObject
         public override Color Color { get { return Graphic.Color ?? null; } set { SetColor(value); } }
         public string Direction { private get; set; }
         public bool Posessed { get; set; }
-        public bool Noclip { private get; set; }
         public int Length { get; private set; }
 
         /// <summary>
@@ -112,7 +111,7 @@ namespace WormGame.GameObject
         {
             newTarget.X = target.X + deltaX; newTarget.Y = target.Y + deltaY;
 
-            if (collision.WormCheck(this, newTarget, Noclip))
+            if (collision.WormCheck(this, newTarget))
                 Move(deltaX, deltaY);
             else if (!Posessed)
                 Direction = Random.Direction();
@@ -124,9 +123,9 @@ namespace WormGame.GameObject
         /// </summary>
         public override void Disable()
         {
-            for (int i = 0; i < worm.Length; i++)
+            for (int i = 0; i < Length; i++)
             {
-                playArea.Update(target, null);
+                playArea.Update(worm[i].target, null);
                 worm[i].Enabled = false;
             }
         }
@@ -138,7 +137,7 @@ namespace WormGame.GameObject
         /// <param name="color"></param>
         public void SetColor(Color color)
         {
-            for (int i = 0; i < worm.Length; i++)
+            for (int i = 0; i < Length; i++)
                 worm[i].Graphic.Color = color;
         }
 
