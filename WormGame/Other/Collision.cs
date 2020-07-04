@@ -20,11 +20,31 @@ namespace WormGame.Other
         /// <summary>
         /// Checks worms collision
         /// </summary>
+        /// <param name="next"></param>
+        /// <returns></returns>
+        public bool Check(Vector2 next)
+        {
+            // Actual collision detection
+            int nextReverseX = playArea.X(next.X);
+            int nextReverseY = playArea.Y(next.Y);
+
+            if (nextReverseX <= -1 ||
+                nextReverseX >= playArea.Width ||
+                nextReverseY <= -1 ||
+                nextReverseY >= playArea.Height ||
+                playArea.Get(next) != null)
+                return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Checks worms collision
+        /// </summary>
         /// <param name="worm"></param>
         /// <param name="nextTarget"></param>
         /// <param name="noclip"></param>
         /// <returns></returns>
-        public bool WormCheck(Worm worm, Vector2 nextTarget, bool noclip)
+        public bool WormCheck(Worm worm, Vector2 nextTarget)
         {
             // Actual collision detection
             int nextReverseX = playArea.X(nextTarget.X);
@@ -33,7 +53,7 @@ namespace WormGame.Other
                 nextReverseX >= playArea.Width ||
                 nextReverseY <= -1 ||
                 nextReverseY >= playArea.Height ||
-                (playArea.Get(nextTarget) != null && !noclip))
+                playArea.Get(nextTarget) != null)
                 return false;
 
             // Update collision data

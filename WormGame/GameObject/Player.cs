@@ -17,7 +17,7 @@ namespace WormGame.GameObject
         private readonly float dropTimerReset = 0.3f;
 
         private Worm worm;
-        private Bricks bricks;
+        private Bunch bunch;
         private Color oldColor;
 
         private float leftX;
@@ -55,11 +55,11 @@ namespace WormGame.GameObject
         /// </summary>
         private void Posess()
         {
-            if (bricks != null)
+            if (bunch != null)
             {
-                bricks.Color = oldColor;
-                Position = bricks.Position;
-                bricks = null;
+                bunch.Color = oldColor;
+                Position = bunch.Position;
+                bunch = null;
                 Graphic.Visible = true;
             }
             if (worm != null)
@@ -99,8 +99,8 @@ namespace WormGame.GameObject
         {
             if (worm == null) return;
             worm.Disable();
-            bricks = wormScene.Brickify(worm);
-            bricks.Color = worm.Color;
+            bunch = wormScene.SpawnBunch(worm);
+            bunch.Color = worm.Color;
             worm = null;
         }
 
@@ -110,29 +110,40 @@ namespace WormGame.GameObject
         /// </summary>
         private void BrickControl()
         {
-            if (bricks == null) return;
+            if (bunch == null) return;
 
             float dpadDeadZone = 80;
 
             if (dropAction)
-                if (Mathf.FastAbs(dpadY) > dpadDeadZone) //up hard, down soft, horizontal move
+            {
+                if (Mathf.FastAbs(dpadX) > dpadDeadZone)
                 {
                     if (dpadY > 0)
                     {
-                        bricks.SoftDrop();
                         dropAction = false;
                     }
                     if (dpadY < 0)
                     {
-                        bricks.HardDrop();
                         dropAction = false;
                     }
                 }
-
+                if (Mathf.FastAbs(dpadY) > dpadDeadZone)
+                {
+                    if (dpadY > 0)
+                    {
+                        bunch.Drop();
+                        dropAction = false;
+                    }
+                    if (dpadY < 0)
+                    {
+                        dropAction = false;
+                    }
+                }
+            }
             if (Input.ButtonPressed(0, playerNumber)) // A
-                bricks.Rotate();
+                bunch.Rotate();
             if (Input.ButtonPressed(1, playerNumber)) // B
-                bricks.Rotate(true);
+                bunch.Rotate(true);
 
             if (Input.ButtonPressed(4, playerNumber)) // LB
                 Brickify();
@@ -168,7 +179,7 @@ namespace WormGame.GameObject
         /// </summary>
         private void GhostControl()
         {
-            if (worm != null || bricks != null) return;
+            if (worm != null || bunch != null) return;
             float deadZone = 10;
             if (Mathf.FastAbs(leftX) > deadZone)
                 X += leftX * speedModifier;

@@ -12,12 +12,11 @@ namespace WormGame
     /// </summary>
     class WormScene : Scene
     {
-        private readonly Config config;
         private readonly PlayArea playArea;
         private readonly Collision collision;
 
-        private readonly Pooler<Bricks> bunches;
-        private readonly Pooler<Brick> blocks;
+        private readonly Pooler<Bunch> bunches;
+        private readonly Pooler<Brick> bricks;
         private readonly Pooler<WormTail> tails;
         private readonly Pooler<Worm> worms;
 
@@ -26,23 +25,18 @@ namespace WormGame
         private float bunchTimer = 0;
         private float wormTimer = 0;
 
-        private readonly Vector2[] wormPositions;
-        private int wormPositionsLength;
-
         /// <summary>
         /// Initializes poolers and collision system. Spawns initial entities.
         /// </summary>
         /// <param name="game"></param>
         public WormScene(Game game, Config config)
         {
-            this.config = config;
             playArea = new PlayArea(game, Config.width, Config.height, Config.margin);
             collision = new Collision(playArea);
-            bunches = new Pooler<Bricks>(this, config.wormAmount, playArea.Size);
-            blocks = new Pooler<Brick>(this, config.tailAmount, playArea.Size);
+            bunches = new Pooler<Bunch>(this, config.wormAmount, playArea.Size);
+            bricks = new Pooler<Brick>(this, config.tailAmount, playArea.Size);
             tails = new Pooler<WormTail>(this, config.tailAmount, playArea.Size);
             worms = new Pooler<Worm>(this, config.wormAmount, playArea.Size);
-            wormPositions = new Vector2[Config.maxWormLength];
 
             // Entity setup
             int density = 4;
@@ -117,29 +111,11 @@ namespace WormGame
         /// Turns the given worm into a collection of bricks
         /// </summary>
         /// <param name="worm">Worm to transform</param>
-        public Bricks Brickify(Worm worm)
+        public Bunch SpawnBunch(Worm worm)
         {
-            wormPositionsLength = worm.Length;
-            for (int i = 0; i < wormPositionsLength; i++)
-                wormPositions[i] = worm[i].target;
-
-            Bricks bunch = bunches.Enable();
+            Bunch bunch = bunches.Enable();
             if (bunch == null) return null;
-            bunch.Spawn(wormPositions[0], Color.Gray, worm.Length, playArea.EntityY(0));
-            playArea.Update(bunch);
-
-            Brick tmpBlock = bunch;
-            Brick previousBlock = tmpBlock;
-
-            for (int i = 1; i < wormPositions.Length; i++)
-            {
-                tmpBlock = blocks.Enable();
-                previousBlock.NextBlock = tmpBlock;
-                tmpBlock.Spawn(wormPositions[i], Color.Gray);
-                playArea.Update(tmpBlock);
-                previousBlock = tmpBlock;
-            }
-
+            bunch.Spawn(bricks, collision, playArea, worm);
             return bunch;
         }
 
@@ -173,7 +149,7 @@ namespace WormGame
             foreach (Worm worm in worms)
                 if (worm.Enabled)
                     worm.Move();
-            if (Config.visualizePlayArea)
+            if (Config.visualizeCollision)
                 playArea.Visualize();
         }
 

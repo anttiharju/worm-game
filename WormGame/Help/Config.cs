@@ -9,7 +9,7 @@
         public static readonly int height = 32;
         public static readonly int maxWormLength = 4;
 
-        public static bool visualizePlayArea = false;
+        public static bool visualizeCollision = false;
 
         public readonly int tailAmount;
         public readonly int wormAmount;
