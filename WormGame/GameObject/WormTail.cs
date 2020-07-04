@@ -59,7 +59,8 @@ namespace WormGame.GameObject
         /// </summary>
         public override void Update()
         {
-            Position += (target - Position) * speed;
+            if (Enabled)
+                Position += (target - Position) * speed;
         }
     }
 }
