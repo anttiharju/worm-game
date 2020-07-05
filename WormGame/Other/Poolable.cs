@@ -1,4 +1,5 @@
-﻿using Otter;
+﻿using Otter.Core;
+using Otter.Graphics;
 
 namespace WormGame.Other
 {
@@ -27,6 +28,11 @@ namespace WormGame.Other
         public virtual void Disable()
         {
             Enabled = false;
+        }
+
+        public override void Update()
+        {
+            base.Update();
         }
     }
 }

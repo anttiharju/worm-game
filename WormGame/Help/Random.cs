@@ -1,4 +1,4 @@
-﻿using Otter;
+﻿using Otter.Graphics;
 
 namespace WormGame.Help
 {
@@ -10,7 +10,7 @@ namespace WormGame.Help
     static class Random
     {
         private static readonly System.Random randomNumber = new System.Random();
-        private static readonly Color[] colors = { Otter.Color.Blue, Otter.Color.Cyan, Otter.Color.Green, Otter.Color.Magenta, Otter.Color.Orange, Otter.Color.Yellow };
+        private static readonly Color[] colors = { Otter.Graphics.Color.Blue, Otter.Graphics.Color.Cyan, Otter.Graphics.Color.Green, Otter.Graphics.Color.Magenta, Otter.Graphics.Color.Orange, Otter.Graphics.Color.Yellow };
         private static readonly string[] directions = { "UP", "LEFT", "DOWN", "RIGHT" };
 
         /// <summary>

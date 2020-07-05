@@ -1,7 +1,9 @@
-﻿using Otter;
-using WormGame.Help;
+﻿using WormGame.Help;
 using WormGame.Other;
 using WormGame.GameObject;
+using Otter.Utility.MonoGame;
+using Otter.Graphics;
+using Otter.Core;
 
 namespace WormGame
 {
@@ -12,13 +14,12 @@ namespace WormGame
     /// </summary>
     class WormScene : Scene
     {
-        private readonly PlayArea playArea;
-        private readonly Collision collision;
+        private readonly Collision field;
 
-        private readonly Pooler<Bunch> bunches;
-        private readonly Pooler<Brick> bricks;
-        private readonly Pooler<WormTail> tails;
         private readonly Pooler<Worm> worms;
+        private readonly Pooler<Brick> bricks;
+        private readonly Pooler<WormBase> baseworms;
+        private readonly Pooler<BrickBase> basebricks;
 
         private readonly float bunchTimerReset = 0.6f;
         private readonly float wormTimerReset = 0.1f;
@@ -31,12 +32,11 @@ namespace WormGame
         /// <param name="game"></param>
         public WormScene(Game game, Config config)
         {
-            playArea = new PlayArea(game, Config.width, Config.height, Config.margin);
-            collision = new Collision(playArea);
-            bunches = new Pooler<Bunch>(this, config.wormAmount, playArea.Size);
-            bricks = new Pooler<Brick>(this, config.tailAmount, playArea.Size);
-            tails = new Pooler<WormTail>(this, config.tailAmount, playArea.Size);
-            worms = new Pooler<Worm>(this, config.wormAmount, playArea.Size);
+            field = new Collision(game, Config.width, Config.height, Config.margin);
+            bricks = new Pooler<Brick>(this, config.wormAmount, field.Size);
+            basebricks = new Pooler<BrickBase>(this, config.tailAmount, field.Size);
+            baseworms = new Pooler<WormBase>(this, config.tailAmount, field.Size);
+            worms = new Pooler<Worm>(this, config.wormAmount, field.Size);
 
             // Entity setup
             int density = 4;
@@ -51,8 +51,8 @@ namespace WormGame
         /// Finds the nearest worm to the given position, within given range.
         /// Used by player class to posess worms.
         /// </summary>
-        /// <param name="position">Point that the worm has to be close to</param>
-        /// <param name="range">The worm has to be at least this near</param>
+        /// <param name="position">Search point</param>
+        /// <param name="range">Maximum distance from search point to worm</param>
         /// <returns>Nearest worm</returns>
         public Worm NearestWorm(Vector2 position, float range)
         {
@@ -87,7 +87,7 @@ namespace WormGame
             if (length == -1) length = Config.maxWormLength;
             Worm worm = worms.Enable();
             if (worm == null) return null;
-            worm.Spawn(tails, collision, playArea, playArea.EntityX(x), playArea.EntityY(y), length, color, direction);
+            worm.Spawn(baseworms, field, field.EntityX(x), field.EntityY(y), length, color, direction);
             return worm;
         }
 
@@ -101,7 +101,7 @@ namespace WormGame
         /// <returns>Spawned player</returns>
         public Player SpawnPlayer(float x, float y, Color color)
         {
-            Player tmpPlayer = new Player(this, 0, x, y, color, playArea.Size);
+            Player tmpPlayer = new Player(this, 0, x, y, color, field.Size);
             Add(tmpPlayer);
             return tmpPlayer;
         }
@@ -111,11 +111,11 @@ namespace WormGame
         /// Turns the given worm into a collection of bricks
         /// </summary>
         /// <param name="worm">Worm to transform</param>
-        public Bunch SpawnBunch(Worm worm)
+        public Brick SpawnBrick(Worm worm)
         {
-            Bunch bunch = bunches.Enable();
+            Brick bunch = bricks.Enable();
             if (bunch == null) return null;
-            bunch.Spawn(bricks, collision, playArea, worm);
+            bunch.Spawn(basebricks, field, worm);
             return bunch;
         }
 
@@ -136,7 +136,7 @@ namespace WormGame
             if (bunchTimer >= bunchTimerReset)
             {
                 bunchTimer = 0;
-                BunchUpdate();
+                //BrickUpdate();
             }
         }
 
@@ -150,20 +150,7 @@ namespace WormGame
                 if (worm.Enabled)
                     worm.Move();
             if (Config.visualizeCollision)
-                playArea.Visualize();
-        }
-
-
-        /// <summary>
-        /// Applies gravity to bunches
-        /// </summary>
-        public void BunchUpdate()
-        {
-            /** / // TODO: If player is doing softdrop, don't apply gravity
-            foreach (Bunch bunch in bunches)
-                if (bunch.Enabled)
-                    bunch.SoftDrop();
-            /**/
+                field.Visualize();
         }
     }
 }
