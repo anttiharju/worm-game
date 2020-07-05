@@ -1,4 +1,4 @@
-﻿using Otter;
+﻿using Otter.Utility.MonoGame;
 
 namespace WormGame.Help
 {

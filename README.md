@@ -22,6 +22,3 @@ Educational project. The goal is to become a better developer by actually workin
 - Visual Studio 2019
 - C# + [Otter](http://otter2d.com/)
 - [ComTest](https://trac.cc.jyu.fi/projects/comtest/wiki/ComTestInEnglish) 
-
-# Issues
-- High GPU usage (50-100%) even on a GTX 1080 causing coil whine, unless limited with other software like [RTSS.](https://www.guru3d.com/files-details/rtss-rivatuner-statistics-server-download.html) Probably caused by a bug in Otter, but I haven't investigated it that much.

@@ -1,5 +1,8 @@
-# TODO
-- Investigate GPU usage issue
+# 05.07.2020
+- Upgraded Otter to 1.0 from 0.9.
+    - GPU usage issue seems to be resolved.
+- Brought Controls.cs back to life to be used with bricks
+    - Bricks have a weird bug I can't debug where sometimes they only partially rotate when moving horizontally
 
 # 01.07.2020
 - Trying to do less massive commits, getting into the good habit of small commits.
