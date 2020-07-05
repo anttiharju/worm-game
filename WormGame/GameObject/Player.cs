@@ -1,6 +1,8 @@
-﻿using Otter;
+﻿using Otter.Graphics;
 using WormGame.Other;
 using WormGame.Help;
+using Otter.Graphics.Drawables;
+using Otter.Core;
 
 namespace WormGame.GameObject
 {
@@ -17,7 +19,7 @@ namespace WormGame.GameObject
         private readonly float dropTimerReset = 0.3f;
 
         private Worm worm;
-        private Bunch bunch;
+        private Brick brick;
         private Color oldColor;
 
         private float leftX;
@@ -55,11 +57,11 @@ namespace WormGame.GameObject
         /// </summary>
         private void Posess()
         {
-            if (bunch != null)
+            if (brick != null)
             {
-                bunch.Color = oldColor;
-                Position = bunch.Position;
-                bunch = null;
+                brick.Color = oldColor;
+                Position = brick.Position;
+                brick = null;
                 Graphic.Visible = true;
             }
             if (worm != null)
@@ -99,8 +101,8 @@ namespace WormGame.GameObject
         {
             if (worm == null) return;
             worm.Disable();
-            bunch = wormScene.SpawnBunch(worm);
-            bunch.Color = worm.Color;
+            brick = wormScene.SpawnBrick(worm);
+            brick.Color = worm.Color;
             worm = null;
         }
 
@@ -110,7 +112,7 @@ namespace WormGame.GameObject
         /// </summary>
         private void BrickControl()
         {
-            if (bunch == null) return;
+            if (brick == null) return;
 
             float dpadDeadZone = 80;
 
@@ -118,12 +120,14 @@ namespace WormGame.GameObject
             {
                 if (Mathf.FastAbs(dpadX) > dpadDeadZone)
                 {
-                    if (dpadY > 0)
+                    if (dpadX > 0)
                     {
+                        brick.controls.Add('D');
                         dropAction = false;
                     }
-                    if (dpadY < 0)
+                    if (dpadX < 0)
                     {
+                        brick.controls.Add('A');
                         dropAction = false;
                     }
                 }
@@ -131,19 +135,20 @@ namespace WormGame.GameObject
                 {
                     if (dpadY > 0)
                     {
-                        bunch.Drop();
+                        brick.controls.Add('S');
                         dropAction = false;
                     }
                     if (dpadY < 0)
                     {
+                        brick.controls.Add('W');
                         dropAction = false;
                     }
                 }
             }
             if (Input.ButtonPressed(0, playerNumber)) // A
-                bunch.Rotate();
+                brick.controls.Add('Q');
             if (Input.ButtonPressed(1, playerNumber)) // B
-                bunch.Rotate(true);
+                brick.controls.Add('E');
 
             if (Input.ButtonPressed(4, playerNumber)) // LB
                 Brickify();
@@ -179,7 +184,7 @@ namespace WormGame.GameObject
         /// </summary>
         private void GhostControl()
         {
-            if (worm != null || bunch != null) return;
+            if (worm != null || brick != null) return;
             float deadZone = 10;
             if (Mathf.FastAbs(leftX) > deadZone)
                 X += leftX * speedModifier;
@@ -283,15 +288,15 @@ namespace WormGame.GameObject
         /// </summary>
         private void Timers()
         {
-            if (-10 < dpadY && dpadY < 10)
+            if (-10 < dpadY && dpadY < 10 && -10 < dpadX && dpadX < 10)
                 dropAction = true;
-            if (!dropAction)
+            /*if (!dropAction)
                 dropTimer += Scene.Game.DeltaTime;
             if (dropTimer >= dropTimerReset)
             {
                 dropAction = true;
                 dropTimer = 0;
-            }
+            }*/
         }
     }
 }
