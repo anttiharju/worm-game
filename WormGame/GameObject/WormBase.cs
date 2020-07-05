@@ -1,4 +1,5 @@
-﻿using Otter;
+﻿using Otter.Graphics.Drawables;
+using Otter.Utility.MonoGame;
 using WormGame.Help;
 using WormGame.Other;
 
@@ -9,9 +10,9 @@ namespace WormGame.GameObject
     /// <summary>
     /// Tail class. Acts as the foundation for the entire worm.
     /// </summary>
-    class WormTail : Poolable
+    class WormBase : Poolable
     {
-        public WormTail Next { get; set; }
+        public WormBase Next { get; set; }
         public Vector2 target;
 
         private readonly float speed;
@@ -20,7 +21,7 @@ namespace WormGame.GameObject
         /// Constructor. Creates a circle graphic for the entity.
         /// </summary>
         /// <param name="size">Circle graphic diameter</param>
-        public WormTail(int size) : base()
+        public WormBase(int size) : base()
         {
             Image image = Image.CreateCircle(size / 2);
             AddGraphic(image);
@@ -44,13 +45,13 @@ namespace WormGame.GameObject
         /// <summary>
         /// Recursively moves the entire worm
         /// </summary>
-        /// <param name="xDelta">horizontal movement</param>
-        /// <param name="yDelta">vertical movement</param>
-        public void Move(float xDelta, float yDelta)
+        /// <param name="deltaX">horizontal movement</param>
+        /// <param name="deltaY">vertical movement</param>
+        public void Move(float deltaX, float deltaY)
         {
             Next.TailFollow(target);
-            target.X += xDelta;
-            target.Y += yDelta;
+            target.X += deltaX;
+            target.Y += deltaY;
         }
 
 
@@ -59,6 +60,7 @@ namespace WormGame.GameObject
         /// </summary>
         public override void Update()
         {
+            base.Update();
             if (Enabled)
                 Position += (target - Position) * speed;
         }

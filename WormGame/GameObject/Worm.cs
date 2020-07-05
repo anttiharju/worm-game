@@ -1,4 +1,5 @@
-﻿using Otter;
+﻿using Otter.Graphics;
+using Otter.Utility.MonoGame;
 using WormGame.Help;
 using WormGame.Other;
 
@@ -9,13 +10,12 @@ namespace WormGame.GameObject
     /// <summary>
     /// The worm class. Technically it's just the head entity but it manages the entire worm.
     /// </summary>
-    class Worm : WormTail
+    class Worm : WormBase
     {
-        private readonly WormTail[] worm;
+        private readonly WormBase[] worm;
         private readonly int size;
 
-        private PlayArea playArea;
-        private Collision collision;
+        private Collision field;
         private Vector2 newTarget;
 
         public override Color Color { get { return Graphic.Color ?? null; } set { SetColor(value); } }
@@ -31,7 +31,7 @@ namespace WormGame.GameObject
         {
             this.size = size;
             Direction = "UP";
-            worm = new WormTail[Config.maxWormLength];
+            worm = new WormBase[Config.maxWormLength];
             newTarget = new Vector2();
         }
 
@@ -46,15 +46,15 @@ namespace WormGame.GameObject
         /// <param name="color">Worms color</param>
         /// <param name="directions">Movement instructions for the worm</param>
         /// <returns>The spawned worm</returns>
-        public Worm Spawn(Pooler<WormTail> tails, Collision collision, PlayArea playArea, int x, int y, int length, Color color, string direction)
-        {
+        public Worm Spawn(Pooler<WormBase> tails, Collision field, int x, int y, int length, Color color, string direction)
+        {   
             // Tail
-            int tailCount = length - 1; // minus one because head already counts as 1
-            WormTail current = this;
+            int tailCount = length - 1; // ignore head
+            WormBase current = this;
             for (int i = 0; i < tailCount; i++)
             {
                 worm[i] = current;
-                WormTail next = tails.Enable();
+                WormBase next = tails.Enable();
                 if (next == null) return null;
                 next.X = x;
                 next.Y = y;
@@ -65,14 +65,13 @@ namespace WormGame.GameObject
             worm[tailCount] = current;
 
             // Head
-            this.collision = collision;
-            this.playArea = playArea;
+            this.field = field;
             X = x;
             Y = y;
             Length = length;
             target = Position;
             Direction = direction;
-            playArea.Update(target, this);
+            this.field.Update(target, this);
             Color = color;
 
             return this;
@@ -111,8 +110,14 @@ namespace WormGame.GameObject
         {
             newTarget.X = target.X + deltaX; newTarget.Y = target.Y + deltaY;
 
-            if (collision.WormCheck(this, newTarget))
+            if (field.Check(newTarget))
+            {
+                field.Update(worm[^1].target, null);
+                for (int i = worm.Length - 1; i > 0; i--)
+                    field.Update(worm[i - 1].target, worm[i]);
+                field.Update(newTarget, worm[0]);
                 Move(deltaX, deltaY);
+            }
             else if (!Posessed)
                 Direction = Random.Direction();
         }
@@ -125,7 +130,7 @@ namespace WormGame.GameObject
         {
             for (int i = 0; i < Length; i++)
             {
-                playArea.Update(worm[i].target, null);
+                field.Update(worm[i].target, null);
                 worm[i].Enabled = false;
             }
         }
@@ -148,7 +153,7 @@ namespace WormGame.GameObject
         /// </summary>
         /// <param name="i">index</param>
         /// <returns>Worms body part at index</returns>
-        public WormTail this[int i]
+        public WormBase this[int i]
         {
             get => worm[i];
             set => worm[i] = value;
