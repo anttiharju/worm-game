@@ -1,6 +1,5 @@
 ﻿using Otter.Graphics;
 using Otter.Utility.MonoGame;
-using WBGame.Other;
 using WormGame.Help;
 using WormGame.Other;
 
@@ -16,7 +15,6 @@ namespace WormGame.GameObject
         public override Color Color { get { return Graphic.Color ?? null; } set { SetColor(value); } }
         public bool Posessed { get; set; }
         public int Count { get; private set; }
-        public Controls controls;
 
         private Collision field;
         private int anchorIndex;
@@ -35,7 +33,6 @@ namespace WormGame.GameObject
             this.size = size;
             allBricks = new BrickBase[Config.maxWormLength];
             next = new Vector2[Config.maxWormLength];
-            controls = new Controls();
         }
 
 
@@ -49,22 +46,24 @@ namespace WormGame.GameObject
         /// <param name="color">BrickBrains color</param>
         /// <param name="directions">Movement instructions for the BrickBrain</param>
         /// <returns>The spawned BrickBrain</returns>
-        public Brick Spawn(Pooler<BrickBase> bricks, Collision field, Worm worm)
+        public Brick Spawn(Pooler<BrickBase> baseBricks, Collision field, Worm worm)
         {
             this.field = field;
-            anchorIndex = Count / 2;
-
             Count = worm.Length;
-            for (int i = 0; i < Count; i++)
-            {
-                allBricks[i] = bricks.Enable();
-                allBricks[i].X = worm[i].target.X;
-                allBricks[i].Y = worm[i].target.Y;
-                field.Update(allBricks[i]);
-            }
+            SetBrick(this, worm, 0);
+            for (int i = 1; i < Count; i++)
+                SetBrick(baseBricks.Enable(), worm, i);
+            anchorIndex = Count / 2;
             Color = worm.Color;
-
             return this;
+        }
+
+        public void SetBrick(BrickBase brick, Worm worm, int i)
+        {
+            allBricks[i] = brick;
+            allBricks[i].X = worm[i].target.X;
+            allBricks[i].Y = worm[i].target.Y;
+            field.Update(allBricks[i]);
         }
 
 
@@ -79,6 +78,7 @@ namespace WormGame.GameObject
             BrickBase anchor = allBricks[anchorIndex];
             for (int i = 0; i < Count; i++)
             {
+                //next[i] = allBricks[i].Position;
                 if (i == anchorIndex) i++;
                 Vector2 rotationVector = allBricks[i].Position - anchor.Position;
                 rotationVector = clockwise ? Mathf.RotateCW(rotationVector) : Mathf.RotateCCW(rotationVector);
@@ -184,31 +184,6 @@ namespace WormGame.GameObject
             }
         }
 
-        public override void Update()
-        {
-            switch (controls.Next())
-            {
-                case 'W':
-                    HardDrop();
-                    break;
-                case 'A':
-                    Left();
-                    break;
-                case 'S':
-                    SoftDrop();
-                    break;
-                case 'D':
-                    Right();
-                    break;
-                case 'E':
-                    Rotate(true);
-                    break;
-                case 'Q':
-                    Rotate();
-                    break;
-            }
-        }
-
         public float Lowest(Vector2[] next)
         {
             float biggest = 0;
@@ -219,7 +194,7 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Sets BrickBrains color
+        /// Sets Brick color
         /// </summary>
         /// <param name="color"></param>
         public void SetColor(Color color)

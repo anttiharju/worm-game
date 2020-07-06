@@ -13,7 +13,7 @@ namespace WormGame
         static void Main()
         {
             Config config = new Config();
-            Game game = new Game("Worm bricks", 1280, 720, Config.targetFramerate)
+            Game game = new Game("Worm bricks", 1920, 1080, Config.targetFramerate, true)
             {
                 MeasureTimeInFrames = false,
                 WindowResize = false,

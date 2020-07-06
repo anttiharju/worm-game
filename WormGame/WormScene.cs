@@ -39,10 +39,11 @@ namespace WormGame
             worms = new Pooler<Worm>(this, config.wormAmount, field.Size);
 
             // Entity setup
+            SpawnWorm(8, 8);
             int density = 4;
             for (int x = 0; x < Config.width; x += density)
                 for (int y = 0; y < Config.height; y += density)
-                    SpawnWorm(x, y, Config.maxWormLength, Random.Direction());
+                    SpawnWorm(x, y);
             SpawnPlayer(game.HalfWidth, game.HalfHeight, Color.Red);
         }
 
@@ -81,10 +82,11 @@ namespace WormGame
         /// <param name="color">Worms color, by default uses a random color from Helper class</param>
         /// <param name="direction">Worms direction: UP, LEFT, DOWN or RIGHT</param>
         /// <returns>Spawned worm</returns>
-        public Worm SpawnWorm(int x, int y, int length = -1, string direction = "", Color color = null)
+        public Worm SpawnWorm(int x, int y, int length = -1, int direction = -1, Color color = null)
         {
-            if (color == null) color = Random.Color();
             if (length == -1) length = Config.maxWormLength;
+            if (direction == -1) direction = Random.Range(0, 4);
+            if (color == null) color = Random.Color();
             Worm worm = worms.Enable();
             if (worm == null) return null;
             worm.Spawn(baseworms, field, field.EntityX(x), field.EntityY(y), length, color, direction);
@@ -113,10 +115,10 @@ namespace WormGame
         /// <param name="worm">Worm to transform</param>
         public Brick SpawnBrick(Worm worm)
         {
-            Brick bunch = bricks.Enable();
-            if (bunch == null) return null;
-            bunch.Spawn(basebricks, field, worm);
-            return bunch;
+            Brick brick = bricks.Enable();
+            if (brick == null) return null;
+            brick.Spawn(basebricks, field, worm);
+            return brick;
         }
 
 
