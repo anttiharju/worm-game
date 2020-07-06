@@ -9,9 +9,8 @@ namespace WormGame.Help
     /// </summary>
     static class Random
     {
-        private static readonly System.Random randomNumber = new System.Random();
+        private static readonly System.Random randomGenerator = new System.Random();
         private static readonly Color[] colors = { Otter.Graphics.Color.Blue, Otter.Graphics.Color.Cyan, Otter.Graphics.Color.Green, Otter.Graphics.Color.Magenta, Otter.Graphics.Color.Orange, Otter.Graphics.Color.Yellow };
-        private static readonly string[] directions = { "UP", "LEFT", "DOWN", "RIGHT" };
 
         /// <summary>
         /// Returns a random number between a and b, b exclusive.
@@ -21,7 +20,7 @@ namespace WormGame.Help
         /// <returns>Random number between a and b</returns>
         public static int Range(int a, int b)
         {
-            return randomNumber.Next(a, b);
+            return randomGenerator.Next(a, b);
         }
 
 
@@ -32,16 +31,6 @@ namespace WormGame.Help
         public static Color Color()
         {
             return colors[Range(0, colors.Length)];
-        }
-
-
-        /// <summary>
-        /// Returns a random direction.
-        /// </summary>
-        /// <returns>Random color</returns>
-        public static string Direction()
-        {
-            return directions[Range(0, directions.Length)];
         }
     }
 }

@@ -64,7 +64,12 @@ namespace WormGame.Other
         /// <returns>Play area value</returns>
         public ref Poolable Get(Vector2 target)
         {
-            return ref field[X(target.X), Y(target.Y)];
+            return ref Get(X(target.X), Y(target.Y));
+        }
+
+        private ref Poolable Get(int x, int y)
+        {
+            return ref field[x, y];
         }
 
         /// <summary>
@@ -74,19 +79,19 @@ namespace WormGame.Other
         /// <returns></returns>
         public bool Check(Vector2 next)
         {
-            // Actual collision detection
-            int nextReverseX = X(next.X);
-            int nextReverseY = Y(next.Y);
+            return Check(X(next.X), Y(next.Y));
+        }
 
-            if (nextReverseX <= -1 ||
-                nextReverseX >= Width ||
-                nextReverseY <= -1 ||
-                nextReverseY >= Height ||
-                Get(next) != null)
+        public bool Check(int x, int y)
+        {
+            if (x <= -1 ||
+                x >= Width ||
+                y <= -1 ||
+                y >= Height ||
+                Get(x, y) != null)
                 return false;
             return true;
         }
-
 
         /// <summary>
         /// Update play area through this method.
@@ -171,7 +176,12 @@ namespace WormGame.Other
                     if (field[x, y] == null)
                         Console.Write(".");
                     else
-                        Console.Write("o");
+                    {
+                        if (field[x, y] is WormBase)
+                            Console.Write("o");
+                        if (field[x, y] is BrickBase)
+                            Console.Write("x");
+                    }
                 }
             }
         }
