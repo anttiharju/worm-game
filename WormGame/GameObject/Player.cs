@@ -3,6 +3,7 @@ using WormGame.Other;
 using WormGame.Help;
 using Otter.Graphics.Drawables;
 using Otter.Core;
+using System.IO.MemoryMappedFiles;
 
 namespace WormGame.GameObject
 {
@@ -102,6 +103,7 @@ namespace WormGame.GameObject
             if (worm == null) return;
             worm.Disable();
             brick = wormScene.SpawnBrick(worm);
+            if (brick == null) return;
             brick.Color = worm.Color;
             worm = null;
         }
@@ -122,12 +124,12 @@ namespace WormGame.GameObject
                 {
                     if (dpadX > 0)
                     {
-                        brick.controls.Add('D');
+                        brick.Right();
                         dropAction = false;
                     }
                     if (dpadX < 0)
                     {
-                        brick.controls.Add('A');
+                        brick.Left();
                         dropAction = false;
                     }
                 }
@@ -135,20 +137,20 @@ namespace WormGame.GameObject
                 {
                     if (dpadY > 0)
                     {
-                        brick.controls.Add('S');
+                        brick.SoftDrop();
                         dropAction = false;
                     }
                     if (dpadY < 0)
                     {
-                        brick.controls.Add('W');
+                        brick.HardDrop();
                         dropAction = false;
                     }
                 }
             }
             if (Input.ButtonPressed(0, playerNumber)) // A
-                brick.controls.Add('Q');
+                brick.Rotate();
             if (Input.ButtonPressed(1, playerNumber)) // B
-                brick.controls.Add('E');
+                brick.Rotate(true);
 
             if (Input.ButtonPressed(4, playerNumber)) // LB
                 Brickify();
@@ -165,14 +167,14 @@ namespace WormGame.GameObject
         {
             if (worm == null) return;
             float deadZone = 90;
-            if (leftX < -deadZone)
-                worm.Direction = "LEFT";
-            if (leftX > deadZone)
-                worm.Direction = "RIGHT";
             if (leftY < -deadZone)
-                worm.Direction = "UP";
+                worm.Direction = 0; // UP
+            if (leftX < -deadZone)
+                worm.Direction = 1; // LEFT
             if (leftY > deadZone)
-                worm.Direction = "DOWN";
+                worm.Direction = 2; // DOWN
+            if (leftX > deadZone)
+                worm.Direction = 3; // RIGHT
 
             if (Input.ButtonPressed(3, playerNumber)) // Y
                 KillWorm();
