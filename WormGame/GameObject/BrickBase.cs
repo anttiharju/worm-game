@@ -1,5 +1,5 @@
-﻿using Otter.Graphics.Drawables;
-using WormGame.Other;
+﻿using WormGame.Manager;
+using Otter.Graphics.Drawables;
 
 namespace WormGame.GameObject
 {
@@ -14,7 +14,7 @@ namespace WormGame.GameObject
         /// Constructor. Creates a circle graphic for the entity.
         /// </summary>
         /// <param name="size">Circle graphic diameter</param>
-        public BrickBase(int size) : base()
+        public BrickBase(int size, Config config) : base()
         {
             Image image = Image.CreateRectangle(size);
             AddGraphic(image);
