@@ -1,25 +1,23 @@
-﻿using Otter.Core;
+﻿using System;
+using Otter.Core;
 using Otter.Utility.MonoGame;
-using System;
 using WormGame.GameObject;
-using WormGame.Help;
+using WormGame.Static;
 
-namespace WormGame.Other
+namespace WormGame.Manager
 {
     /// @author Antti Harju
     /// @version 01.07.2020
     /// <summary>
     /// Class for play area. Has close ties to collision.
     /// </summary>
-    class Collision
+    public class Collision
     {
-        private readonly Game game;
-        public int Width { get; private set; }
-        public int Height { get; private set; }
-        public int Size { get; private set; }
+        private readonly int width;
+        private readonly int height;
+        private readonly int size;
 
         private readonly Poolable[,] field;
-        private readonly int margin;
         private readonly int leftBorder;
         private readonly int topBorder;
 
@@ -30,30 +28,14 @@ namespace WormGame.Other
         /// <param name="width">Play area width</param>
         /// <param name="height">Play area height</param>
         /// <param name="margin">Play area margin</param>
-        public Collision(Game game, int width, int height, int margin)
+        public Collision(Game game, Config config)
         {
-            this.game = game;
-            this.margin = margin;
-            Width = width;
-            Height = height;
-            Size = CalculateSize();
-            field = new Poolable[Width, Height];
-            leftBorder = game.WindowWidth / 2 - Width / 2 * Size + Size / 2;
-            topBorder = game.WindowHeight / 2 + Height / 2 * Size - Size / 2;
-        }
-
-
-        /// <summary>
-        /// Calculates entity size based on window and play area dimensions.
-        /// </summary>
-        /// <returns>Entity size</returns>
-        private int CalculateSize()
-        {
-            int xSize = game.WindowWidth / (Width + margin * 2);
-            int ySize = game.WindowHeight / (Height + margin * 2);
-            int size = Mathf.Smaller(xSize, ySize);
-            if (size % 2 != 0) size--;
-            return size;
+            width = config.width;
+            height = config.height;
+            size = config.size;
+            field = new Poolable[width, height];
+            leftBorder = game.WindowWidth / 2 - width / 2 * size + size / 2;
+            topBorder = game.WindowHeight / 2 + height / 2 * size - size / 2;
         }
 
 
@@ -85,9 +67,9 @@ namespace WormGame.Other
         public bool Check(int x, int y)
         {
             if (x <= -1 ||
-                x >= Width ||
+                x >= width ||
                 y <= -1 ||
-                y >= Height ||
+                y >= height ||
                 Get(x, y) != null)
                 return false;
             return true;
@@ -125,7 +107,7 @@ namespace WormGame.Other
         /// <returns>Play areas horizontal position</returns>
         public int X(float x)
         {
-            return (((int)x - leftBorder) / Size);
+            return ((Mathf.FastRound(x) - leftBorder) / size);
         }
 
 
@@ -136,7 +118,7 @@ namespace WormGame.Other
         /// <returns>Play areas vertical position</returns>
         public int Y(float y)
         {
-            return (topBorder - (int)y) / Size;
+            return (topBorder - Mathf.FastRound(y)) / size;
         }
 
 
@@ -147,7 +129,7 @@ namespace WormGame.Other
         /// <returns>Horizontal entity position</returns>
         public int EntityX(int x)
         {
-            return leftBorder + Size * x;
+            return leftBorder + size * x;
         }
 
 
@@ -158,7 +140,7 @@ namespace WormGame.Other
         /// <returns>Vertical entity position</returns>
         public int EntityY(int y)
         {
-            return topBorder - Size * y;
+            return topBorder - size * y;
         }
 
 
@@ -167,10 +149,10 @@ namespace WormGame.Other
         /// </summary>
         public void Visualize()
         {
-            for (int y = 0; y < Height; y++)
+            for (int y = 0; y < height; y++)
             {
-                Console.CursorTop = Height - y;
-                for (int x = 0; x < Width; x++)
+                Console.CursorTop = height - y;
+                for (int x = 0; x < width; x++)
                 {
                     Console.CursorLeft = x;
                     if (field[x, y] == null)

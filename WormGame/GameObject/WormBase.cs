@@ -1,7 +1,6 @@
-﻿using Otter.Graphics.Drawables;
-using Otter.Utility.MonoGame;
-using WormGame.Help;
-using WormGame.Other;
+﻿using Otter.Utility.MonoGame;
+using Otter.Graphics.Drawables;
+using WormGame.Manager;
 
 namespace WormGame.GameObject
 {
@@ -12,46 +11,43 @@ namespace WormGame.GameObject
     /// </summary>
     class WormBase : Poolable
     {
+        private readonly Config config;
+        private Worm head;
+
         public WormBase Next { get; set; }
         public Vector2 target;
-
-        private readonly float speed;
 
         /// <summary>
         /// Constructor. Creates a circle graphic for the entity.
         /// </summary>
         /// <param name="size">Circle graphic diameter</param>
-        public WormBase(int size) : base()
+        public WormBase(int size, Config config) : base()
         {
             Image image = Image.CreateCircle(size / 2);
             AddGraphic(image);
             image.CenterOrigin();
-            speed = 0.15f * (144 / Config.targetFramerate);
+            this.config = config;
         }
 
+        public void SetHead(Worm head)
+        {
+            if (Next != null)
+                Next.SetHead(head);
+            this.head = head;
+        }
 
         /// <summary>
         /// Recursive method that makes every part of the tail follow the head
         /// </summary>
-        /// <param name="newPosition">Position to move to</param>
-        public void TailFollow(Vector2 newPosition)
+        /// <param name="newTarget">Position to move to</param>
+        public void TailFollow(Vector2 newTarget)
         {
             if (Next != null)
+            {
+                Next.Position = Next.target;
                 Next.TailFollow(target);
-            target = newPosition;
-        }
-
-
-        /// <summary>
-        /// Recursively moves the entire worm
-        /// </summary>
-        /// <param name="deltaX">horizontal movement</param>
-        /// <param name="deltaY">vertical movement</param>
-        public void Move(float deltaX, float deltaY)
-        {
-            Next.TailFollow(target);
-            target.X += deltaX;
-            target.Y += deltaY;
+            }
+            target = newTarget;
         }
 
 
@@ -62,7 +58,7 @@ namespace WormGame.GameObject
         {
             base.Update();
             if (Enabled)
-                Position += (target - Position) * speed;
+                Position += (target - Position) * config.WormSpeed;
         }
     }
 }

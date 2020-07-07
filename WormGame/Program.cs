@@ -1,5 +1,5 @@
 ﻿using Otter.Core;
-using WormGame.Help;
+using WormGame.Manager;
 
 namespace WormGame
 {
@@ -12,8 +12,9 @@ namespace WormGame
     {
         static void Main()
         {
-            Config config = new Config();
-            Game game = new Game("Worm bricks", 1920, 1080, Config.targetFramerate, true)
+            int windowWidth = 1280; int windowHeight = 720;
+            Config config = new Config(windowWidth, windowHeight);
+            Game game = new Game("Worm bricks", windowWidth, windowHeight, config.targetFramerate)
             {
                 MeasureTimeInFrames = false,
                 WindowResize = false,

@@ -1,7 +1,7 @@
 ﻿using Otter.Core;
 using Otter.Graphics;
 
-namespace WormGame.Other
+namespace WormGame.Manager
 {
     /// @author Antti Harju
     /// @version 28.06.2020
