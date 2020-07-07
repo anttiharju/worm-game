@@ -1,6 +1,7 @@
 ﻿using Otter.Utility.MonoGame;
+using System;
 
-namespace WormGame.Help
+namespace WormGame.Static
 {
     /// @author anvemaha
     /// @version 01.07.2020
@@ -25,6 +26,32 @@ namespace WormGame.Help
         {
             if (number < 0) return -number;
             return number;
+        }
+
+
+        /// <summary>
+        /// Lightweight version of Math.Round()
+        /// Doesn't work for negative floats
+        /// </summary>
+        /// <param name="number">float</param>
+        /// <returns>int</returns>
+        /// <example>
+        /// <pre name="test">
+        ///  FastRound(1.9f) === 2;
+        ///  FastRound(4.1f) === 4;
+        ///  FastRound(-2.9f) === -3;
+        ///  FastRound(-6.1f) === -6;
+        /// </pre>
+        /// </example>
+        public static int FastRound(float number)
+        {
+#if DEBUG
+            if (number < 0)
+                throw new Exception("FastRound() is not valid for negative floats.");
+#endif
+            int integer = (int)number;
+            if (number < integer + 0.5f) return integer;
+            return ++integer;
         }
 
 

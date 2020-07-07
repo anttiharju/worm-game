@@ -1,9 +1,8 @@
-﻿using Otter.Graphics;
-using WormGame.Other;
-using WormGame.Help;
+﻿using Otter.Core;
+using Otter.Graphics;
 using Otter.Graphics.Drawables;
-using Otter.Core;
-using System.IO.MemoryMappedFiles;
+using WormGame.Manager;
+using WormGame.Static;
 
 namespace WormGame.GameObject
 {
@@ -17,7 +16,6 @@ namespace WormGame.GameObject
         private readonly int playerNumber;
         private readonly int axisDeadZone = 10;
         private readonly float speedModifier = 0.05f;
-        private readonly float dropTimerReset = 0.3f;
 
         private Worm worm;
         private Brick brick;
@@ -27,7 +25,6 @@ namespace WormGame.GameObject
         private float leftY;
         private float dpadX;
         private float dpadY;
-        private float dropTimer;
         private bool dropAction = true;
 
 
@@ -168,13 +165,13 @@ namespace WormGame.GameObject
             if (worm == null) return;
             float deadZone = 90;
             if (leftY < -deadZone)
-                worm.Direction = 0; // UP
+                worm.Direction = Help.directions[0]; // UP
             if (leftX < -deadZone)
-                worm.Direction = 1; // LEFT
+                worm.Direction = Help.directions[1]; // LEFT
             if (leftY > deadZone)
-                worm.Direction = 2; // DOWN
+                worm.Direction = Help.directions[2]; // DOWN
             if (leftX > deadZone)
-                worm.Direction = 3; // RIGHT
+                worm.Direction = Help.directions[3]; // RIGHT
 
             if (Input.ButtonPressed(3, playerNumber)) // Y
                 KillWorm();
