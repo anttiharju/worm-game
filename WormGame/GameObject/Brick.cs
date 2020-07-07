@@ -1,7 +1,7 @@
 ﻿using Otter.Graphics;
 using Otter.Utility.MonoGame;
-using WormGame.Help;
-using WormGame.Other;
+using WormGame.Static;
+using WormGame.Manager;
 
 namespace WormGame.GameObject
 {
@@ -28,11 +28,11 @@ namespace WormGame.GameObject
         /// Head constructor. Calls Body constructor.
         /// </summary>
         /// <param name="size">Diameter of the circle graphic</param>
-        public Brick(int size) : base(size)
+        public Brick(int size, Config config) : base(size, config)
         {
             this.size = size;
-            allBricks = new BrickBase[Config.maxWormLength];
-            next = new Vector2[Config.maxWormLength];
+            allBricks = new BrickBase[config.maxWormLength];
+            next = new Vector2[config.maxWormLength];
         }
 
 
@@ -78,7 +78,8 @@ namespace WormGame.GameObject
             BrickBase anchor = allBricks[anchorIndex];
             for (int i = 0; i < Count; i++)
             {
-                //next[i] = allBricks[i].Position;
+                // I don't know why, but without the next line rotating sometimes fucks up when moving horizontally.
+                next[i] = allBricks[i].Position; 
                 if (i == anchorIndex) i++;
                 Vector2 rotationVector = allBricks[i].Position - anchor.Position;
                 rotationVector = clockwise ? Mathf.RotateCW(rotationVector) : Mathf.RotateCCW(rotationVector);

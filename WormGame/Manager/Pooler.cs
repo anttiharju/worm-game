@@ -1,8 +1,8 @@
-﻿using Otter.Core;
-using System;
+﻿using System;
 using System.Collections;
+using Otter.Core;
 
-namespace WormGame.Other
+namespace WormGame.Manager
 {
     /// @author Antti Harju
     /// @version 28.06.2020
@@ -22,14 +22,14 @@ namespace WormGame.Other
         /// <param name="scene">scene to add the objects to</param>
         /// <param name="capacity">pool size</param>
         /// <param name="entitySize">pooled entity size</param>
-        public Pooler(Scene scene, int capacity, int entitySize)
+        public Pooler(Scene scene, Config config, int capacity, int entitySize)
         {
             lastIndex = capacity - 1;
             pool = new T[capacity];
             for (int i = 0; i < capacity; i++)
             {
-                T tmp = (T)Activator.CreateInstance(typeof(T), new object[] { entitySize });
-                tmp.Graphic.Visible = false;
+                T tmp = (T)Activator.CreateInstance(typeof(T), new object[] { entitySize, config });
+                tmp.Enabled = false;
                 pool[i] = tmp;
             }
             scene.AddMultiple(pool);

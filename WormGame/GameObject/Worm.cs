@@ -1,8 +1,7 @@
 ﻿using Otter.Graphics;
 using Otter.Utility.MonoGame;
-using System.Net.Http.Headers;
-using WormGame.Help;
-using WormGame.Other;
+using WormGame.Static;
+using WormGame.Manager;
 
 namespace WormGame.GameObject
 {
@@ -17,23 +16,22 @@ namespace WormGame.GameObject
         private readonly int size;
 
         private Collision field;
-        private Vector2 newTarget;
-        private int direction;
+        private Vector2 direction = new Vector2();
+        private Vector2 tmpTarget = new Vector2();
 
-        public override Color Color { get { return Graphic.Color ?? null; } set { SetColor(value); } }
         public bool Posessed { get; set; }
         public int Length { get; private set; }
-        public int Direction { private get { return direction; } set { if (ValidateDirection(target.X, target.Y, value)) direction = value; } }
+        public override Color Color { get { return Graphic.Color ?? null; } set { SetColor(value); } }
+        public Vector2 Direction { get { return direction; } set { if (Help.ValidateDirection(field, target, value * size)) direction = value; } }
 
         /// <summary>
         /// Head constructor. Calls Body constructor.
         /// </summary>
         /// <param name="size">Diameter of the circle graphic</param>
-        public Worm(int size) : base(size)
+        public Worm(int size, Config config) : base(size, config)
         {
             this.size = size;
-            worm = new WormBase[Config.maxWormLength];
-            newTarget = new Vector2();
+            worm = new WormBase[config.maxWormLength];
         }
 
         /// <summary>
@@ -46,7 +44,7 @@ namespace WormGame.GameObject
         /// <param name="color">Worms color</param>
         /// <param name="directions">Movement instructions for the worm</param>
         /// <returns>The spawned worm</returns>
-        public Worm Spawn(Pooler<WormBase> tails, Collision field, int x, int y, int length, Color color, int direction)
+        public Worm Spawn(Pooler<WormBase> tails, Collision field, int x, int y, int length, Color color)
         {
             // Tail
             int tailCount = length - 1; // ignore head
@@ -64,13 +62,15 @@ namespace WormGame.GameObject
             }
             worm[tailCount] = current;
 
+            SetHead(this);
+
             // Head
             this.field = field;
             X = x;
             Y = y;
             Length = length;
             target = Position;
-            Direction = direction;
+            Direction = Help.directions[3];
             this.field.Update(target, this);
             Color = color;
 
@@ -84,42 +84,33 @@ namespace WormGame.GameObject
         public void Move()
         {
             bool retry = false;
-            Retry:
-            int deltaX = 0;
-            int deltaY = 0;
-            switch (direction)
-            {
-                case 0:
-                    deltaY -= size;
-                    break;
-                case 1:
-                    deltaX -= size;
-                    break;
-                case 2:
-                    deltaY += size;
-                    break;
-                case 3:
-                    deltaX += size;
-                    break;
-            }
-            newTarget.X = target.X + deltaX; newTarget.Y = target.Y + deltaY;
-
-            if (field.Check(newTarget))
+        Retry:
+            tmpTarget = target + Direction * size;
+            if (field.Check(tmpTarget))
             {
                 field.Update(worm[^1].target, null);
                 for (int i = worm.Length - 1; i > 0; i--)
                     field.Update(worm[i - 1].target, worm[i]);
-                field.Update(newTarget, worm[0]);
-                Move(deltaX, deltaY);
+                field.Update(tmpTarget, worm[0]);
+                TailFollow(tmpTarget);
             }
             else if (!Posessed && !retry)
             {
-                Direction = RandomValidDirection();
+                Direction = Random.ValidDirection(field, target, size);
                 retry = true;
                 goto Retry;
             }
         }
 
+
+        public void UpdateTargets(Vector2 next)
+        {
+            for (int i = worm.Length - 1; i > 0; i--)
+            {
+                worm[i].target = worm[i - 1].target;
+            }
+            worm[0].target = next;
+        }
 
         /// <summary>
         /// Disables the worm
@@ -144,45 +135,6 @@ namespace WormGame.GameObject
                 worm[i].Graphic.Color = color;
         }
 
-        private int RandomValidDirection()
-        {
-            int direction = Random.Range(0, 4);
-            for (int i = 0; i < 3; i++)
-            {
-                if (ValidateDirection(target.X, target.Y, direction))
-                    break;
-                else
-                {
-                    direction--;
-                    if (direction < 0)
-                        direction = 3;
-                }
-            }
-            return direction;
-        }
-
-
-        private bool ValidateDirection(float x, float y, int direction)
-        {
-            int x1 = field.X(x);
-            int y1 = field.Y(y);
-            switch (direction)
-            {
-                case 0:
-                    y1 += 1;
-                    break;
-                case 1:
-                    x1 -= 1;
-                    break;
-                case 2:
-                    y1 -= 1;
-                    break;
-                case 3:
-                    x1 += 1;
-                    break;
-            }
-            return field.Check(x1, y1);
-        }
 
 #pragma warning disable CS0108 // Member hides inherited member; missing new keyword
         /// <summary>
