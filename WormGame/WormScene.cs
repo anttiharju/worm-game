@@ -3,8 +3,9 @@ using Otter.Core;
 using Otter.Utility;
 using Otter.Graphics;
 using Otter.Utility.MonoGame;
+using WormGame.Core;
 using WormGame.Static;
-using WormGame.Manager;
+using WormGame.Pooling;
 using WormGame.GameObject;
 
 namespace WormGame
@@ -20,33 +21,37 @@ namespace WormGame
         private readonly Config config;
         private readonly Collision field;
 
-        private readonly Pooler<Worm> worms;
-        private readonly Pooler<Brick> bricks;
-        private readonly Pooler<WormBase> tails;
-        private readonly Pooler<BrickBase> basebricks;
+        private readonly Pool<Worm> worms;
+        private readonly Pool<WormEntity> bodies;
+        private readonly Pool<BrickBrain> brickBrains;
+        private readonly Pool<Brick> bricks;
+
+        private float wormCounter = 0;
 
         /// <summary>
-        /// Initializes poolers and collision system. Spawns initial entities.
+        /// Initializes pools and collision system. Spawns initial entities.
         /// </summary>
         /// <param name="game"></param>
         public WormScene(Game game, Config config)
         {
             this.game = game;
             this.config = config;
-            field = new Collision(game, config);
+            field = config.field;
 
-            bricks = new Pooler<Brick>(this, config, config.wormAmount, config.size);
-            basebricks = new Pooler<BrickBase>(this, config, config.tailAmount, config.size);
-            tails = new Pooler<WormBase>(this, config, config.tailAmount, config.size);
-            worms = new Pooler<Worm>(this, config, config.wormAmount, config.size);
+            brickBrains = new Pool<BrickBrain>(config, config.wormAmount);
+            bricks = new Pool<Brick>(config, config.tailAmount);
+            AddMultiple(bricks.GetPool());
+            bodies = new Pool<WormEntity>(config, config.tailAmount);
+            AddMultiple(bodies.GetPool());
+            worms = new Pool<Worm>(config, config.wormAmount);
+
 
             // Entity setup
-            int density = 4;
+            int density = config.density;
             for (int x = 0; x < config.width; x += density)
                 for (int y = 0; y < config.height; y += density)
                     SpawnWorm(x, y);
             SpawnPlayer(game.HalfWidth, game.HalfHeight, Color.Red);
-            game.Coroutine.Start(WormRoutine());
         }
 
 
@@ -64,7 +69,7 @@ namespace WormGame
             foreach (Worm worm in worms)
                 if (worm.Enabled)
                 {
-                    float distance = Vector2.Distance(position, worm.Position);
+                    float distance = Vector2.Distance(position, Vector2.Zero);
                     if (distance < nearestDistance)
                     {
                         nearestWorm = worm;
@@ -90,7 +95,7 @@ namespace WormGame
             if (color == null) color = Random.Color();
             Worm worm = worms.Enable();
             if (worm == null) return null;
-            worm.Spawn(tails, field, field.EntityX(x), field.EntityY(y), length, color);
+            worm.Spawn(bodies, field, field.EntityX(x), field.EntityY(y), length, color);
             return worm;
         }
 
@@ -114,32 +119,34 @@ namespace WormGame
         /// Turns the given worm into a collection of bricks
         /// </summary>
         /// <param name="worm">Worm to transform</param>
-        public Brick SpawnBrick(Worm worm)
+        public BrickBrain SpawnBrick(Worm worm)
         {
-            Brick brick = bricks.Enable();
+            BrickBrain brick = brickBrains.Enable();
             if (brick == null) return null;
-            brick.Spawn(basebricks, field, worm);
+            brick.Spawn(bricks, field, worm);
             return brick;
-        }
-
-        public override void UpdateFirst()
-        {
-            base.UpdateFirst();
-            config.UpdateFirst(game);
         }
 
         /// <summary>
         /// Makes every worm move to their next position
         /// </summary>
-        IEnumerator WormRoutine()
+        public override void Update()
         {
-            yield return Coroutine.Instance.WaitForSeconds(config.wormFreq);
-            foreach (Worm worm in worms)
-                if (worm.Enabled)
-                    worm.Move();
+            wormCounter += config.wormStep;
+            foreach (WormEntity body in bodies)
+                if (body.Enabled)
+                    body.Step();
+
+            if (wormCounter >= config.size)
+            {
+                foreach (Worm worm in worms)
+                    if (worm.Enabled)
+                        worm.Move();
+                wormCounter = 0;
+            }
+
             if (Config.visualizeCollision)
                 field.Visualize();
-            Game.Coroutine.Start(WormRoutine());
         }
     }
 }

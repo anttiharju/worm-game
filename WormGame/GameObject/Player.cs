@@ -1,7 +1,8 @@
 ﻿using Otter.Core;
 using Otter.Graphics;
 using Otter.Graphics.Drawables;
-using WormGame.Manager;
+using WormGame.Pooling;
+using WormGame.Core;
 using WormGame.Static;
 
 namespace WormGame.GameObject
@@ -18,7 +19,7 @@ namespace WormGame.GameObject
         private readonly float speedModifier = 0.05f;
 
         private Worm worm;
-        private Brick brick;
+        private BrickBrain brick;
         private Color oldColor;
 
         private float leftX;
