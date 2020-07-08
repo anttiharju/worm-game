@@ -37,7 +37,7 @@ namespace WormGame.Static
         /// Lightweight version of Math.Abs().
         /// </summary>
         /// <param name="number">Number</param>
-        /// <returns>Numbers absolute value</returns>
+        /// <returns>Absolute value of number</returns>
         /// <example>
         /// <pre name="test">
         ///  FastAbs(1) ~~~ 1;
@@ -76,10 +76,10 @@ namespace WormGame.Static
 
 
         /// <summary>
-        /// Rotates a Vector2 counter-clockwise.
+        /// Rotates a Vector2 90° counter-clockwise.
         /// </summary>
-        /// <param name="v">Vector to rotate</param>
-        /// <returns>Rotated vector</returns>
+        /// <param name="vector">Vector to rotate</param>
+        /// <returns>Vector rotated counter-clockwise by 90°</returns>
         /// <example>
         /// <pre name="test">
         /// Vector2 v = new Vector2(-1, 0);           // Down
@@ -89,20 +89,20 @@ namespace WormGame.Static
         ///      RotateCCW(v) === new Vector2(-1, 0); // Down
         /// </pre>
         /// </example>
-        public static Vector2 RotateCCW(Vector2 v)
+        public static Vector2 RotateCCW(Vector2 vector)
         {
-            float x = v.X;
-            v.X = v.Y;
-            v.Y = -x;
-            return v;
+            float x = vector.X;
+            vector.X = vector.Y;
+            vector.Y = -x;
+            return vector;
         }
 
 
         /// <summary>
-        /// Rotates a Vector2 clockwise.
+        /// Rotates a Vector2 90° clockwise.
         /// </summary>
-        /// <param name="v">Vector to rotate</param>
-        /// <returns>Rotated vector</returns>
+        /// <param name="vector">Vector to rotate</param>
+        /// <returns>Vector rotated clockwise by 90°</returns>
         /// <example>
         /// <pre name="test">
         /// Vector2 v = new Vector2(-1, 0);          // Down
@@ -112,12 +112,12 @@ namespace WormGame.Static
         ///      RotateCW(v) === new Vector2(-1, 0); // Down
         /// </pre>
         /// </example>
-        public static Vector2 RotateCW(Vector2 v)
+        public static Vector2 RotateCW(Vector2 vector)
         {
-            float x = v.X;
-            v.X = -v.Y;
-            v.Y = x;
-            return v;
+            float x = vector.X;
+            vector.X = -vector.Y;
+            vector.Y = x;
+            return vector;
         }
 
 

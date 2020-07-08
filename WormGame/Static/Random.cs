@@ -5,9 +5,9 @@ using WormGame.Core;
 namespace WormGame.Static
 {
     /// @author Antti Harju
-    /// @version 01.07.2020
+    /// @version 08.07.2020
     /// <summary>
-    /// Class for random things.
+    /// Class for generating random stuff.
     /// </summary>
     static class Random
     {
@@ -17,17 +17,17 @@ namespace WormGame.Static
         /// <summary>
         /// Returns a random number between a and b, b exclusive.
         /// </summary>
-        /// <param name="a">Minimum value</param>
-        /// <param name="b">Maximum value</param>
+        /// <param name="min">Minimum value</param>
+        /// <param name="max">Maximum value</param>
         /// <returns>Random number between a and b</returns>
-        public static int Range(int a, int b)
+        public static int Range(int min, int max)
         {
-            return randomGenerator.Next(a, b);
+            return randomGenerator.Next(min, max);
         }
 
 
         /// <summary>
-        /// Returns a random Color from an array.
+        /// Returns a random Color from a predetermined array.
         /// </summary>
         /// <returns>Random color</returns>
         public static Color Color()
@@ -47,15 +47,18 @@ namespace WormGame.Static
 
 
         /// <summary>
-        /// Returns a random valid direction.
+        /// Generates a random valid direction.
         /// </summary>
-        /// <returns>Random color</returns>
-        public static Vector2 ValidDirection(Collision field, Vector2 target, int size)
+        /// <param name="field">Collision</param>
+        /// <param name="position">Worm target</param>
+        /// <param name="size">Entity size</param>
+        /// <returns>Random valid direction</returns>
+        public static Vector2 ValidDirection(Collision field, Vector2 position, int size)
         {
             int direction = Range(0, Help.directions.Length);
             for (int i = 0; i < 3; i++)
             {
-                if (Help.ValidateDirection(field, target, Help.directions[direction] * size))
+                if (Help.ValidateDirection(field, position, size, Help.directions[direction]))
                     break;
                 else
                 {

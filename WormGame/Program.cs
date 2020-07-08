@@ -4,9 +4,9 @@ using WormGame.Core;
 namespace WormGame
 {
     /// @author Antti Harju
-    /// @version 01.07.2020
+    /// @version 08.07.2020
     /// <summary>
-    /// Program starts here
+    /// Program starts here.
     /// </summary>
     class Program
     {
@@ -14,9 +14,8 @@ namespace WormGame
         {
             int windowWidth = 1280; int windowHeight = 720;
             Config config = new Config(windowWidth, windowHeight);
-            Game game = new Game("Worm bricks", windowWidth, windowHeight, config.targetFramerate)
+            Game game = new Game("Worm Bricks", config.windowWidth, config.windowHeight, config.targetFramerate)
             {
-                MeasureTimeInFrames = false,
                 WindowResize = false,
                 AlwaysUpdate = true,
                 MouseVisible = true

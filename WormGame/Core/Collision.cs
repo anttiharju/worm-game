@@ -1,8 +1,8 @@
 ﻿using System;
 using Otter.Utility.MonoGame;
-using WormGame.GameObject;
 using WormGame.Static;
 using WormGame.Pooling;
+using WormGame.GameObject;
 
 namespace WormGame.Core
 {
@@ -22,7 +22,7 @@ namespace WormGame.Core
         private readonly int topBorder;
 
         /// <summary>
-        /// Initializes the field which is basically a 2d array of poolables used for collision.
+        /// Initializes the field which is a 2d array of poolables used for collision.
         /// </summary>
         /// <param name="game">Required so we know the window dimensions</param>
         /// <param name="width">Field width</param>
@@ -99,7 +99,7 @@ namespace WormGame.Core
         {
 #if DEBUG
             if (entity is WormEntity)
-                throw new Exception("Update(entity) is not valid for worms. Use Update(entity, target) instead.");
+                throw new Exception("Set(entity) is not valid for WormEntities. Use Set(wormEntity, target) instead.");
 #endif
             Get(entity.Position) = entity;
         }
@@ -108,11 +108,11 @@ namespace WormGame.Core
         /// <summary>
         /// Occupy a cell from the field for a worm.
         /// </summary>
-        /// <param name="entity">Worm</param>
+        /// <param name="wormEntity">Worm</param>
         /// <param name="target">Worm target</param>
-        public void Set(WormEntity entity, Vector2 target)
+        public void Set(WormEntity wormEntity, Vector2 target)
         {
-            Get(target) = entity;
+            Get(target) = wormEntity;
         }
 
 
@@ -120,8 +120,7 @@ namespace WormGame.Core
         /// Set to a cell on the field to null.
         /// </summary>
         /// <param name="target">Entity position</param>
-        /// <param name="entity">Entity</param>
-        public void SetNull(Vector2 target)
+        public void Set(Vector2 target)
         {
             Get(target) = null;
         }

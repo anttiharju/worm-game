@@ -9,9 +9,9 @@ using WormGame.GameObject;
 namespace WormGame
 {
     /// @author Antti Harju
-    /// @version 01.07.2020
+    /// @version 08.07.2020
     /// <summary>
-    /// The main scene for WormGame
+    /// The main scene for Worm Bricks
     /// </summary>
     class WormScene : Scene
     {
@@ -28,7 +28,7 @@ namespace WormGame
         /// <summary>
         /// Initializes pools and collision system. Spawns initial entities.
         /// </summary>
-        /// <param name="game"></param>
+        /// <param name="config">Configuration</param>
         public WormScene(Config config)
         {
             this.config = config;
@@ -42,10 +42,18 @@ namespace WormGame
             worms = new Pool<Worm>(config, config.brainAmount);
 
             // Entity setup
+            /** /
+            SpawnWorm(0, 0, 1, true);
+            SpawnWorm(0, config.height - 1, 1, true);
+            SpawnWorm(config.width - 1, 0, 1, true);
+            SpawnWorm(config.width - 1, config.height - 1, config.maxWormLength, true);
+            /**/
+            /**/
             int density = config.density;
             for (int x = 0; x < config.width; x += density)
                 for (int y = 0; y < config.height; y += density)
                     SpawnWorm(x, y);
+            /**/
             SpawnPlayer(config.windowWidth / 2, config.windowHeight / 2, Color.Red);
         }
 
@@ -78,24 +86,25 @@ namespace WormGame
         /// <summary>
         /// Spawns a worm
         /// </summary>
-        /// <param name="x">Horizontal position (playArea)</param>
-        /// <param name="y">Vertical postition (playArea)</param>
-        /// <param name="length">Worms length</param>
-        /// <param name="color">Worms color, by default uses a random color from Helper class</param>
-        /// <param name="direction">Worms direction: UP, LEFT, DOWN or RIGHT</param>
+        /// <param name="x">Horizontal field position</param>
+        /// <param name="y">Vertical field postition</param>
+        /// <param name="length">Worm length</param>
+        /// <param name="stationary">Should the worm start moving after spawning</param>
+        /// <param name="color">Worm color, by default random</param>
         /// <returns>Spawned worm</returns>
-        public Worm SpawnWorm(int x, int y, int length = -1, Color color = null)
+        public Worm SpawnWorm(int x, int y, int length = -1, bool stationary = false, Color color = null)
         {
             if (length == -1) length = config.maxWormLength;
             if (color == null) color = Random.Color();
             Worm worm = worms.Enable();
             if (worm == null) return null;
-            worm.Spawn(bodies, field, field.EntityX(x), field.EntityY(y), length, color);
+            worm.Spawn(bodies, field, field.EntityX(x), field.EntityY(y), length, color, stationary);
             return worm;
         }
 
+
         /// <summary>
-        /// Turns the given worm into a collection of bricks
+        /// Turns the given worm into a collection of bricks.
         /// </summary>
         /// <param name="worm">Worm to transform</param>
         public BrickBrain SpawnBrick(Worm worm)
@@ -108,7 +117,7 @@ namespace WormGame
 
 
         /// <summary>
-        /// Spawn a player
+        /// Spawn a player.
         /// </summary>
         /// <param name="x">Horizontal position (actual)</param>
         /// <param name="y">Vertical position (actual)</param>
@@ -123,7 +132,7 @@ namespace WormGame
 
 
         /// <summary>
-        /// Makes every worm move to their next position
+        /// Keeps the scene going.
         /// </summary>
         public override void Update()
         {
