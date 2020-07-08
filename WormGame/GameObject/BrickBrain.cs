@@ -6,7 +6,7 @@ using WormGame.Pooling;
 
 namespace WormGame.GameObject
 {
-    class BrickBrain : BasicPoolable
+    public class BrickBrain : BasicPoolable
     {
         private readonly Brick[] bricks;
         private readonly Vector2[] next;

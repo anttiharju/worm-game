@@ -13,7 +13,7 @@ namespace WormGame
     /// <summary>
     /// The main scene for Worm Bricks
     /// </summary>
-    class WormScene : Scene
+    public class WormScene : Scene
     {
         private readonly Config config;
         private readonly Collision field;
