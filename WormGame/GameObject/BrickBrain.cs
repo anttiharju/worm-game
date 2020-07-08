@@ -1,7 +1,7 @@
 ﻿using Otter.Graphics;
 using Otter.Utility.MonoGame;
-using WormGame.Static;
 using WormGame.Core;
+using WormGame.Static;
 using WormGame.Pooling;
 
 namespace WormGame.GameObject
@@ -78,7 +78,7 @@ namespace WormGame.GameObject
         private void SetNull()
         {
             for (int j = 0; j < Count; j++)
-                field.SetNull(bricks[j].Position);
+                field.Set(bricks[j].Position);
         }
 
 
@@ -147,7 +147,7 @@ namespace WormGame.GameObject
         {
             for (int i = 0; i < Count; i++)
             {
-                field.SetNull(bricks[i].Position);
+                field.Set(bricks[i].Position);
                 bricks[i].Enabled = false;
             }
         }

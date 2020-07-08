@@ -17,9 +17,9 @@ namespace WormGame.Static
         /// <param name="target"></param>
         /// <param name="direction"></param>
         /// <returns></returns>
-        public static bool ValidateDirection(Collision field, Vector2 target, Vector2 direction)
+        public static bool ValidateDirection(Collision field, Vector2 target, int size, Vector2 direction)
         {
-            target += direction;
+            target += direction * size;
             return field.Check(field.X(target.X), field.Y(target.Y));
         }
     }
