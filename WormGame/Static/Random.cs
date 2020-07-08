@@ -9,7 +9,7 @@ namespace WormGame.Static
     /// <summary>
     /// Class for generating random stuff.
     /// </summary>
-    static class Random
+    public static class Random
     {
         private static readonly System.Random randomGenerator = new System.Random();
         private static readonly Color[] colors = { Otter.Graphics.Color.Blue, Otter.Graphics.Color.Cyan, Otter.Graphics.Color.Green, Otter.Graphics.Color.Magenta, Otter.Graphics.Color.Orange, Otter.Graphics.Color.Yellow };
