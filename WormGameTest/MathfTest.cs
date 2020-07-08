@@ -1,5 +1,5 @@
-using Otter.Utility.MonoGame;
 using System;
+using Otter.Utility.MonoGame;
 using NUnit.Framework;
 using static WormGame.Static.Mathf;
 using WormGame.Static;
