@@ -7,7 +7,7 @@ namespace WormGame.Static
     /// @author Antti Harju
     /// @version 01.07.2020
     /// <summary>
-    /// Random class for randomizing things.
+    /// Class for random things.
     /// </summary>
     static class Random
     {
@@ -35,8 +35,9 @@ namespace WormGame.Static
             return colors[Range(0, colors.Length)];
         }
 
+
         /// <summary>
-        /// Returns a random directions.
+        /// Returns a random direction.
         /// </summary>
         /// <returns>Random color</returns>
         public static Vector2 Direction()
@@ -44,8 +45,9 @@ namespace WormGame.Static
             return Help.directions[Range(0, Help.directions.Length)];
         }
 
+
         /// <summary>
-        /// Returns a random valid directions.
+        /// Returns a random valid direction.
         /// </summary>
         /// <returns>Random color</returns>
         public static Vector2 ValidDirection(Collision field, Vector2 target, int size)

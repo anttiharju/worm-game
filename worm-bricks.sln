@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WormGame", "WormGame\WormGa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Otter", "..\..\..\..\devel\otter\Otter\Otter.csproj", "{A8E376B3-7272-43B4-8823-61B416F4CF19}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WormGameTest", "WormGameTest\WormGameTest.csproj", "{53A763E8-7368-4BE4-9387-5A268BEDA4AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WormGameTest", "WormGameTest\WormGameTest.csproj", "{8580147B-2CAC-4E5F-890A-23D771F43916}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{A8E376B3-7272-43B4-8823-61B416F4CF19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8E376B3-7272-43B4-8823-61B416F4CF19}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8E376B3-7272-43B4-8823-61B416F4CF19}.Release|Any CPU.Build.0 = Release|Any CPU
-		{53A763E8-7368-4BE4-9387-5A268BEDA4AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{53A763E8-7368-4BE4-9387-5A268BEDA4AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{53A763E8-7368-4BE4-9387-5A268BEDA4AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{53A763E8-7368-4BE4-9387-5A268BEDA4AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8580147B-2CAC-4E5F-890A-23D771F43916}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8580147B-2CAC-4E5F-890A-23D771F43916}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8580147B-2CAC-4E5F-890A-23D771F43916}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8580147B-2CAC-4E5F-890A-23D771F43916}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

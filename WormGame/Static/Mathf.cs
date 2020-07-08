@@ -1,17 +1,40 @@
-﻿using Otter.Utility.MonoGame;
-using System;
+﻿using System;
+using Otter.Utility.MonoGame;
 
 namespace WormGame.Static
 {
-    /// @author anvemaha
-    /// @version 01.07.2020
+    /// @author Antti Harju
+    /// @version 08.07.2020
     /// <summary>
     /// Class for miscellaneous mathematical functions.
     /// </summary>
     public static class Mathf
     {
         /// <summary>
-        /// Lightweight version of Math.Abs()
+        /// Returns the bigger value.
+        /// </summary>
+        /// <param name="a">First value</param>
+        /// <param name="b">Second value</param>
+        /// <returns>Bigger value</returns>
+        /// <example>
+        /// <pre name="test">
+        ///  Bigger(1, 2) === 2;
+        ///  Bigger(2, 1) === 2;
+        ///  Bigger(-1, 1) === 1;
+        ///  Bigger(0, 0) === 0;
+        ///  Bigger(-1, -2) === -1;
+        ///  Bigger(-2, -1) === -1;
+        /// </pre>
+        /// </example>
+        public static float Bigger(float a, float b)
+        {
+            if (b < a) return a;
+            return b;
+        }
+
+
+        /// <summary>
+        /// Lightweight version of Math.Abs().
         /// </summary>
         /// <param name="number">Number</param>
         /// <returns>Numbers absolute value</returns>
@@ -30,8 +53,7 @@ namespace WormGame.Static
 
 
         /// <summary>
-        /// Lightweight version of Math.Round()
-        /// Doesn't work for negative floats
+        /// Lightweight version of Math.Round() for converting floats to ints accurately. Doesn't work for negative floats.
         /// </summary>
         /// <param name="number">float</param>
         /// <returns>int</returns>
@@ -39,8 +61,6 @@ namespace WormGame.Static
         /// <pre name="test">
         ///  FastRound(1.9f) === 2;
         ///  FastRound(4.1f) === 4;
-        ///  FastRound(-2.9f) === -3;
-        ///  FastRound(-6.1f) === -6;
         /// </pre>
         /// </example>
         public static int FastRound(float number)
@@ -56,30 +76,7 @@ namespace WormGame.Static
 
 
         /// <summary>
-        /// Rotates vector counter-clockwise
-        /// </summary>
-        /// <param name="v">Vector to rotate</param>
-        /// <returns>Rotated vector</returns>
-        /// <example>
-        /// <pre name="test">
-        /// Vector2 v = new Vector2(-1, 0);          // Down
-        ///  v = RotateCW(v) === new Vector2(0, -1); // Left
-        ///  v = RotateCW(v) === new Vector2(1, 0);  // Up
-        ///  v = RotateCW(v) === new Vector2(0, 1);  // Right
-        ///  v = RotateCW(v) === new Vector2(-1, 0); // Down
-        /// </pre>
-        /// </example>
-        public static Vector2 RotateCW(Vector2 v)
-        {
-            float x = v.X;
-            v.X = -v.Y;
-            v.Y = x;
-            return v;
-        }
-
-
-        /// <summary>
-        /// Rotates vector clockwise
+        /// Rotates a Vector2 counter-clockwise.
         /// </summary>
         /// <param name="v">Vector to rotate</param>
         /// <returns>Rotated vector</returns>
@@ -89,7 +86,7 @@ namespace WormGame.Static
         ///  v = RotateCCW(v) === new Vector2(0, 1);  // Right
         ///  v = RotateCCW(v) === new Vector2(1, 0);  // Up
         ///  v = RotateCCW(v) === new Vector2(0, -1); // Left
-        ///  v = RotateCCW(v) === new Vector2(-1, 0); // Down
+        ///      RotateCCW(v) === new Vector2(-1, 0); // Down
         /// </pre>
         /// </example>
         public static Vector2 RotateCCW(Vector2 v)
@@ -102,7 +99,30 @@ namespace WormGame.Static
 
 
         /// <summary>
-        /// Returns the smaller value
+        /// Rotates a Vector2 clockwise.
+        /// </summary>
+        /// <param name="v">Vector to rotate</param>
+        /// <returns>Rotated vector</returns>
+        /// <example>
+        /// <pre name="test">
+        /// Vector2 v = new Vector2(-1, 0);          // Down
+        ///  v = RotateCW(v) === new Vector2(0, -1); // Left
+        ///  v = RotateCW(v) === new Vector2(1, 0);  // Up
+        ///  v = RotateCW(v) === new Vector2(0, 1);  // Right
+        ///      RotateCW(v) === new Vector2(-1, 0); // Down
+        /// </pre>
+        /// </example>
+        public static Vector2 RotateCW(Vector2 v)
+        {
+            float x = v.X;
+            v.X = -v.Y;
+            v.Y = x;
+            return v;
+        }
+
+
+        /// <summary>
+        /// Returns the smaller value.
         /// </summary>
         /// <param name="a">First value</param>
         /// <param name="b">Second value</param>
@@ -123,7 +143,7 @@ namespace WormGame.Static
 
 
         /// <summary>
-        /// Returns the smaller value
+        /// Returns the smaller value.
         /// </summary>
         /// <param name="a">First value</param>
         /// <param name="b">Second value</param>
@@ -139,27 +159,6 @@ namespace WormGame.Static
         public static float Smaller(float a, float b)
         {
             if (a < b) return a;
-            return b;
-        }
-
-
-        /// <summary>
-        /// Returns the bigger value
-        /// </summary>
-        /// <param name="a">First value</param>
-        /// <param name="b">Second value</param>
-        /// <returns>Bigger value</returns>
-        /// <example>
-        /// <pre name="test">
-        ///  Bigger(1, 2) === 2;
-        ///  Bigger(2, 1) === 2;
-        ///  Bigger(-1, 1) === 1;
-        ///  Bigger(0, 0) === 0;
-        /// </pre>
-        /// </example>
-        public static float Bigger(float a, float b)
-        {
-            if (b < a) return a;
             return b;
         }
     }

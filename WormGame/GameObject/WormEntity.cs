@@ -6,17 +6,17 @@ using WormGame.Static;
 
 namespace WormGame.GameObject
 {
-    class WormEntity : Poolable
+    public class WormEntity : Poolable
     {
         private readonly int size;
         private readonly float step;
         private readonly Collision field;
-
         private Vector2 direction = new Vector2(0, 0);
 
+        public Vector2 target;
         public WormEntity Next { get; set; }
         public Vector2 Direction { get { return direction; } set { if (Help.ValidateDirection(field, target, value * size)) direction = value; } }
-        public Vector2 target;
+        public bool Stuck { get; set; }
 
         public WormEntity(Config config) : base()
         {
@@ -29,11 +29,11 @@ namespace WormGame.GameObject
             image.CenterOrigin();
         }
 
-        public void DirectionFollow(Vector2 previousDirection)
+        public void DirectionFollow(Vector2 newDirection)
         {
             if (Next != null)
                 Next.DirectionFollow(direction);
-            direction = previousDirection;
+            direction = newDirection;
         }
 
         public void TargetFollow(Vector2 newTarget)
@@ -45,7 +45,8 @@ namespace WormGame.GameObject
 
         public void Step()
         {
-            Position += Direction * step;
+            if (!Stuck)
+                Position += Direction * step;
         }
     }
 }

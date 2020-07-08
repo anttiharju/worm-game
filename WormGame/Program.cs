@@ -21,7 +21,7 @@ namespace WormGame
                 AlwaysUpdate = true,
                 MouseVisible = true
             };
-            game.Start(new WormScene(game, config));
+            game.Start(new WormScene(config));
         }
     }
 }
