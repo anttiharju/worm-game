@@ -11,7 +11,7 @@ namespace WormGame.GameObject
     /// <summary>
     /// Player class (Ghost class). Work in progress.
     /// </summary>
-    class Player : Poolable
+    public class Player : Poolable
     {
         private readonly WormScene wormScene;
         private readonly Color playerColor;

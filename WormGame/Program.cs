@@ -8,7 +8,7 @@ namespace WormGame
     /// <summary>
     /// Program starts here.
     /// </summary>
-    class Program
+    public class Program
     {
         static void Main()
         {

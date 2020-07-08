@@ -6,7 +6,7 @@ namespace WormGame.Static
     /// <summary>
     /// Class for static things that don't belong anywhere else.
     /// </summary>
-    static class Help
+    public static class Help
     {
         public static readonly Vector2[] directions = { new Vector2(0, -1), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(1, 0) };
 
