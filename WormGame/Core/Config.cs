@@ -1,22 +1,23 @@
-﻿using Otter.Core;
-using Otter.Utility.MonoGame;
-using WormGame.Static;
+﻿using WormGame.Static;
 
-namespace WormGame.Manager
+namespace WormGame.Core
 {
     public class Config
     {
+        public readonly Collision field;
 
         public readonly int targetFramerate = 144;
+        public readonly float wormSpeed = 6;
+        public readonly float wormStep;
         public readonly int size;
         public readonly int margin = 1;
-        public readonly int width = 50;
-        public readonly int height = 26;
+        public readonly int width = 6;
+        public readonly int height = 6;
+        public readonly int density = 6;
         public readonly int maxWormLength = 4;
-        public readonly float wormFreq = 0.1f;
         public readonly float brickFreq = 0.4f;
 
-        public static bool visualizeCollision = false;
+        public static bool visualizeCollision = true;
 
         public readonly int tailAmount;
         public readonly int wormAmount;
@@ -29,6 +30,8 @@ namespace WormGame.Manager
             wormAmount = cellAmount / maxWormLength;
             tailAmount = cellAmount - wormAmount;
             size = CalculateSize(windowWidth, windowHeight);
+            wormStep = wormSpeed / targetFramerate * size;
+            field = new Collision(windowWidth, windowHeight, this);
         }
 
         /// <summary>
@@ -42,11 +45,6 @@ namespace WormGame.Manager
             int size = Mathf.Smaller(xSize, ySize);
             if (size % 2 != 0) size--;
             return size;
-        }
-
-        public void UpdateFirst(Game game)
-        {
-            WormSpeed = wormFreq;
         }
     }
 }
