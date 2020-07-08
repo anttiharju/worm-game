@@ -57,7 +57,9 @@ namespace WormGame.Pooling
                 Defrag(); // Moves enablingIndex
                 if (enablingIndex == lastIndex)
                 {
+#if DEBUG
                     Console.WriteLine("[EMPTY] " + this);
+#endif
                     return null;
                 }
             }

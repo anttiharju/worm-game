@@ -1,22 +1,21 @@
 # Worm bricks (2d game)
 Educational project. The goal is to become a better developer by actually working on a project. Please see [concept.svg](https://raw.githubusercontent.com/anvemaha/worm-bricks/master/concept.svg) to understand the game.
-- Play area
-    - Like in Tetris, maybe wider.
-    - Fruits spawn on the grid.
+- Field
+    - Fruits spawn on it.
 - Worms
-    - Pop in on the upper half of the grid.
+    - Wander around aimlessly on the field.
     - Controlled like snake in the snake game.
     - Grow longer by eating fruits.
     - Can be transformed into bricks.
 - Bricks
     - Controlled like tetrominoes in Tetris.
-    - Full horizontal rows in the play area explode, increasing score.
+    - Full horizontal brick rows on the field disappear, increasing score.
 - Ghosts
     - Controlled by players.
-    - No collision (free movement).
+        - Multiple players, co-op?
     - Can posess worms.
-    - Can't eat fruits.
-    - Multiple players.
+    - Don't collide with anything.
+    - Can't eat fruits. :(
 
 # Tools
 - Visual Studio 2019

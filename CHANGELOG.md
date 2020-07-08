@@ -1,8 +1,20 @@
+# 08.07.2020
+- Been working on making worms move smooth, which led to me accidentally improving collision and pooling and overall code structure.
+    - Big commits (bad) but once I hammer the last bugs with worms we have a really solid foundation to build on.
+    - Also updated documentation here and there because the bug is really weird and I've been avoiding fixing it.
+- Poolers can now pool all kinds of things! No more just entities but non-entity objects too!
+- Fixed collision field floating point inaccuracy, renamed a bunch of methods and wrote better documentation.
+- GPU usage issue is not solved? Sometimes it's fine, sometimes not. Maybe I'm doing something weird with pooling that causes it?
+- Been focusing on making code readable and avoiding code structures that I don't have to compensate for all the time.
+- Also wrote some tests, but I should write more. It's not really TDD if you write the tests after the code works.
+
+
 # 05.07.2020
 - Upgraded Otter to 1.0 from 0.9.
     - GPU usage issue seems to be resolved.
 - Brought Controls.cs back to life to be used with bricks
     - Bricks have a weird bug I can't debug where sometimes they only partially rotate when moving horizontally
+
 
 # 01.07.2020
 - Trying to do less massive commits, getting into the good habit of small commits.
@@ -33,6 +45,7 @@
     - Woo! Finally documented all the code and merged it to master. TOMORROW I CAN FINALLY START WORKING ON NEW STUFF!
 - Add tests to Mathf
 
+
 # 30.06.2020
 - Cleaned up the new collision system, it still has bugs but it shouldn't crash.
     - I'm going to commit now because I have other things that need my attention and the commit is probably already way too massive
@@ -62,6 +75,7 @@
     - I'll treat null values as empty, let's see if I'll regret this
     - The system has to constantly convert floats to ints and it hurts just a little bit, but it's probably fine.
         - I tried approach where Poolables had extra fields called GridX and GridY which would've been the worms position on the grid as ints and I would convert ints to floats when updating the position, but everything got really messy and confusing.
+
 
 # 28.06.2020
 - Thoughts:

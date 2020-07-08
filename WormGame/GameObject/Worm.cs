@@ -12,10 +12,10 @@ namespace WormGame.GameObject
         private readonly WormEntity[] worm;
         private readonly int size;
 
-        private Vector2 tmp = new Vector2();
+        private Vector2 nextTarget = new Vector2();
 
         public Vector2 Position { get { return worm[Length / 2].target; } }
-        public Vector2 Direction { get { return worm[0].target; } set { worm[0].Direction = value; } }
+        public Vector2 Direction { get { return worm[0].Direction; } set { worm[0].DirectionFollow(value); } }
         public Color Color { get { return worm[0].Color ?? null; } set { SetColor(value); } }
         public int Length { get; private set; }
         public bool Posessed { get; set; }
@@ -44,7 +44,7 @@ namespace WormGame.GameObject
             }
 
             Length = length;
-            field.Update(worm[0].target, worm[0]);
+            field.Set(worm[0], worm[0].target);
             worm[0].Direction = Random.Direction();
             Color = color;
             return this;
@@ -52,23 +52,33 @@ namespace WormGame.GameObject
 
         public void Move()
         {
-            bool retry = false;
-        Retry:
-            tmp = worm[0].target + worm[0].Direction * size;
-            if (field.Check(tmp))
+            Stuck(false);
+            worm[0].Graphic.Color = Color.Red;
+            nextTarget = worm[0].target + worm[0].Direction * size;
+            if (field.Check(nextTarget))
             {
-                field.Update(worm[^1].target, null);
+                field.SetNull(worm[^1].target);
                 for (int i = worm.Length - 1; i > 0; i--)
-                    field.Update(worm[i - 1].target, worm[i]);
-                field.Update(tmp, worm[0]);
-                worm[0].TargetFollow(tmp);
+                    field.Set(worm[i], worm[i - 1].target);
+                field.Set(worm[0], nextTarget);
+                worm[0].TargetFollow(nextTarget);
                 worm[0].Next.DirectionFollow(worm[0].Direction);
             }
-            else if (!Posessed && !retry)
+            else
             {
-                worm[0].Direction = Random.ValidDirection(field, worm[0].target, size);
-                retry = true;
-                goto Retry;
+                if (!Posessed)
+                {
+                    worm[0].DirectionFollow(Random.ValidDirection(field, worm[0].target, size));
+                }
+                Stuck();
+            }
+        }
+
+        private void Stuck(bool stuck = true)
+        {
+            for (int i = 0; i < Length; i++)
+            {
+                worm[i].Stuck = stuck;
             }
         }
 
@@ -76,7 +86,7 @@ namespace WormGame.GameObject
         {
             for (int i = 0; i < Length; i++)
             {
-                field.Update(worm[i].target, null);
+                field.SetNull(worm[i].target);
                 worm[i].Enabled = false;
             }
             Enabled = false;

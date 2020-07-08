@@ -5,7 +5,7 @@
     /// <summary>
     /// Class for poolable non-entity objects.
     /// </summary>
-    public abstract class BasicPoolable : IPoolable
+    public class BasicPoolable : IPoolable
     {
         /// <summary>
         /// Tells wheter or not the object is in use.

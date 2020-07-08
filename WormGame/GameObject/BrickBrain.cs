@@ -45,7 +45,7 @@ namespace WormGame.GameObject
             bricks[i] = brick;
             bricks[i].X = worm[i].target.X;
             bricks[i].Y = worm[i].target.Y;
-            field.Update(bricks[i]);
+            field.Set(bricks[i]);
         }
 
 
@@ -78,14 +78,14 @@ namespace WormGame.GameObject
         private void SetNull()
         {
             for (int j = 0; j < Count; j++)
-                field.Update(bricks[j].Position, null);
+                field.SetNull(bricks[j].Position);
         }
 
 
         private void Reset()
         {
             for (int i = 0; i < Count; i++)
-                field.Update(bricks[i]);
+                field.Set(bricks[i]);
         }
 
 
@@ -94,7 +94,7 @@ namespace WormGame.GameObject
             for (int i = 0; i < Count; i++)
             {
                 bricks[i].Position = next[i];
-                field.Update(bricks[i]);
+                field.Set(bricks[i]);
             }
         }
 
@@ -147,7 +147,7 @@ namespace WormGame.GameObject
         {
             for (int i = 0; i < Count; i++)
             {
-                field.Update(bricks[i].Position, null);
+                field.SetNull(bricks[i].Position);
                 bricks[i].Enabled = false;
             }
         }
