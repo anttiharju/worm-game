@@ -4,7 +4,7 @@ using WormGame.Pooling;
 
 namespace WormGame.GameObject
 {
-    class Brick : Poolable
+    public class Brick : Poolable
     {
         public Brick(Config config) : base()
         {

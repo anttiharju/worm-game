@@ -6,7 +6,7 @@ using WormGame.Pooling;
 
 namespace WormGame.GameObject
 {
-    class Worm : BasicPoolable
+    public class Worm : BasicPoolable
     {
         private readonly Collision field;
         private readonly WormEntity[] worm;
