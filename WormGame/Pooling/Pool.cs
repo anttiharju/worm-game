@@ -1,43 +1,53 @@
 ﻿using System;
 using System.Collections;
-using Otter.Core;
+using WormGame.Core;
 
-namespace WormGame.Manager
+namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 28.06.2020
+    /// @version 08.07.2020
     /// <summary>
-    /// Entity pooler.
+    /// Object pooler.
     /// </summary>
-    /// <typeparam name="T">Poolable entity type</typeparam>
-    public class Pooler<T> : IEnumerable where T : Poolable
+    /// <typeparam name="T">Poolable object type</typeparam>
+    /// TODO: Write tests
+    public class Pool<T> : IEnumerable where T : class, IPoolable
     {
         private readonly T[] pool;
         private readonly int lastIndex;
         private int enablingIndex = 0;
 
         /// <summary>
-        /// Initializes pool and poolable entities.
+        /// Initializes the object pool.
         /// </summary>
-        /// <param name="scene">scene to add the objects to</param>
-        /// <param name="capacity">pool size</param>
-        /// <param name="entitySize">pooled entity size</param>
-        public Pooler(Scene scene, Config config, int capacity, int entitySize)
+        /// <param name="config">Configuration object</param>
+        /// <param name="capacity">Pool size</param>
+        public Pool(Config config, int capacity)
         {
             lastIndex = capacity - 1;
             pool = new T[capacity];
             for (int i = 0; i < capacity; i++)
             {
-                T tmp = (T)Activator.CreateInstance(typeof(T), new object[] { entitySize, config });
+                T tmp = (T)Activator.CreateInstance(typeof(T), new object[] { config });
                 tmp.Enabled = false;
                 pool[i] = tmp;
             }
-            scene.AddMultiple(pool);
         }
 
 
         /// <summary>
-        /// Enables a disabled entity from the pool.
+        /// If the pooled objects are Otter2d entities we can add them to the scene with this.
+        /// Not sure if it's possible to do in-class due to how generics work.
+        /// </summary>
+        /// <returns>Object pool</returns>
+        public T[] GetPool()
+        {
+            return pool;
+        }
+
+
+        /// <summary>
+        /// Enables a disabled object from the pool.
         /// </summary>
         /// <returns>Enabled entity</returns>
         public T Enable()
@@ -60,8 +70,7 @@ namespace WormGame.Manager
 
 
         /// <summary>
-        /// Defragments the pool. This is way cheaper than looping through the entire pool
-        /// every time something needs to be enabled.
+        /// Defragments the pool. This is way cheaper than looping through the entire pool every time something needs to be enabled.
         /// </summary>
         private void Defrag()
         {
@@ -91,9 +100,9 @@ namespace WormGame.Manager
 
 
         /// <summary>
-        /// So we can foreach through the pool. Once the project uses the new collision 
-        /// system and we don't need to debug pooling this can be removed. Although may 
-        /// be useful to writing tests.
+        /// We need to be able to loop through the pools contents to make calls to them etc.
+        /// I would love to give an enumerator that only has the enabled ones, but I don't
+        /// want to disable entities through the pool as the code would get really messy.
         /// </summary>
         /// <returns>Pool enumerator</returns>
         public IEnumerator GetEnumerator()
