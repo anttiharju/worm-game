@@ -22,7 +22,7 @@ namespace WormGame.Core
 
         public readonly int maxWormLength = 4;
         public readonly int density = 4;
-        public readonly float wormSpeed = 12; // 60/12 = 5, 120/12 = 10, 144/12 = 12, we won't support 30fps because 6 is too slow
+        public readonly float wormSpeed = 12; // 12 supports 144hz, 120hz, 60hz, 6 supports those plus 30hz
         public readonly float wormStep;
 
         public readonly float brickFreq = 0.4f;
