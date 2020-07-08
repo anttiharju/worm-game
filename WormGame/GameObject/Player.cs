@@ -1,9 +1,8 @@
 ﻿using Otter.Core;
 using Otter.Graphics;
 using Otter.Graphics.Drawables;
-using WormGame.Pooling;
-using WormGame.Core;
 using WormGame.Static;
+using WormGame.Pooling;
 
 namespace WormGame.GameObject
 {

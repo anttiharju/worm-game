@@ -2,33 +2,42 @@
 
 namespace WormGame.Core
 {
+    /// <summary>
+    /// Configuration. Work in progress.
+    /// </summary>
     public class Config
     {
-        public readonly Collision field;
-
+        public readonly int windowWidth;
+        public readonly int windowHeight;
         public readonly int targetFramerate = 144;
-        public readonly float wormSpeed = 6;
-        public readonly float wormStep;
-        public readonly int size;
-        public readonly int margin = 1;
+
+        public readonly Collision field;
         public readonly int width = 6;
         public readonly int height = 6;
+        public readonly int margin = 1;
+
+        public readonly int size;
         public readonly int density = 6;
-        public readonly int maxWormLength = 4;
+        public readonly int maxWormLength = 19;
+        public readonly float wormSpeed = 6;
+        public readonly float wormStep;
+
         public readonly float brickFreq = 0.4f;
-
-        public static bool visualizeCollision = true;
-
-        public readonly int tailAmount;
-        public readonly int wormAmount;
+#if DEBUG
+        public bool visualizeCollision = true;
+#endif
+        public readonly int brainAmount;
+        public readonly int bodyAmount;
 
         public float WormSpeed { private set; get; }
 
         public Config(int windowWidth, int windowHeight)
         {
+            this.windowWidth = windowWidth;
+            this.windowHeight = windowHeight;
             int cellAmount = width * height;
-            wormAmount = cellAmount / maxWormLength;
-            tailAmount = cellAmount - wormAmount;
+            brainAmount = cellAmount / maxWormLength;
+            bodyAmount = cellAmount - brainAmount;
             size = CalculateSize(windowWidth, windowHeight);
             wormStep = wormSpeed / targetFramerate * size;
             field = new Collision(windowWidth, windowHeight, this);

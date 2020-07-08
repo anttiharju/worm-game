@@ -7,9 +7,9 @@ using WormGame.Pooling;
 namespace WormGame.Core
 {
     /// @author Antti Harju
-    /// @version 01.07.2020
+    /// @version 08.07.2020
     /// <summary>
-    /// Class for play area. Has close ties to collision.
+    /// Collision field.
     /// </summary>
     public class Collision
     {
@@ -22,12 +22,12 @@ namespace WormGame.Core
         private readonly int topBorder;
 
         /// <summary>
-        /// Initializes the play area which is basically a 2d array of poolables used for collision.
+        /// Initializes the field which is basically a 2d array of poolables used for collision.
         /// </summary>
         /// <param name="game">Required so we know the window dimensions</param>
-        /// <param name="width">Play area width</param>
-        /// <param name="height">Play area height</param>
-        /// <param name="margin">Play area margin</param>
+        /// <param name="width">Field width</param>
+        /// <param name="height">Field height</param>
+        /// <param name="margin">Field margin</param>
         public Collision(int windowWidth, int windowHeight, Config config)
         {
             width = config.width;
@@ -40,30 +40,45 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Get the play area value at an entity position
+        /// Get a cells value from the field at an entity position.
         /// </summary>
-        /// <param name="target">Entitys target position</param>
-        /// <returns>Play area value</returns>
+        /// <param name="target">Entity target position</param>
+        /// <returns>Field value</returns>
         public ref Poolable Get(Vector2 target)
         {
             return ref Get(X(target.X), Y(target.Y));
         }
 
+
+        /// <summary>
+        /// Get a cells value from the field.
+        /// </summary>
+        /// <param name="x">Horizontal field position</param>
+        /// <param name="y">Vertical field position</param>
+        /// <returns>Field value</returns>
         private ref Poolable Get(int x, int y)
         {
             return ref field[x, y];
         }
 
+
         /// <summary>
-        /// Checks worms collision
+        /// Checks wheter a cell on the field is occupied.
         /// </summary>
-        /// <param name="next"></param>
-        /// <returns></returns>
-        public bool Check(Vector2 next)
+        /// <param name="target">Entity position</param>
+        /// <returns>Wheter or not position is occupied</returns>
+        public bool Check(Vector2 target)
         {
-            return Check(X(next.X), Y(next.Y));
+            return Check(X(target.X), Y(target.Y));
         }
 
+
+        /// <summary>
+        /// Checks wheter a cell on the field is occupied.
+        /// </summary>
+        /// <param name="x">Horizontal field position</param>
+        /// <param name="y">Vertical field position</param>
+        /// <returns></returns>
         public bool Check(int x, int y)
         {
             if (x <= -1 ||
@@ -75,36 +90,48 @@ namespace WormGame.Core
             return true;
         }
 
+
         /// <summary>
-        /// Update play area through this method.
+        /// Occupy a cell from the field.
         /// </summary>
         /// <param name="entity">Entity</param>
-        public void Update(Poolable entity)
+        public void Set(Poolable entity)
         {
 #if DEBUG
             if (entity is WormEntity)
-                throw new Exception("Update(entity) is not valid for worms. Use Update(target, entity) instead.");
+                throw new Exception("Update(entity) is not valid for worms. Use Update(entity, target) instead.");
 #endif
-            Update(entity.Position, entity);
+            Get(entity.Position) = entity;
         }
 
 
         /// <summary>
-        /// Update play area through this method.
+        /// Occupy a cell from the field for a worm.
         /// </summary>
-        /// <param name="target">Entity position</param>
-        /// <param name="entity">Entity</param>
-        public void Update(Vector2 target, Poolable entity = null)
+        /// <param name="entity">Worm</param>
+        /// <param name="target">Worm target</param>
+        public void Set(WormEntity entity, Vector2 target)
         {
             Get(target) = entity;
         }
 
 
         /// <summary>
-        /// Translates a horizontal entity position to a play area one.
+        /// Set to a cell on the field to null.
         /// </summary>
-        /// <param name="x">Entitys horizontal position</param>
-        /// <returns>Play areas horizontal position</returns>
+        /// <param name="target">Entity position</param>
+        /// <param name="entity">Entity</param>
+        public void SetNull(Vector2 target)
+        {
+            Get(target) = null;
+        }
+
+
+        /// <summary>
+        /// Translates a horizontal entity position to a field one.
+        /// </summary>
+        /// <param name="x">Horizontal entity position</param>
+        /// <returns>Horizontal field position</returns>
         public int X(float x)
         {
             return ((Mathf.FastRound(x) - leftBorder) / size);
@@ -112,10 +139,10 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Translates a vertical entity position to a play area one.
+        /// Translates a vertical entity position to a field one.
         /// </summary>
-        /// <param name="y">Entitys vertical position</param>
-        /// <returns>Play areas vertical position</returns>
+        /// <param name="y">Vertical entity position</param>
+        /// <returns>Vertical field position</returns>
         public int Y(float y)
         {
             return (topBorder - Mathf.FastRound(y)) / size;
@@ -123,9 +150,9 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Translates a horizontal play area position to an entity one.
+        /// Translates a horizontal field position to an entity one.
         /// </summary>
-        /// <param name="x">Horizontal play area position</param>
+        /// <param name="x">Horizontal field position</param>
         /// <returns>Horizontal entity position</returns>
         public int EntityX(int x)
         {
@@ -134,18 +161,18 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Translates a vertical play area position to an entity one.
+        /// Translates a vertical field position to an entity one.
         /// </summary>
-        /// <param name="y">Vertical play area position</param>
+        /// <param name="y">Vertical field position</param>
         /// <returns>Vertical entity position</returns>
         public int EntityY(int y)
         {
             return topBorder - size * y;
         }
 
-
+#if DEBUG
         /// <summary>
-        /// Mainly used for debugging, but also looks kind of cool
+        /// Visualises the collision field as ASCII art. Used for debugging and looks cool as shit. Causes lag with large fields (above 20x10). 
         /// </summary>
         public void Visualize()
         {
@@ -167,5 +194,6 @@ namespace WormGame.Core
                 }
             }
         }
+#endif
     }
 }

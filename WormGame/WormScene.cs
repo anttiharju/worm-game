@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using Otter.Core;
-using Otter.Utility;
+﻿using Otter.Core;
 using Otter.Graphics;
 using Otter.Utility.MonoGame;
 using WormGame.Core;
@@ -17,7 +15,6 @@ namespace WormGame
     /// </summary>
     class WormScene : Scene
     {
-        private readonly Game game;
         private readonly Config config;
         private readonly Collision field;
 
@@ -32,26 +29,24 @@ namespace WormGame
         /// Initializes pools and collision system. Spawns initial entities.
         /// </summary>
         /// <param name="game"></param>
-        public WormScene(Game game, Config config)
+        public WormScene(Config config)
         {
-            this.game = game;
             this.config = config;
             field = config.field;
 
-            brickBrains = new Pool<BrickBrain>(config, config.wormAmount);
-            bricks = new Pool<Brick>(config, config.tailAmount);
+            brickBrains = new Pool<BrickBrain>(config, config.brainAmount);
+            bricks = new Pool<Brick>(config, config.bodyAmount);
             AddMultiple(bricks.GetPool());
-            bodies = new Pool<WormEntity>(config, config.tailAmount);
+            bodies = new Pool<WormEntity>(config, config.bodyAmount);
             AddMultiple(bodies.GetPool());
-            worms = new Pool<Worm>(config, config.wormAmount);
-
+            worms = new Pool<Worm>(config, config.brainAmount);
 
             // Entity setup
             int density = config.density;
             for (int x = 0; x < config.width; x += density)
                 for (int y = 0; y < config.height; y += density)
                     SpawnWorm(x, y);
-            SpawnPlayer(game.HalfWidth, game.HalfHeight, Color.Red);
+            SpawnPlayer(config.windowWidth / 2, config.windowHeight / 2, Color.Red);
         }
 
 
@@ -69,7 +64,7 @@ namespace WormGame
             foreach (Worm worm in worms)
                 if (worm.Enabled)
                 {
-                    float distance = Vector2.Distance(position, Vector2.Zero);
+                    float distance = Vector2.Distance(position, worm.Position);
                     if (distance < nearestDistance)
                     {
                         nearestWorm = worm;
@@ -99,6 +94,18 @@ namespace WormGame
             return worm;
         }
 
+        /// <summary>
+        /// Turns the given worm into a collection of bricks
+        /// </summary>
+        /// <param name="worm">Worm to transform</param>
+        public BrickBrain SpawnBrick(Worm worm)
+        {
+            BrickBrain brick = brickBrains.Enable();
+            if (brick == null) return null;
+            brick.Spawn(bricks, field, worm);
+            return brick;
+        }
+
 
         /// <summary>
         /// Spawn a player
@@ -114,18 +121,6 @@ namespace WormGame
             return tmpPlayer;
         }
 
-
-        /// <summary>
-        /// Turns the given worm into a collection of bricks
-        /// </summary>
-        /// <param name="worm">Worm to transform</param>
-        public BrickBrain SpawnBrick(Worm worm)
-        {
-            BrickBrain brick = brickBrains.Enable();
-            if (brick == null) return null;
-            brick.Spawn(bricks, field, worm);
-            return brick;
-        }
 
         /// <summary>
         /// Makes every worm move to their next position
@@ -144,9 +139,10 @@ namespace WormGame
                         worm.Move();
                 wormCounter = 0;
             }
-
-            if (Config.visualizeCollision)
+#if DEBUG
+            if (config.visualizeCollision)
                 field.Visualize();
+#endif
         }
     }
 }
