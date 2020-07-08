@@ -1,5 +1,5 @@
 ﻿using Otter.Utility.MonoGame;
-using WormGame.Manager;
+using WormGame.Core;
 
 namespace WormGame.Static
 {

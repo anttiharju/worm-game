@@ -1,5 +1,5 @@
 ﻿using Otter.Core;
-using WormGame.Manager;
+using WormGame.Core;
 
 namespace WormGame
 {

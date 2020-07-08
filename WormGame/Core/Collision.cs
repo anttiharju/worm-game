@@ -1,10 +1,10 @@
 ﻿using System;
-using Otter.Core;
 using Otter.Utility.MonoGame;
 using WormGame.GameObject;
 using WormGame.Static;
+using WormGame.Pooling;
 
-namespace WormGame.Manager
+namespace WormGame.Core
 {
     /// @author Antti Harju
     /// @version 01.07.2020
@@ -28,14 +28,14 @@ namespace WormGame.Manager
         /// <param name="width">Play area width</param>
         /// <param name="height">Play area height</param>
         /// <param name="margin">Play area margin</param>
-        public Collision(Game game, Config config)
+        public Collision(int windowWidth, int windowHeight, Config config)
         {
             width = config.width;
             height = config.height;
             size = config.size;
             field = new Poolable[width, height];
-            leftBorder = game.WindowWidth / 2 - width / 2 * size + size / 2;
-            topBorder = game.WindowHeight / 2 + height / 2 * size - size / 2;
+            leftBorder = windowWidth / 2 - width / 2 * size + size / 2;
+            topBorder = windowHeight / 2 + height / 2 * size - size / 2;
         }
 
 
@@ -82,7 +82,7 @@ namespace WormGame.Manager
         public void Update(Poolable entity)
         {
 #if DEBUG
-            if (entity is WormBase)
+            if (entity is WormEntity)
                 throw new Exception("Update(entity) is not valid for worms. Use Update(target, entity) instead.");
 #endif
             Update(entity.Position, entity);
@@ -159,9 +159,9 @@ namespace WormGame.Manager
                         Console.Write(".");
                     else
                     {
-                        if (field[x, y] is WormBase)
+                        if (field[x, y] is WormEntity)
                             Console.Write("o");
-                        if (field[x, y] is BrickBase)
+                        if (field[x, y] is Brick)
                             Console.Write("x");
                     }
                 }
