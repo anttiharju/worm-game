@@ -6,8 +6,10 @@ using WormGame.Pooling;
 
 namespace WormGame.GameObject
 {
+    /// @author Antti Harju
+    /// @version 08.07.2020
     /// <summary>
-    /// Player class (Ghost class). Very much work in progress.
+    /// Player class (Ghost class). Work in progress.
     /// </summary>
     class Player : Poolable
     {
@@ -20,13 +22,11 @@ namespace WormGame.GameObject
         private Worm worm;
         private BrickBrain brick;
         private Color oldColor;
-
         private float leftX;
         private float leftY;
         private float dpadX;
         private float dpadY;
         private bool dropAction = true;
-
 
         /// <summary>
         /// Constructor.
