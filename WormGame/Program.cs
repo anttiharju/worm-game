@@ -12,9 +12,11 @@ namespace WormGame
     {
         static void Main()
         {
-            int windowWidth = 1280; int windowHeight = 720;
+            int windowWidth = 1280;
+            int windowHeight = 720;
+            bool fullscreen = false;
             Config config = new Config(windowWidth, windowHeight);
-            Game game = new Game("Worm Bricks", config.windowWidth, config.windowHeight, config.targetFramerate)
+            Game game = new Game("Worm Bricks", config.windowWidth, config.windowHeight, config.targetFramerate, fullscreen)
             {
                 WindowResize = false,
                 AlwaysUpdate = true,

@@ -137,9 +137,6 @@ namespace WormGame
         public override void Update()
         {
             wormCounter += config.wormStep;
-            foreach (WormEntity body in bodies)
-                if (body.Enabled)
-                    body.Step();
 
             if (wormCounter >= config.size)
             {

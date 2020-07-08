@@ -20,7 +20,7 @@ namespace WormGame.Pooling
         /// Sets graphic visibility. Improves code readability: it's way easier to understand that we want to know 
         /// if entity is enabled or not by looking at entity.Enabled rather than entity.Graphic.Visible.
         /// </summary>
-        public bool Enabled { get { return Graphic.Visible; } set { Graphic.Visible = value; } }
+        public bool Enabled { get { return Visible; } set { Collidable = value; AutoUpdate = value; AutoRender = value; Visible = value; } }
 
 
         /// <summary>

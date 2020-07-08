@@ -73,8 +73,9 @@ namespace WormGame.GameObject
         /// <summary>
         /// Moves the WormEntity.
         /// </summary>
-        public void Step()
+        public override void Update()
         {
+            base.Update();
             if (!Stationary)
                 Position += Direction * step;
         }
