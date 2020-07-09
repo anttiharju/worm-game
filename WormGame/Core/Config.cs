@@ -12,7 +12,7 @@ namespace WormGame.Core
 #endif
         public readonly int windowWidth;
         public readonly int windowHeight;
-        public readonly int targetFramerate = 144;
+        public readonly int refreshRate = 144;
 
         public readonly Collision field;
         public readonly int width = 64;
@@ -22,8 +22,8 @@ namespace WormGame.Core
 
         public readonly int maxWormLength = 4;
         public readonly int density = 4;
-        public readonly float wormSpeed = 12; // 12 supports 144hz, 120hz, 60hz, 6 supports those plus 30hz
-        public readonly float wormStep;
+        public readonly float wormSpeed = 6; // 12 supports 144hz, 120hz, 60hz, 6 supports those plus 30hz
+        public readonly float step;
 
         public readonly float brickFreq = 0.4f;
 
@@ -37,7 +37,7 @@ namespace WormGame.Core
             bodyAmount = width * height;
             brainAmount = bodyAmount / maxWormLength;
             size = CalculateSize(windowWidth, windowHeight);
-            wormStep = wormSpeed / targetFramerate * size;
+            step = wormSpeed / refreshRate * size;
             field = new Collision(windowWidth, windowHeight, this);
         }
 

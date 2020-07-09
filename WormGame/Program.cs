@@ -16,7 +16,7 @@ namespace WormGame
             int windowHeight = 720;
             bool fullscreen = false;
             Config config = new Config(windowWidth, windowHeight);
-            Game game = new Game("Worm Bricks", config.windowWidth, config.windowHeight, config.targetFramerate, fullscreen)
+            Game game = new Game("Worm Bricks", config.windowWidth, config.windowHeight, config.refreshRate, fullscreen)
             {
                 WindowResize = false,
                 AlwaysUpdate = true,
