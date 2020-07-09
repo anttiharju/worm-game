@@ -77,7 +77,7 @@ namespace WormGame.GameObject
         private void SetNull()
         {
             for (int j = 0; j < Count; j++)
-                field.Set(bricks[j].Position);
+                field.Set(null, bricks[j].Position);
         }
 
 
@@ -119,20 +119,13 @@ namespace WormGame.GameObject
             Set();
         }
 
-
-        public void HardDrop(int amount = 1)
-        {
-            SoftDrop();
-        }
-
-
-        public void SoftDrop(int amount = 1)
+        public void HardDrop()
         {
             SetNull();
             for (int i = 0; i < Count; i++)
             {
                 next[i] = bricks[i].Position;
-                next[i].Y += size * amount;
+                next[i].Y += size * HardDropAmount();
                 if (!field.Check(next[i]))
                 {
                     Reset(); return;
@@ -141,22 +134,62 @@ namespace WormGame.GameObject
             Set();
         }
 
+        public int HardDropAmount()
+        {
+            int startX = Leftmost();
+            int endX = Rightmost();
+            int startY = field.Y(Position.Y) - 1;
+            for (int x = startX; x < endX; x++)
+                for (int y = startY; y >= 0; y--)
+                    if (!field.Check(x, y))
+                        return startY - y;
+            return startY + 1;
+        }
+
+
+        public void SoftDrop()
+        {
+            SetNull();
+            for (int i = 0; i < Count; i++)
+            {
+                next[i] = bricks[i].Position;
+                next[i].Y += size;
+                if (!field.Check(next[i]))
+                    Reset(); return;
+            }
+            Set();
+        }
 
         public override void Disable()
         {
             for (int i = 0; i < Count; i++)
             {
-                field.Set(bricks[i].Position);
+                field.Set(null, bricks[i].Position);
                 bricks[i].Enabled = false;
             }
         }
 
+        private int Leftmost()
+        {
+            float smallest = float.MaxValue;
+            for (int i = 0; i < Count; i++)
+                smallest = Mathf.Smaller(bricks[i].X, smallest);
+            return field.X(smallest);
+        }
 
-        public float Lowest(Vector2[] next)
+        private int Rightmost()
         {
             float biggest = 0;
             for (int i = 0; i < Count; i++)
-                biggest = Mathf.Bigger(next[i].Y, biggest);
+                biggest = Mathf.Bigger(bricks[i].X, biggest);
+            return field.X(biggest);
+        }
+
+        private float Lowest()
+        {
+            float biggest = 0;
+            for (int i = 0; i < Count; i++)
+                biggest = Mathf.Bigger(bricks[i].Y, biggest);
             return biggest;
         }
 

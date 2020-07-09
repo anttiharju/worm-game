@@ -33,7 +33,7 @@ namespace WormGame.Core
             width = config.width;
             height = config.height;
             size = config.size;
-            field = new Poolable[width, height];
+            field = new Poolable[width + 1, height]; // + 1 is required for a hack to make worm collision work properly on spawn.
             leftBorder = windowWidth / 2 - width / 2 * size + size / 2;
             topBorder = windowHeight / 2 + height / 2 * size - size / 2;
         }
@@ -126,17 +126,6 @@ namespace WormGame.Core
         {
             Get(x, y) = entity;
         }
-
-
-        /// <summary>
-        /// Set to a cell on the field to null.
-        /// </summary>
-        /// <param name="target">Entity position</param>
-        public void Set(Vector2 target)
-        {
-            Get(target) = null;
-        }
-
 
         /// <summary>
         /// Translates a horizontal entity position to a field one.

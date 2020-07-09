@@ -72,7 +72,7 @@ namespace WormGame
             foreach (Worm worm in worms)
                 if (worm.Enabled)
                 {
-                    float distance = Vector2.Distance(position, worm.Position);
+                    float distance = Vector2.Distance(position, worm.GetTarget(worm.Length / 2));
                     if (distance < nearestDistance)
                     {
                         nearestWorm = worm;
@@ -98,7 +98,7 @@ namespace WormGame
             if (color == null) color = Random.Color();
             Worm worm = worms.Enable();
             if (worm == null) return null;
-            worm.Spawn(x, y, length, color);
+            worm.Spawn(x, y, length, color, config.width);
             return worm;
         }
 
