@@ -10,17 +10,18 @@ namespace WormGame.Core
 #if DEBUG
         public bool visualizeCollision = false;
 #endif
-        public readonly int windowWidth;
-        public readonly int windowHeight;
+        public readonly int windowWidth = 1280;
+        public readonly int windowHeight = 720;
         public readonly int refreshRate = 144;
+        public readonly bool fullscreen = false;
 
         public readonly Collision field;
-        public readonly int width = 64;
-        public readonly int height = 32;
-        public readonly int margin = 1;
+        public readonly int width = 52;
+        public readonly int height = 28;
+        public readonly int margin = 4;
         public readonly int size;
 
-        public readonly int maxWormLength = 4;
+        public readonly int maxWormLength = 3;
         public readonly int density = 4;
         public readonly float wormSpeed = 6; // 12 supports 144hz, 120hz, 60hz, 6 supports those plus 30hz
         public readonly float step;
@@ -30,13 +31,14 @@ namespace WormGame.Core
         public readonly int brainAmount;
         public readonly int bodyAmount;
 
-        public Config(int windowWidth, int windowHeight)
+        public readonly int imageSize = 64; //52x25+4 results in size of 32 on 1080p so 64 should be enough to support 4k displays properly
+
+        public Config()
         {
-            this.windowWidth = windowWidth;
-            this.windowHeight = windowHeight;
             bodyAmount = width * height;
             brainAmount = bodyAmount / maxWormLength;
             size = CalculateSize(windowWidth, windowHeight);
+            System.Console.WriteLine(size);
             step = wormSpeed / refreshRate * size;
             field = new Collision(windowWidth, windowHeight, this);
         }

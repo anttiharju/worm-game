@@ -4,7 +4,6 @@ using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
 using Otter.Graphics.Drawables;
-using System.Dynamic;
 
 namespace WormGame.GameObject
 {
@@ -16,15 +15,15 @@ namespace WormGame.GameObject
         private readonly float step;
 
         private bool moving;
-        private Vector2 nextTarget;
-        private Vector2 nextDirection;
-        private Vector2[] target;
-        private Vector2[] direction;
+        private Vector2 target;
+        private Vector2 direction;
+        private Vector2[] targets;
+        private Vector2[] directions;
 
         public bool Posessed { get; set; }
         public int Length { get; private set; }
         public override Color Color { get { return worm[0].Color ?? null; } set { SetColor(value); } }
-        public Vector2 Direction { get { return direction[0]; } set { if (Help.ValidateDirection(field, target[0], size, value)) nextDirection = value; } }
+        public Vector2 Direction { get { return directions[0]; } set { if (Help.ValidateDirection(field, targets[0], size, value)) direction = value; } }
 
 
         public Worm(Config config) : base()
@@ -35,36 +34,39 @@ namespace WormGame.GameObject
             Length = config.maxWormLength;
 
             worm = new Image[config.maxWormLength];
-            target = new Vector2[config.maxWormLength];
-            direction = new Vector2[config.maxWormLength];
+            targets = new Vector2[config.maxWormLength];
+            directions = new Vector2[config.maxWormLength];
 
             for (int i = 0; i < worm.Length; i++)
             {
-                worm[i] = Image.CreateCircle(size / 2);
+                worm[i] = Image.CreateCircle(config.imageSize / 2);
+                worm[i].Scale = config.size * 1.0f / config.imageSize;
                 worm[i].Visible = false;
                 worm[i].CenterOrigin();
                 AddGraphic(worm[i]);
             }
         }
 
-        public Worm Spawn(int x, int y, int length, Color color)
+        public Worm Spawn(int x, int y, int length, Color color, int hack)
         {
             X = field.EntityX(x); Y = field.EntityY(y); Length = length; Color = color;
             for (int i = 0; i < Length; i++)
             {
                 worm[i].X = 0; worm[i].Y = 0;
                 worm[i].Visible = true;
-                target[i] = Position;
+                // Hacky, but makes collision work when the worm is just starting to move.
+                targets[i].X = field.EntityX(hack); targets[i].Y = field.EntityY(0);
             }
+            targets[0] = Position;
 
-            nextDirection = Random.ValidDirection(field, Position, size);
+            direction = Random.ValidDirection(field, Position, size);
             field.Set(this, x, y);
             return this;
         }
 
         public Vector2 GetTarget(int index)
         {
-            return target[index];
+            return targets[index];
         }
 
         public void SetColor(Color color)
@@ -78,7 +80,7 @@ namespace WormGame.GameObject
             for (int i = 0; i < Length; i++)
             {
                 worm[i].Visible = false;
-                direction[i].X = 0; direction[i].Y = 0;
+                directions[i].X = 0; directions[i].Y = 0;
             }
             Enabled = false;
         }
@@ -91,19 +93,19 @@ namespace WormGame.GameObject
             moving = true;
             bool retry = false;
         Retry:
-            nextTarget = target[0] + nextDirection * size;
-            if (field.Check(nextTarget))
+            target = targets[0] + direction * size;
+            if (field.Check(target))
             {
-                field.Set(target[Length - 1]);
-                Follow(ref direction, nextDirection);
-                Follow(ref target, nextTarget);
-                field.Set(this, nextTarget);
+                field.Set(null, targets[Length - 1]);
+                Follow(ref directions, direction);
+                Follow(ref targets, target);
+                field.Set(this, target);
             }
             else
             {
                 if (!Posessed && !retry)
                 {
-                    nextDirection = Random.ValidDirection(field, target[0], size);
+                    direction = Random.ValidDirection(field, targets[0], size);
                     retry = true;
                     goto Retry;
                 }
@@ -130,8 +132,14 @@ namespace WormGame.GameObject
             {
                 for (int i = 0; i < Length; i++)
                 {
-                    worm[i].X += direction[i].X * step;
-                    worm[i].Y += direction[i].Y * step;
+                    Vector2 positionDelta = directions[0] * step;
+                    if (i == 0)
+                        Position += positionDelta;
+                    else
+                    {
+                        Vector2 graphicDelta = directions[i] * step - positionDelta;
+                        worm[i].X += graphicDelta.X; worm[i].Y += graphicDelta.Y;
+                    }
                 }
             }
         }
