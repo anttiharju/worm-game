@@ -98,21 +98,33 @@ namespace WormGame.Core
         public void Set(Poolable entity)
         {
 #if DEBUG
-            if (entity is WormEntity)
-                throw new Exception("Set(entity) is not valid for WormEntities. Use Set(wormEntity, target) instead.");
+            if (entity is Worm)
+                throw new Exception("Set(entity) is not valid for Worms. Use Set(entity, x, y) instead.");
 #endif
             Get(entity.Position) = entity;
         }
 
 
         /// <summary>
-        /// Occupy a cell from the field for a worm.
+        /// Occupy a cell from the field for an entity.
         /// </summary>
         /// <param name="wormEntity">Worm</param>
         /// <param name="target">Worm target</param>
-        public void Set(WormEntity wormEntity, Vector2 target)
+        public void Set(Poolable entity, Vector2 target)
         {
-            Get(target) = wormEntity;
+            Get(target) = entity;
+        }
+
+
+        /// <summary>
+        /// Occupy a cell from the field for an entity.
+        /// </summary>
+        /// <param name="wormEntity">Worm</param>
+        /// <param name="x">Horizontal field position</param>
+        /// <param name="y">Vertical field position</param>
+        public void Set(Poolable entity, int x, int y)
+        {
+            Get(x, y) = entity;
         }
 
 
@@ -185,7 +197,7 @@ namespace WormGame.Core
                         Console.Write(".");
                     else
                     {
-                        if (field[x, y] is WormEntity)
+                        if (field[x, y] is Worm)
                             Console.Write("o");
                         if (field[x, y] is Brick)
                             Console.Write("x");

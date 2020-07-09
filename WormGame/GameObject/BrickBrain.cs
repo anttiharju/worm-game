@@ -43,8 +43,7 @@ namespace WormGame.GameObject
         public void SetBrick(Brick brick, Worm worm, int i)
         {
             bricks[i] = brick;
-            bricks[i].X = worm[i].target.X;
-            bricks[i].Y = worm[i].target.Y;
+            bricks[i].Position = worm.GetTarget(i);
             field.Set(bricks[i]);
         }
 
