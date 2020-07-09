@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Otter.Core;
+using System;
 using System.Collections;
 using WormGame.Core;
 
@@ -18,7 +19,7 @@ namespace WormGame.Pooling
         private int enablingIndex = 0;
 
         /// <summary>
-        /// Initializes the object pool.
+        /// Initializes the object pool. If you're pooling Poolables (not BasicPoolables) they have to be manually added to the scene with GetPool().
         /// </summary>
         /// <param name="config">Configuration object</param>
         /// <param name="capacity">Pool size</param>

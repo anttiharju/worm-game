@@ -13,7 +13,7 @@ namespace WormGame.Pooling
         /// <summary>
         /// Not related to pooling, but useful.
         /// </summary>
-        public Color Color { get { return Graphic.Color ?? null; } set { Graphic.Color = value; } }
+        public virtual Color Color { get { return Graphic.Color ?? null; } set { Graphic.Color = value; } }
 
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace WormGame.Pooling
         /// <summary>
         /// Improves code readability: entity.Disable() is way easier to understand than entity.Enabled = false;
         /// </summary>
-        public void Disable()
+        public virtual void Disable()
         {
             Enabled = false;
         }

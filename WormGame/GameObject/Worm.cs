@@ -3,172 +3,137 @@ using Otter.Utility.MonoGame;
 using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
+using Otter.Graphics.Drawables;
+using System.Dynamic;
 
 namespace WormGame.GameObject
 {
-    public class Worm : BasicPoolable
+    public class Worm : Poolable
     {
         private readonly Collision field;
-        private readonly WormEntity[] worm;
+        private readonly Image[] worm;
         private readonly int size;
+        private readonly float step;
 
+        private bool moving;
         private Vector2 nextTarget;
-        private Vector2 direction;
+        private Vector2 nextDirection;
+        private Vector2[] target;
+        private Vector2[] direction;
 
-        /// <summary>
-        /// Worm position.
-        /// </summary>
-        public Vector2 Position { get { return worm[Length / 2].target; } }
-        
-
-        /// <summary>
-        /// Worm direction.
-        /// </summary>
-        public Vector2 Direction { get { return direction; } set { if (Help.ValidateDirection(field, worm[0].target, size, value)) direction = value; } }
-        
-
-        /// <summary>
-        /// Worm color.
-        /// </summary>
-        public Color Color { get { return worm[0].Color ?? null; } set { SetColor(value); } }
-        
-        
-        /// <summary>
-        /// Worms length. Use this instead of worm.Length.
-        /// </summary>
-        public int Length { get; private set; }
-
-
-        /// <summary>
-        /// Is the worm controlled by player or not.
-        /// </summary>
         public bool Posessed { get; set; }
+        public int Length { get; private set; }
+        public override Color Color { get { return worm[0].Color ?? null; } set { SetColor(value); } }
+        public Vector2 Direction { get { return direction[0]; } set { if (Help.ValidateDirection(field, target[0], size, value)) nextDirection = value; } }
 
 
-        /// <summary>
-        /// Constructor. Takes size and collision from config and initializes WormEntity array with configs maxWormLength.
-        /// </summary>
-        /// <param name="config"></param>
-        public Worm(Config config)
+        public Worm(Config config) : base()
         {
             size = config.size;
+            step = config.step;
             field = config.field;
-            worm = new WormEntity[config.maxWormLength];
+            Length = config.maxWormLength;
+
+            worm = new Image[config.maxWormLength];
+            target = new Vector2[config.maxWormLength];
+            direction = new Vector2[config.maxWormLength];
+
+            for (int i = 0; i < worm.Length; i++)
+            {
+                worm[i] = Image.CreateCircle(size / 2);
+                worm[i].Visible = false;
+                worm[i].CenterOrigin();
+                AddGraphic(worm[i]);
+            }
         }
 
-
-        /// <summary>
-        /// Creates the worm. Not done in constructor because we have object pooling.
-        /// </summary>
-        /// <param name="bodies">Pool containing WormEntities</param>
-        /// <param name="field">Collision</param>
-        /// <param name="x">Horizontal field position</param>
-        /// <param name="y">Vertical field position</param>
-        /// <param name="length">Worms length</param>
-        /// <param name="color">Worms color</param>
-        /// <param name="stationary">Should the worm start moving by itself or not</param>
-        /// <returns>Spawned worm</returns>
-        public Worm Spawn(Pool<WormEntity> bodies, Collision field, int x, int y, int length, Color color, bool stationary)
+        public Worm Spawn(int x, int y, int length, Color color)
         {
-            WormEntity previous = null;
-            for (int i = 0; i < length; i++)
+            X = field.EntityX(x); Y = field.EntityY(y); Length = length; Color = color;
+            for (int i = 0; i < Length; i++)
             {
-                WormEntity current = bodies.Enable();
-                if (current == null) return null;
-                worm[i] = current;
-                current.X = x; current.Y = y;
-                current.target = current.Position;
-                if (previous != null)
-                    previous.Next = current;
-                previous = current;
+                worm[i].X = 0; worm[i].Y = 0;
+                worm[i].Visible = true;
+                target[i] = Position;
             }
 
-            Length = length;
-            field.Set(worm[0], worm[0].target);
-            if (stationary)
-                direction = Vector2.Zero;
-            else
-                direction = Random.ValidDirection(field, Position, size);
-            Color = color;
+            nextDirection = Random.ValidDirection(field, Position, size);
+            field.Set(this, x, y);
             return this;
         }
 
+        public Vector2 GetTarget(int index)
+        {
+            return target[index];
+        }
+
+        public void SetColor(Color color)
+        {
+            for (int i = 0; i < Length; i++)
+                worm[i].Color = color;
+        }
+
+        public override void Disable()
+        {
+            for (int i = 0; i < Length; i++)
+            {
+                worm[i].Visible = false;
+                direction[i].X = 0; direction[i].Y = 0;
+            }
+            Enabled = false;
+        }
 
         /// <summary>
-        /// Updates worm to collision field and keeps the worm together.
+        /// Updates worms directions, targets and adds it to the collision field.
         /// </summary>
         public void Move()
         {
-            Stop(false);
+            moving = true;
             bool retry = false;
         Retry:
-            nextTarget = worm[0].target + direction * size;
+            nextTarget = target[0] + nextDirection * size;
             if (field.Check(nextTarget))
             {
-                field.Set(worm[Length - 1].target);
-                worm[0].DirectionFollow(direction);
-                worm[0].TargetFollow(nextTarget);
-                field.Set(worm[0], nextTarget);
+                field.Set(target[Length - 1]);
+                Follow(ref direction, nextDirection);
+                Follow(ref target, nextTarget);
+                field.Set(this, nextTarget);
             }
             else
             {
                 if (!Posessed && !retry)
                 {
-                    direction = Random.ValidDirection(field, worm[0].target, size);
+                    nextDirection = Random.ValidDirection(field, target[0], size);
                     retry = true;
                     goto Retry;
                 }
-                Stop();
+                moving = false;
             }
         }
 
 
-
-        /// <summary>
-        /// Stops/unstops the worm.
-        /// </summary>
-        /// <param name="stationary">Should the worm stop or go</param>
-        private void Stop(bool stationary = true)
+        public void Follow(ref Vector2[] array, Vector2 newVector)
         {
-            for (int i = 0; i < Length; i++)
-                worm[i].Stationary = stationary;
+            for (int i = Length - 1; i > 0; i--)
+                array[i] = array[i - 1];
+            array[0] = newVector;
         }
 
 
         /// <summary>
-        /// Disables the worm.
+        /// Moves worms graphics
         /// </summary>
-        public override void Disable()
+        public override void Update()
         {
-            for (int i = 0; i < Length; i++)
+            base.Update();
+            if (moving)
             {
-                field.Set(worm[i].target);
-                worm[i].Enabled = false;
+                for (int i = 0; i < Length; i++)
+                {
+                    worm[i].X += direction[i].X * step;
+                    worm[i].Y += direction[i].Y * step;
+                }
             }
-            Enabled = false;
-        }
-
-
-        /// <summary>
-        /// Sets the entire worms color.
-        /// </summary>
-        /// <param name="color"></param>
-        public void SetColor(Color color)
-        {
-            for (int i = 0; i < Length; i++)
-                worm[i].Graphic.Color = color;
-        }
-
-
-        /// <summary>
-        /// Indexer so we can access all WormEntities of Worm.
-        /// </summary>
-        /// <param name="i"></param>
-        /// <returns></returns>
-        public WormEntity this[int i]
-        {
-            get => worm[i];
-            set => worm[i] = value;
         }
     }
 }

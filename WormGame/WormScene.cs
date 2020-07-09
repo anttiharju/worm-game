@@ -19,7 +19,6 @@ namespace WormGame
         private readonly Collision field;
 
         private readonly Pool<Worm> worms;
-        private readonly Pool<WormEntity> bodies;
         private readonly Pool<BrickBrain> brickBrains;
         private readonly Pool<Brick> bricks;
 
@@ -34,12 +33,12 @@ namespace WormGame
             this.config = config;
             field = config.field;
 
-            brickBrains = new Pool<BrickBrain>(config, config.brainAmount);
-            bricks = new Pool<Brick>(config, config.bodyAmount);
-            AddMultiple(bricks.GetPool());
-            bodies = new Pool<WormEntity>(config, config.bodyAmount);
-            AddMultiple(bodies.GetPool());
             worms = new Pool<Worm>(config, config.brainAmount);
+            bricks = new Pool<Brick>(config, config.bodyAmount);
+            brickBrains = new Pool<BrickBrain>(config, config.brainAmount);
+
+            AddMultiple(worms.GetPool());
+            AddMultiple(bricks.GetPool());
 
             // Entity setup
             /** /
@@ -50,9 +49,10 @@ namespace WormGame
             /**/
             /**/
             int density = config.density;
-            for (int x = 0; x < config.width; x += density)
-                for (int y = 0; y < config.height; y += density)
-                    SpawnWorm(x, y);
+            if (density > 0)
+                for (int x = 0; x < config.width; x += density)
+                    for (int y = 0; y < config.height; y += density)
+                        SpawnWorm(x, y);
             /**/
             SpawnPlayer(config.windowWidth / 2, config.windowHeight / 2, Color.Red);
         }
@@ -92,13 +92,13 @@ namespace WormGame
         /// <param name="stationary">Should the worm start moving after spawning</param>
         /// <param name="color">Worm color, by default random</param>
         /// <returns>Spawned worm</returns>
-        public Worm SpawnWorm(int x, int y, int length = -1, bool stationary = false, Color color = null)
+        public Worm SpawnWorm(int x, int y, int length = 0, Color color = null)
         {
-            if (length == -1) length = config.maxWormLength;
+            if (length == 0) length = config.maxWormLength;
             if (color == null) color = Random.Color();
             Worm worm = worms.Enable();
             if (worm == null) return null;
-            worm.Spawn(bodies, field, field.EntityX(x), field.EntityY(y), length, color, stationary);
+            worm.Spawn(x, y, length, color);
             return worm;
         }
 
@@ -136,7 +136,7 @@ namespace WormGame
         /// </summary>
         public override void Update()
         {
-            wormCounter += config.wormStep;
+            wormCounter += config.step;
 
             if (wormCounter >= config.size)
             {
