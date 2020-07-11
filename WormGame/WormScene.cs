@@ -19,8 +19,8 @@ namespace WormGame
         private readonly Collision field;
 
         private readonly Pool<Worm> worms;
-        private readonly Pool<BrickBrain> brickBrains;
         private readonly Pool<Brick> bricks;
+        private readonly Pool<BrickEntity> brickEntities;
 
         private float wormCounter = 0;
 
@@ -34,26 +34,18 @@ namespace WormGame
             field = config.field;
 
             worms = new Pool<Worm>(config, config.brainAmount);
-            bricks = new Pool<Brick>(config, config.bodyAmount);
-            brickBrains = new Pool<BrickBrain>(config, config.brainAmount);
+            bricks = new Pool<Brick>(config, config.brainAmount);
+            brickEntities = new Pool<BrickEntity>(config, config.bodyAmount);
 
             AddMultiple(worms.GetPool());
-            AddMultiple(bricks.GetPool());
+            AddMultiple(brickEntities.GetPool());
 
             // Entity setup
-            /** /
-            SpawnWorm(0, 0, 1, true);
-            SpawnWorm(0, config.height - 1, 1, true);
-            SpawnWorm(config.width - 1, 0, 1, true);
-            SpawnWorm(config.width - 1, config.height - 1, config.maxWormLength, true);
-            /**/
-            /**/
             int density = config.density;
             if (density > 0)
                 for (int x = 0; x < config.width; x += density)
                     for (int y = 0; y < config.height; y += density)
                         SpawnWorm(x, y);
-            /**/
             SpawnPlayer(config.windowWidth / 2, config.windowHeight / 2, Color.Red);
         }
 
@@ -107,11 +99,11 @@ namespace WormGame
         /// Turns the given worm into a collection of bricks.
         /// </summary>
         /// <param name="worm">Worm to transform</param>
-        public BrickBrain SpawnBrick(Worm worm)
+        public Brick SpawnBrick(Worm worm)
         {
-            BrickBrain brick = brickBrains.Enable();
+            Brick brick = bricks.Enable();
             if (brick == null) return null;
-            brick.Spawn(bricks, field, worm);
+            brick.Spawn(this, field, brickEntities, worm);
             return brick;
         }
 
