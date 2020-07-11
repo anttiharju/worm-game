@@ -14,6 +14,7 @@ namespace WormGame.GameObject
         private readonly int size;
         private readonly float step;
 
+        private int rampUp;
         private bool moving;
         private Vector2 target;
         private Vector2 direction;
@@ -96,7 +97,10 @@ namespace WormGame.GameObject
             target = targets[0] + direction * size;
             if (field.Check(target))
             {
-                field.Set(null, targets[Length - 1]);
+                if (rampUp < Length - 1)
+                    rampUp++;
+                else
+                    field.Set(null, targets[Length - 1]);
                 Follow(ref directions, direction);
                 Follow(ref targets, target);
                 field.Set(this, target);

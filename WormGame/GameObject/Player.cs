@@ -20,7 +20,7 @@ namespace WormGame.GameObject
         private readonly float speedModifier = 0.05f;
 
         private Worm worm;
-        private BrickBrain brick;
+        private Brick brick;
         private Color oldColor;
         private float leftX;
         private float leftY;
