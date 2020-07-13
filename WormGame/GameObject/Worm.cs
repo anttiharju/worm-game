@@ -123,7 +123,7 @@ namespace WormGame.GameObject
                 }
                 moving = false;
             }
-            if (grow)
+            if (grow && moving)
             {
                 Image newGraphic = worm[Length];
                 newGraphic.Visible = true;
