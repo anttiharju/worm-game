@@ -5,6 +5,7 @@ using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
 using WormGame.GameObject;
+using Otter.Utility;
 
 namespace WormGame
 {
@@ -19,6 +20,7 @@ namespace WormGame
         private readonly Collision field;
 
         private readonly Pool<Worm> worms;
+        private readonly Pool<Fruit> fruits;
         private readonly Pool<Brick> bricks;
         private readonly Pool<BrickEntity> brickEntities;
 
@@ -35,10 +37,12 @@ namespace WormGame
             field = config.field;
 
             worms = new Pool<Worm>(config, config.brainAmount);
+            fruits = new Pool<Fruit>(config, config.fruitAmount);
             bricks = new Pool<Brick>(config, config.brainAmount);
             brickEntities = new Pool<BrickEntity>(config, config.bodyAmount);
 
             AddMultiple(worms.GetPool());
+            AddMultiple(fruits.GetPool());
             AddMultiple(brickEntities.GetPool());
 
             // Entity setup
@@ -47,6 +51,16 @@ namespace WormGame
                 for (int x = 0; x < config.width; x += density)
                     for (int y = 0; y < config.height; y += density)
                         SpawnWorm(x, y, config.maxWormLength - 2);
+
+            Fruit fruit = fruits.Enable();
+            fruit.Spawn(1, 1, Random.Color());
+
+            Vector2 random = Random.ValidPosition(field, config.width, config.height);
+            random.X = field.EntityX(Mathf.FastRound(random.X));
+            random.Y = field.EntityY(Mathf.FastRound(random.Y));
+            BrickEntity brick = brickEntities.Enable();
+            brick.Spawn(random, null);
+
             SpawnPlayer(config.windowWidth / 2, config.windowHeight / 2, Color.Red);
         }
 

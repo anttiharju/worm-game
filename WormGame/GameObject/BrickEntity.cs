@@ -27,7 +27,6 @@ namespace WormGame.GameObject
             Parent = parent;
             Position = newPosition;
             field.Set(this, Position);
-            Enabled = true;
             return this;
         }
 

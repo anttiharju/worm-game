@@ -47,6 +47,38 @@ namespace WormGame.Static
 
 
         /// <summary>
+        /// Returns a random direction.
+        /// </summary>
+        /// <returns>Random color</returns>
+        public static Vector2 ValidPosition(Collision field, int width, int height)
+        {
+            int randomX = Range(0, width);
+            int randomY = Range(0, height);
+            if (!field.Check(randomX, randomY))
+            {
+                for (int y = randomY; y < height; y++)
+                    for (int x = randomX; x < width; x++)
+                        if (field.Check(x, y))
+                        {
+                            randomX = x;
+                            randomY = y;
+                            goto End;
+                        }
+                for (int y = randomY; y >= 0; y--)
+                    for (int x = randomX; x >= 0; x--)
+                        if (field.Check(x, y))
+                        {
+                            randomX = x;
+                            randomY = y;
+                            goto End;
+                        }
+            }
+        End:
+            return new Vector2(randomX, randomY);
+        }
+
+
+        /// <summary>
         /// Generates a random valid direction.
         /// </summary>
         /// <param name="field">Collision</param>
