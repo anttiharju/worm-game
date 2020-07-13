@@ -1,12 +1,11 @@
-﻿using Otter.Core;
-using System;
+﻿using System;
 using System.Collections;
 using WormGame.Core;
 
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 08.07.2020
+    /// @version 13.07.2020
     /// <summary>
     /// Object pooler.
     /// </summary>
@@ -17,6 +16,13 @@ namespace WormGame.Pooling
         private readonly T[] pool;
         private readonly int lastIndex;
         private int enablingIndex = 0;
+
+
+        /// <summary>
+        /// Returns pool max capacity.
+        /// </summary>
+        public int Count { get { return pool.Length; } }
+
 
         /// <summary>
         /// Initializes the object pool. If you're pooling Poolables (not BasicPoolables) they have to be manually added to the scene with GetPool().
@@ -104,8 +110,8 @@ namespace WormGame.Pooling
 
         /// <summary>
         /// We need to be able to loop through the pools contents to make calls to them etc.
-        /// I would love to give an enumerator that only has the enabled ones, but I don't
-        /// want to disable entities through the pool as the code would get really messy.
+        /// I would love to give an enumerator that only has the enabled ones, but that
+        /// would mean disabling poolables through the pool and I don't want that.
         /// </summary>
         /// <returns>Pool enumerator</returns>
         public IEnumerator GetEnumerator()
