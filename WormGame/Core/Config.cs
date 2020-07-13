@@ -8,7 +8,7 @@ namespace WormGame.Core
     public class Config
     {
 #if DEBUG
-        public bool visualizeCollision = false;
+        public bool visualizeCollision = true;
 #endif
         public readonly bool fullscreen = false;
         public readonly int windowWidth = 1280;
@@ -18,10 +18,10 @@ namespace WormGame.Core
 
         public readonly Collision field;
         public readonly int width = 7;
-        public readonly int height = 30;
+        public readonly int height = 7;
         public readonly int margin = 4;
 
-        public readonly int maxWormLength = 3;
+        public readonly int maxWormLength = 5;
         public readonly int wormSpeed = 6; // 12 supports 144hz, 120hz, 60hz, 6 supports those plus 30hz. Doesn't scale with size.
         public readonly int brickFreq = 4; // bricks update every nth worm update, has to fulfill (n % 2) == 0.
         public readonly int density = 4;
