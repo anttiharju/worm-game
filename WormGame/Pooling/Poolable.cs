@@ -4,23 +4,31 @@ using Otter.Graphics;
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 08.07.2020
+    /// @version 13.07.2020
     /// <summary>
     /// Class for poolable entities.
     /// </summary>
     public class Poolable : Entity, IPoolable
     {
         /// <summary>
-        /// Not related to pooling, but useful.
+        /// Disables Otters collision system.
+        /// </summary>
+        public Poolable()
+        {
+            Collidable = false;
+        }
+
+
+        /// <summary>
+        /// Set entity color.
         /// </summary>
         public virtual Color Color { get { return Graphic.Color ?? null; } set { Graphic.Color = value; } }
 
 
         /// <summary>
-        /// Sets graphic visibility. Improves code readability: it's way easier to understand that we want to know 
-        /// if entity is enabled or not by looking at entity.Enabled rather than entity.Graphic.Visible.
+        /// Sets graphic visibility and various other Otter2d entity variables.
         /// </summary>
-        public bool Enabled { get { return Visible; } set { Collidable = value; AutoUpdate = value; AutoRender = value; Visible = value; } }
+        public bool Enabled { get { return Visible; } set { AutoUpdate = value; AutoRender = value; Visible = value; } }
 
 
         /// <summary>

@@ -8,7 +8,7 @@ namespace WormGame.Core
     public class Config
     {
 #if DEBUG
-        public bool visualizeCollision = true;
+        public bool visualizeCollision = false;
 #endif
         public readonly bool fullscreen = false;
         public readonly int windowWidth = 1280;
@@ -27,6 +27,7 @@ namespace WormGame.Core
         public readonly int density = 4;
 
         // Dynamic values
+        public readonly int fruitAmount;
         public readonly int brainAmount;
         public readonly int bodyAmount;
         public readonly float step;
@@ -40,6 +41,7 @@ namespace WormGame.Core
         {
             if (brickFreq % 2 != 0)
                 brickFreq++;
+            fruitAmount = width / 3;
             bodyAmount = width * height;
             brainAmount = bodyAmount / maxWormLength;
             size = CalculateSize(windowWidth, windowHeight);
