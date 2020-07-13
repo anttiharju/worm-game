@@ -1,9 +1,8 @@
 ﻿using System;
+using System.Text;
 using Otter.Utility.MonoGame;
 using WormGame.Static;
-using WormGame.Pooling;
-using WormGame.GameObject;
-using System.Text;
+using WormGame.Entity;
 
 namespace WormGame.Core
 {
@@ -178,7 +177,7 @@ namespace WormGame.Core
                 bool full = true;
                 for (int x = 0; x < width; x++)
                 {
-                    if (!(field[x, y] is BrickEntity))
+                    if (!(field[x, y] is Brick))
                         full = false;
                 }
                 if (full)
@@ -190,7 +189,7 @@ namespace WormGame.Core
 
 #if DEBUG
         /// <summary>
-        /// Visualises the collision field as ASCII art. Used for debugging and looks cool as shit. Causes lag with large fields (above 20x10). 
+        /// Visualises the collision field as ASCII art. Used for debugging and looks cool as shit. Large fields cause lag (low tens by low tens are fine). 
         /// </summary>
         public void Visualize(Config config)
         {
@@ -208,7 +207,7 @@ namespace WormGame.Core
                         config.visualizeCollision = false;
                         Console.CursorLeft = 0;
                         Console.CursorTop = height - y;
-                        StringBuilder message = new StringBuilder("[VISUALIZATION FAILURE] Max visualizable field with is ").Append(Console.BufferWidth).Append(".");
+                        StringBuilder message = new StringBuilder("[COLLISION] Max visualizable field width is ").Append(Console.BufferWidth).Append(".");
                         message.Append(new string(' ', Console.BufferWidth - message.Length));
                         Console.WriteLine(message.ToString());
                         return;
@@ -224,7 +223,7 @@ namespace WormGame.Core
                         Console.Write("o");
                         continue;
                     }
-                    if (current is BrickEntity)
+                    if (current is Brick)
                     {
                         Console.Write("x");
                         continue;

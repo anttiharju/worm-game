@@ -1,63 +1,91 @@
 ﻿using Otter.Graphics;
-using Otter.Utility.MonoGame;
+using Otter.Graphics.Drawables;
+using System;
 using WormGame.Core;
 using WormGame.Static;
-using WormGame.Pooling;
 
-namespace WormGame.GameObject
+namespace WormGame.Entity
 {
-    public class Brick : BasicPoolable
+    public class Brick : Poolable
     {
-        private readonly BrickEntity[] bricks;
-        private readonly Vector2[] next;
+        private readonly Image[] graphics;
+        private readonly Collision field;
         private readonly int size;
+        private int maxLength;
 
-        private Collision field;
         private int anchorIndex;
-        private int kickBuffer = 2;
-        private int kickCounter = 0;
+        private Player player;
+        private WormScene scene;
 
-        public WormScene Scene { get; private set; }
-        public Color Color { get { return bricks[0].Color ?? null; } set { SetColor(value); } }
-        public Vector2 Position { get { return bricks[0].Position; } }
+
         public int Count { get; private set; }
-        public bool Posessed { get; set; }
-        public bool SoftDrop { get; set; }
+        public Player Player { private get; set; }
+        public override Color Color { get { return graphics[0].Color ?? null; } set { SetColor(value); } }
+
 
         public Brick(Config config)
         {
             size = config.size;
-            bricks = new BrickEntity[config.maxWormLength];
-            next = new Vector2[config.maxWormLength];
+            field = config.field;
+            maxLength = config.maxWormLength;
+
+            graphics = new Image[maxLength];
+            for (int i = 0; i < maxLength; i++)
+            {
+                Image tmp = Image.CreateRectangle(config.imageSize);
+                tmp.Scale = (float)config.size / config.imageSize;
+                tmp.Visible = false;
+                tmp.CenterOrigin();
+                graphics[i] = tmp;
+                AddGraphic(tmp);
+            }
         }
 
 
-        public Brick Spawn(WormScene scene, Collision field, Pool<BrickEntity> brickEntities, Worm worm)
+        public Brick Spawn(WormScene scene, Worm worm)
         {
-            this.field = field;
+            Position = worm.GetTarget(0);
             Count = worm.Length;
-            Scene = scene;
+            Color = worm.Color;
             for (int i = 0; i < Count; i++)
             {
-                BrickEntity tmp = brickEntities.Enable();
-                if (tmp == null) return null;
-                bricks[i] = tmp.Spawn(worm.GetTarget(i), this);
+                graphics[i].X = worm.GetTarget(i).X - worm.GetTarget(0).X;
+                graphics[i].Y = worm.GetTarget(i).Y - worm.GetTarget(0).Y;
+                graphics[i].Visible = true;
             }
-            anchorIndex = Count / 2;
-            Color = worm.Color;
             return this;
         }
 
+        internal void Right()
+        {
+        }
 
+        internal void Left()
+        {
+        }
+
+        internal void SoftDrop()
+        {
+        }
+
+        internal void HardDrop()
+        {
+        }
+
+        internal void Rotate(bool ccw = false)
+        {
+        }
+
+        /*
         public void Rotate(bool clockwise = false)
         {
             SetNull();
-            BrickEntity anchor = bricks[anchorIndex];
+            BrickEntity anchor = graphics[anchorIndex];
             for (int i = 0; i < Count; i++)
             {
-                next[i] = bricks[i].Position; // When moving horizontally rotation fucks up sometimes without this line 
+                next[i] = graphics[i].Position; // When moving horizontally rotation fucks up sometimes without this line 
                 if (i == anchorIndex) i++;
-                Vector2 rotationVector = bricks[i].Position - anchor.Position;
+                Vector2 rotationVector = graphics[i].Position - anchor.Position;
                 rotationVector = clockwise ? Mathf.RotateCW(rotationVector) : Mathf.RotateCCW(rotationVector);
                 next[i] = anchor.Position + rotationVector;
             }
@@ -74,14 +102,14 @@ namespace WormGame.GameObject
         private void SetNull()
         {
             for (int j = 0; j < Count; j++)
-                field.Set(null, bricks[j].Position);
+                field.Set(null, graphics[j].Position);
         }
 
 
         private void Reset()
         {
             for (int i = 0; i < Count; i++)
-                field.Set(bricks[i]);
+                field.Set(graphics[i]);
         }
 
 
@@ -89,8 +117,8 @@ namespace WormGame.GameObject
         {
             for (int i = 0; i < Count; i++)
             {
-                bricks[i].Position = next[i];
-                field.Set(bricks[i]);
+                graphics[i].Position = next[i];
+                field.Set(graphics[i]);
             }
         }
 
@@ -106,7 +134,7 @@ namespace WormGame.GameObject
             SetNull();
             for (int i = 0; i < Count; i++)
             {
-                next[i] = bricks[i].Position;
+                next[i] = graphics[i].Position;
                 next[i].X += size * amount;
                 if (!field.Check(next[i]))
                 {
@@ -123,7 +151,7 @@ namespace WormGame.GameObject
             int dropAmount = HardDropAmount();
             for (int i = 0; i < Count; i++)
             {
-                next[i] = bricks[i].Position;
+                next[i] = graphics[i].Position;
                 next[i].Y += size * dropAmount;
             }
             Set();
@@ -148,7 +176,7 @@ namespace WormGame.GameObject
             SetNull();
             for (int i = 0; i < Count; i++)
             {
-                next[i] = bricks[i].Position;
+                next[i] = graphics[i].Position;
                 next[i].Y += size;
                 if (!field.Check(next[i]))
                 {
@@ -169,9 +197,9 @@ namespace WormGame.GameObject
         {
             for (int i = 0; i < Count; i++)
             {
-                field.Set(null, bricks[i].Position);
-                bricks[i].Enabled = false;
-                bricks[i].Parent = null;
+                field.Set(null, graphics[i].Position);
+                graphics[i].Enabled = false;
+                graphics[i].Parent = null;
             }
         }
 
@@ -180,7 +208,7 @@ namespace WormGame.GameObject
         {
             float smallest = float.MaxValue;
             for (int i = 0; i < Count; i++)
-                smallest = Mathf.Smaller(bricks[i].X, smallest);
+                smallest = Mathf.Smaller(graphics[i].X, smallest);
             return field.X(smallest);
         }
 
@@ -189,7 +217,7 @@ namespace WormGame.GameObject
         {
             float biggest = 0;
             for (int i = 0; i < Count; i++)
-                biggest = Mathf.Bigger(bricks[i].X, biggest);
+                biggest = Mathf.Bigger(graphics[i].X, biggest);
             return field.X(biggest);
         }
 
@@ -198,15 +226,15 @@ namespace WormGame.GameObject
         {
             float biggest = 0;
             for (int i = 0; i < Count; i++)
-                biggest = Mathf.Bigger(bricks[i].Y, biggest);
+                biggest = Mathf.Bigger(graphics[i].Y, biggest);
             return field.Y(biggest);
-        }
+        }*/
 
 
         public void SetColor(Color color)
         {
             for (int i = 0; i < Count; i++)
-                bricks[i].Graphic.Color = color;
+                graphics[i].Color = color;
         }
     }
 }
