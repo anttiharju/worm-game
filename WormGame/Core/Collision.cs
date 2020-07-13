@@ -3,6 +3,7 @@ using Otter.Utility.MonoGame;
 using WormGame.Static;
 using WormGame.Pooling;
 using WormGame.GameObject;
+using System.Text;
 
 namespace WormGame.Core
 {
@@ -170,26 +171,63 @@ namespace WormGame.Core
             return topBorder - size * y;
         }
 
+        public void Scan()
+        {
+            for (int y = 0; y < height; y++)
+            {
+                bool full = true;
+                for (int x = 0; x < width; x++)
+                {
+                    if (!(field[x, y] is BrickEntity))
+                        full = false;
+                }
+                if (full)
+                {
+                    // TODO
+                }
+            }
+        }
+
 #if DEBUG
         /// <summary>
         /// Visualises the collision field as ASCII art. Used for debugging and looks cool as shit. Causes lag with large fields (above 20x10). 
         /// </summary>
-        public void Visualize()
+        public void Visualize(Config config)
         {
             for (int y = 0; y < height; y++)
             {
                 Console.CursorTop = height - y;
                 for (int x = 0; x < width; x++)
                 {
-                    Console.CursorLeft = x;
-                    if (field[x, y] == null)
-                        Console.Write(".");
-                    else
+                    try
                     {
-                        if (field[x, y] is Worm)
-                            Console.Write("o");
-                        if (field[x, y] is Brick)
-                            Console.Write("x");
+                        Console.CursorLeft = x;
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        config.visualizeCollision = false;
+                        Console.CursorLeft = 0;
+                        Console.CursorTop = height - y;
+                        StringBuilder message = new StringBuilder("[VISUALIZATION FAILURE] Max visualizable field with is ").Append(Console.BufferWidth).Append(".");
+                        message.Append(new string(' ', Console.BufferWidth - message.Length));
+                        Console.WriteLine(message.ToString());
+                        return;
+                    }
+                    Poolable current = field[x, y];
+                    if (current == null)
+                    {
+                        Console.Write(".");
+                        continue;
+                    }
+                    if (current is Worm)
+                    {
+                        Console.Write("o");
+                        continue;
+                    }
+                    if (current is BrickEntity)
+                    {
+                        Console.Write("x");
+                        continue;
                     }
                 }
             }
