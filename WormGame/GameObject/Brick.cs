@@ -3,7 +3,6 @@ using Otter.Utility.MonoGame;
 using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
-using System;
 
 namespace WormGame.GameObject
 {
@@ -15,13 +14,15 @@ namespace WormGame.GameObject
 
         private Collision field;
         private int anchorIndex;
+        private int kickBuffer = 2;
+        private int kickCounter = 0;
 
         public WormScene Scene { get; private set; }
         public Color Color { get { return bricks[0].Color ?? null; } set { SetColor(value); } }
         public Vector2 Position { get { return bricks[0].Position; } }
         public int Count { get; private set; }
         public bool Posessed { get; set; }
-        public bool Falling { get; set; }
+        public bool SoftDrop { get; set; }
 
         public Brick(Config config)
         {
@@ -40,20 +41,11 @@ namespace WormGame.GameObject
             {
                 BrickEntity tmp = brickEntities.Enable();
                 if (tmp == null) return null;
-                SetBrick(tmp, worm, i);
-                tmp.Parent = this;
+                bricks[i] = tmp.Spawn(worm.GetTarget(i), this);
             }
             anchorIndex = Count / 2;
             Color = worm.Color;
             return this;
-        }
-
-
-        public void SetBrick(BrickEntity brick, Worm worm, int i)
-        {
-            bricks[i] = brick;
-            bricks[i].Position = worm.GetTarget(i);
-            field.Set(bricks[i]);
         }
 
 
@@ -151,7 +143,7 @@ namespace WormGame.GameObject
         }
 
 
-        public void SoftDrop()
+        public void Fall()
         {
             SetNull();
             for (int i = 0; i < Count; i++)
@@ -161,6 +153,11 @@ namespace WormGame.GameObject
                 if (!field.Check(next[i]))
                 {
                     Reset();
+                    kickCounter++;
+                    if (kickCounter >= kickBuffer)
+                    {
+
+                    }
                     return;
                 }
             }

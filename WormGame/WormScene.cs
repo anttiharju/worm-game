@@ -23,6 +23,7 @@ namespace WormGame
         private readonly Pool<BrickEntity> brickEntities;
 
         private float wormCounter = 0;
+        private int brickCounter = 0;
 
         /// <summary>
         /// Initializes pools and collision system. Spawns initial entities.
@@ -129,18 +130,36 @@ namespace WormGame
         public override void Update()
         {
             wormCounter += config.step;
-
             if (wormCounter >= config.size)
             {
-                foreach (Worm worm in worms)
-                    if (worm.Enabled)
-                        worm.Move();
+                brickCounter++;
+                if (brickCounter >= config.brickFreq)
+                {
+                    BrickUpdate();
+                    brickCounter = 0;
+                }
+                WormUpdate();
                 wormCounter = 0;
-            }
+                field.Scan();
 #if DEBUG
-            if (config.visualizeCollision)
-                field.Visualize();
+                if (config.visualizeCollision)
+                    field.Visualize(config);
 #endif
+            }
+        }
+
+        public void BrickUpdate()
+        {
+            foreach (Brick brick in bricks)
+                if (brick.Enabled || !brick.SoftDrop)
+                    brick.Fall();
+        }
+
+        public void WormUpdate()
+        {
+            foreach (Worm worm in worms)
+                if (worm.Enabled)
+                    worm.Move();
         }
     }
 }

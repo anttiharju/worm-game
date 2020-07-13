@@ -134,7 +134,7 @@ namespace WormGame.GameObject
                 {
                     if (dpadY > 0)
                     {
-                        brick.SoftDrop();
+                        brick.Fall();
                         dropAction = false;
                     }
                     if (dpadY < 0)
@@ -289,13 +289,6 @@ namespace WormGame.GameObject
         {
             if (-10 < dpadY && dpadY < 10 && -10 < dpadX && dpadX < 10)
                 dropAction = true;
-            /*if (!dropAction)
-                dropTimer += Scene.Game.DeltaTime;
-            if (dropTimer >= dropTimerReset)
-            {
-                dropAction = true;
-                dropTimer = 0;
-            }*/
         }
     }
 }
