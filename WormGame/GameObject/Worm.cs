@@ -15,6 +15,7 @@ namespace WormGame.GameObject
         private readonly float step;
 
         private int rampUp;
+        private bool grow;
         private bool moving;
         private Vector2 target;
         private Vector2 direction;
@@ -32,13 +33,12 @@ namespace WormGame.GameObject
             size = config.size;
             step = config.step;
             field = config.field;
-            Length = config.maxWormLength;
 
             worm = new Image[config.maxWormLength];
             targets = new Vector2[config.maxWormLength];
             directions = new Vector2[config.maxWormLength];
 
-            for (int i = 0; i < worm.Length; i++)
+            for (int i = 0; i < config.maxWormLength; i++)
             {
                 worm[i] = Image.CreateCircle(config.imageSize / 2);
                 worm[i].Scale = config.size * 1.0f / config.imageSize;
@@ -50,19 +50,27 @@ namespace WormGame.GameObject
 
         public Worm Spawn(int x, int y, int length, Color color, int hack)
         {
-            X = field.EntityX(x); Y = field.EntityY(y); Length = length; Color = color;
+            X = field.EntityX(x);
+            Y = field.EntityY(y);
+            Length = length;
+            Color = color;
             for (int i = 0; i < Length; i++)
             {
                 worm[i].X = 0; worm[i].Y = 0;
                 worm[i].Visible = true;
-                // Hacky, but makes collision work when the worm is just starting to move.
-                targets[i].X = field.EntityX(hack); targets[i].Y = field.EntityY(0);
+                targets[i] = Position;
             }
-            targets[0] = Position;
 
             direction = Random.ValidDirection(field, Position, size);
             field.Set(this, x, y);
+            grow = false;
             return this;
+        }
+
+        public void Grow()
+        {
+            if (Length == worm.Length) return;
+            grow = true;
         }
 
         public Vector2 GetTarget(int index)
@@ -114,6 +122,18 @@ namespace WormGame.GameObject
                     goto Retry;
                 }
                 moving = false;
+            }
+            if (grow)
+            {
+                Image newGraphic = worm[Length];
+                newGraphic.Visible = true;
+                newGraphic.X = worm[Length - 1].X;
+                newGraphic.Y = worm[Length - 1].Y;
+                targets[Length].X = worm[Length - 1].X - directions[Length - 1].X * size;
+                targets[Length].Y = worm[Length - 1].Y - directions[Length - 1].Y * size;
+                newGraphic.Color = Color;
+                Length++;
+                grow = false;
             }
         }
 

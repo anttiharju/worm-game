@@ -46,7 +46,7 @@ namespace WormGame
             if (density > 0)
                 for (int x = 0; x < config.width; x += density)
                     for (int y = 0; y < config.height; y += density)
-                        SpawnWorm(x, y);
+                        SpawnWorm(x, y, config.maxWormLength - 2);
             SpawnPlayer(config.windowWidth / 2, config.windowHeight / 2, Color.Red);
         }
 
