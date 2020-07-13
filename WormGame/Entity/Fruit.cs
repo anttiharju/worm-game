@@ -1,10 +1,8 @@
 ﻿using Otter.Graphics;
 using Otter.Graphics.Drawables;
-using Otter.Utility.MonoGame;
 using WormGame.Core;
-using WormGame.Pooling;
 
-namespace WormGame.GameObject
+namespace WormGame.Entity
 {
     public class Fruit : Poolable
     {

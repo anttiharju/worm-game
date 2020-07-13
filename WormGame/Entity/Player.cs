@@ -2,9 +2,9 @@
 using Otter.Graphics;
 using Otter.Graphics.Drawables;
 using WormGame.Static;
-using WormGame.Pooling;
+using WormGame.Core;
 
-namespace WormGame.GameObject
+namespace WormGame.Entity
 {
     /// @author Antti Harju
     /// @version 08.07.2020
@@ -134,7 +134,7 @@ namespace WormGame.GameObject
                 {
                     if (dpadY > 0)
                     {
-                        brick.Fall();
+                        brick.SoftDrop();
                         dropAction = false;
                     }
                     if (dpadY < 0)

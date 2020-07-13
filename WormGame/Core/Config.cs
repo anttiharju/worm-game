@@ -41,7 +41,7 @@ namespace WormGame.Core
         {
             if (brickFreq % 2 != 0)
                 brickFreq++;
-            fruitAmount = width / 3;
+            fruitAmount = Mathf.FastRound(Mathf.Bigger(width, height)) / 3;
             bodyAmount = width * height;
             brainAmount = bodyAmount / maxWormLength;
             size = CalculateSize(windowWidth, windowHeight);

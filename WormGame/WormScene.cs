@@ -3,9 +3,7 @@ using Otter.Graphics;
 using Otter.Utility.MonoGame;
 using WormGame.Core;
 using WormGame.Static;
-using WormGame.Pooling;
-using WormGame.GameObject;
-using Otter.Utility;
+using WormGame.Entity;
 
 namespace WormGame
 {
@@ -22,7 +20,6 @@ namespace WormGame
         private readonly Pool<Worm> worms;
         private readonly Pool<Fruit> fruits;
         private readonly Pool<Brick> bricks;
-        private readonly Pool<BrickEntity> brickEntities;
 
         private float wormCounter = 0;
         private int brickCounter = 0;
@@ -36,14 +33,9 @@ namespace WormGame
             this.config = config;
             field = config.field;
 
-            worms = new Pool<Worm>(config, config.brainAmount);
-            fruits = new Pool<Fruit>(config, config.fruitAmount);
-            bricks = new Pool<Brick>(config, config.brainAmount);
-            brickEntities = new Pool<BrickEntity>(config, config.bodyAmount);
-
-            AddMultiple(worms.GetPool());
-            AddMultiple(fruits.GetPool());
-            AddMultiple(brickEntities.GetPool());
+            worms = new Pool<Worm>(this, config, config.brainAmount);
+            fruits = new Pool<Fruit>(this, config, config.fruitAmount);
+            bricks = new Pool<Brick>(this, config, config.brainAmount);
 
             // Entity setup
             int density = config.density;
@@ -52,15 +44,13 @@ namespace WormGame
                     for (int y = 0; y < config.height; y += density)
                         SpawnWorm(x, y, config.maxWormLength - 2);
 
-            Fruit fruit = fruits.Enable();
+            /*Fruit fruit = fruits.Enable();
             fruit.Spawn(1, 1, Random.Color());
 
             Vector2 random = Random.ValidPosition(field, config.width, config.height);
             random.X = field.EntityX(Mathf.FastRound(random.X));
             random.Y = field.EntityY(Mathf.FastRound(random.Y));
-            BrickEntity brick = brickEntities.Enable();
-            brick.Spawn(random, null);
-
+            */
             SpawnPlayer(config.windowWidth / 2, config.windowHeight / 2, Color.Red);
         }
 
@@ -105,7 +95,7 @@ namespace WormGame
             if (color == null) color = Random.Color();
             Worm worm = worms.Enable();
             if (worm == null) return null;
-            worm.Spawn(x, y, length, color, config.width);
+            worm.Spawn(x, y, length, color);
             return worm;
         }
 
@@ -118,7 +108,7 @@ namespace WormGame
         {
             Brick brick = bricks.Enable();
             if (brick == null) return null;
-            brick.Spawn(this, field, brickEntities, worm);
+            brick.Spawn(this, worm);
             return brick;
         }
 
@@ -164,9 +154,6 @@ namespace WormGame
 
         public void BrickUpdate()
         {
-            foreach (Brick brick in bricks)
-                if (brick.Enabled || !brick.SoftDrop)
-                    brick.Fall();
         }
 
         public void WormUpdate()

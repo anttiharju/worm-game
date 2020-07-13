@@ -2,15 +2,14 @@
 using Otter.Utility.MonoGame;
 using WormGame.Core;
 using WormGame.Static;
-using WormGame.Pooling;
 using Otter.Graphics.Drawables;
 
-namespace WormGame.GameObject
+namespace WormGame.Entity
 {
     public class Worm : Poolable
     {
         private readonly Collision field;
-        private readonly Image[] worm;
+        private readonly Image[] graphics;
         private readonly int size;
         private readonly float step;
 
@@ -24,7 +23,7 @@ namespace WormGame.GameObject
 
         public bool Posessed { get; set; }
         public int Length { get; private set; }
-        public override Color Color { get { return worm[0].Color ?? null; } set { SetColor(value); } }
+        public override Color Color { get { return graphics[0].Color ?? null; } set { SetColor(value); } }
         public Vector2 Direction { get { return directions[0]; } set { if (Help.ValidateDirection(field, targets[0], size, value)) direction = value; } }
 
 
@@ -34,21 +33,23 @@ namespace WormGame.GameObject
             step = config.step;
             field = config.field;
 
-            worm = new Image[config.maxWormLength];
-            targets = new Vector2[config.maxWormLength];
-            directions = new Vector2[config.maxWormLength];
+            int maxLength = config.maxWormLength;
+            graphics = new Image[maxLength];
+            targets = new Vector2[maxLength];
+            directions = new Vector2[maxLength];
 
-            for (int i = 0; i < config.maxWormLength; i++)
+            for (int i = 0; i < maxLength; i++)
             {
-                worm[i] = Image.CreateCircle(config.imageSize / 2);
-                worm[i].Scale = config.size * 1.0f / config.imageSize;
-                worm[i].Visible = false;
-                worm[i].CenterOrigin();
-                AddGraphic(worm[i]);
+                Image tmp = Image.CreateCircle(config.imageSize / 2);
+                tmp.Scale = (float)config.size / config.imageSize;
+                tmp.Visible = false;
+                tmp.CenterOrigin();
+                graphics[i] = tmp;
+                AddGraphic(tmp);
             }
         }
 
-        public Worm Spawn(int x, int y, int length, Color color, int hack)
+        public Worm Spawn(int x, int y, int length, Color color)
         {
             X = field.EntityX(x);
             Y = field.EntityY(y);
@@ -56,8 +57,8 @@ namespace WormGame.GameObject
             Color = color;
             for (int i = 0; i < Length; i++)
             {
-                worm[i].X = 0; worm[i].Y = 0;
-                worm[i].Visible = true;
+                graphics[i].X = 0; graphics[i].Y = 0;
+                graphics[i].Visible = true;
                 targets[i] = Position;
             }
 
@@ -69,7 +70,7 @@ namespace WormGame.GameObject
 
         public void Grow()
         {
-            if (Length == worm.Length) return;
+            if (Length == graphics.Length) return;
             grow = true;
         }
 
@@ -81,14 +82,14 @@ namespace WormGame.GameObject
         public void SetColor(Color color)
         {
             for (int i = 0; i < Length; i++)
-                worm[i].Color = color;
+                graphics[i].Color = color;
         }
 
         public override void Disable()
         {
             for (int i = 0; i < Length; i++)
             {
-                worm[i].Visible = false;
+                graphics[i].Visible = false;
                 directions[i].X = 0; directions[i].Y = 0;
             }
             Enabled = false;
@@ -125,12 +126,12 @@ namespace WormGame.GameObject
             }
             if (grow && moving)
             {
-                Image newGraphic = worm[Length];
+                Image newGraphic = graphics[Length];
                 newGraphic.Visible = true;
-                newGraphic.X = worm[Length - 1].X;
-                newGraphic.Y = worm[Length - 1].Y;
-                targets[Length].X = worm[Length - 1].X - directions[Length - 1].X * size;
-                targets[Length].Y = worm[Length - 1].Y - directions[Length - 1].Y * size;
+                newGraphic.X = graphics[Length - 1].X;
+                newGraphic.Y = graphics[Length - 1].Y;
+                targets[Length].X = graphics[Length - 1].X - directions[Length - 1].X * size;
+                targets[Length].Y = graphics[Length - 1].Y - directions[Length - 1].Y * size;
                 newGraphic.Color = Color;
                 Length++;
                 grow = false;
@@ -162,7 +163,7 @@ namespace WormGame.GameObject
                     else
                     {
                         Vector2 graphicDelta = directions[i] * step - positionDelta;
-                        worm[i].X += graphicDelta.X; worm[i].Y += graphicDelta.Y;
+                        graphics[i].X += graphicDelta.X; graphics[i].Y += graphicDelta.Y;
                     }
                 }
             }
