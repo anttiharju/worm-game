@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections;
-using WormGame.Core;
 
-namespace WormGame.Pooling
+namespace WormGame.Core
 {
     /// @author Antti Harju
     /// @version 13.07.2020
     /// <summary>
-    /// Object pooler.
+    /// Entity pooler.
     /// </summary>
-    /// <typeparam name="T">Poolable object type</typeparam>
+    /// <typeparam name="T">Poolable entity type</typeparam>
     /// TODO: Write tests
-    public class Pool<T> : IEnumerable where T : class, IPoolable
+    public class Pool<T> : IEnumerable where T : Poolable
     {
         private readonly T[] pool;
         private readonly int lastIndex;
@@ -29,7 +28,7 @@ namespace WormGame.Pooling
         /// </summary>
         /// <param name="config">Configuration object</param>
         /// <param name="capacity">Pool size</param>
-        public Pool(Config config, int capacity)
+        public Pool(WormScene scene, Config config, int capacity)
         {
             lastIndex = capacity - 1;
             pool = new T[capacity];
@@ -39,22 +38,12 @@ namespace WormGame.Pooling
                 tmp.Enabled = false;
                 pool[i] = tmp;
             }
+            scene.AddMultiple(pool);
         }
 
 
         /// <summary>
-        /// If the pooled objects are Otter2d entities we can add them to the scene with this.
-        /// Not sure if it's possible to do in-class due to how generics work.
-        /// </summary>
-        /// <returns>Object pool</returns>
-        public T[] GetPool()
-        {
-            return pool;
-        }
-
-
-        /// <summary>
-        /// Enables a disabled object from the pool.
+        /// Enables a disabled entity from the pool.
         /// </summary>
         /// <returns>Enabled entity</returns>
         public T Enable()
@@ -109,9 +98,9 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// We need to be able to loop through the pools contents to make calls to them etc.
-        /// I would love to give an enumerator that only has the enabled ones, but that
-        /// would mean disabling poolables through the pool and I don't want that.
+        /// We need to be able to loop through the pools contents to make calls to the entities in it.
+        /// I would love to give an enumerator that only has the enabled ones, but that would mean 
+        /// disabling poolables through the pool and I don't want that.
         /// </summary>
         /// <returns>Pool enumerator</returns>
         public IEnumerator GetEnumerator()
