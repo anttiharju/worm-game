@@ -25,7 +25,7 @@ namespace WormGame.Core
         public readonly int maxWormLength = 5;
         public readonly int wormSpeed = 6; // 6 because 144, 120, 60 and 30 are evenly dividable by it
         public readonly int brickFreq = 4;
-        public readonly int density = 4;
+        public readonly int density = 8;
 
         // Dynamic values
         public readonly int fruitAmount;

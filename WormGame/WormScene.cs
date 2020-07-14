@@ -1,10 +1,10 @@
 ﻿using Otter.Core;
 using Otter.Graphics;
 using Otter.Utility.MonoGame;
+using Otter.Graphics.Drawables;
 using WormGame.Core;
 using WormGame.Static;
 using WormGame.GameObject;
-using Otter.Graphics.Drawables;
 
 namespace WormGame
 {
@@ -48,10 +48,14 @@ namespace WormGame
                     for (int y = 0; y < config.height; y += density)
                         SpawnWorm(x, y, config.maxWormLength - 2);
 
-            fruits.Enable().Spawn(1, 1, Color.Gold);
-            Vector2 random = Random.ValidPosition(field, config.width, config.height);
-            random.X = field.EntityX(Mathf.FastRound(random.X));
-            random.Y = field.EntityY(Mathf.FastRound(random.Y));
+            for (int i = 0; i < fruits.Count; i++)
+            {
+                Vector2 random = Random.ValidPosition(field, config.width, config.height);
+                int randomX = Mathf.FastRound(random.X);
+                int randomY = Mathf.FastRound(random.Y);
+                Fruit fruit = fruits.Enable();
+                fruit.Spawn(randomX, randomY, Random.Color());
+            }
 
             SpawnPlayer(config.windowWidth / 2, config.windowHeight / 2, Color.Red);
         }
