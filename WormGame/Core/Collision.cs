@@ -89,7 +89,8 @@ namespace WormGame.Core
             Poolable cell = Get(x, y);
             if (cell is Fruit)
             {
-                cell.Disable();
+                Fruit fruit = (Fruit)cell;
+                fruit.Respawn();
                 return 1;
             }
             if (cell != null)
