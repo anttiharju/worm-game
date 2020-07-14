@@ -1,9 +1,7 @@
 ﻿using Otter.Graphics;
 using Otter.Graphics.Drawables;
 using Otter.Utility.MonoGame;
-using System;
 using WormGame.Core;
-using WormGame.Static;
 
 namespace WormGame.GameObject
 {
@@ -15,13 +13,12 @@ namespace WormGame.GameObject
 
         private int anchorIndex;
         private int maxLength;
-        private Player player;
         private WormScene scene;
         private Vector2[] positions;
 
 
         public int Count { get; private set; }
-        public Player Player { private get; set; }
+        public Player Player { get; set; }
         public override Color Color { get { return graphics[0].Color ?? null; } set { SetColor(value); } }
 
 

@@ -1,8 +1,8 @@
 ﻿using Otter.Core;
 using Otter.Graphics;
 using Otter.Graphics.Drawables;
-using WormGame.Static;
 using WormGame.Core;
+using WormGame.Static;
 
 namespace WormGame.GameObject
 {
@@ -55,18 +55,12 @@ namespace WormGame.GameObject
         /// </summary>
         private void Posess()
         {
-            if (brick != null)
-            {
-                brick.Color = oldColor;
-                Position = brick.Position;
-                brick = null;
-                Graphic.Visible = true;
-            }
+            if (brick != null) return;
             if (worm != null)
             {
                 worm.Color = oldColor;
                 Position = worm.Position;
-                worm.Posessed = false;
+                worm.Player = null;
                 worm = null;
                 Graphic.Visible = true;
             }
@@ -74,7 +68,7 @@ namespace WormGame.GameObject
             {
                 worm = wormScene.NearestWorm(Position, 250);
                 if (worm == null) return;
-                worm.Posessed = true;
+                worm.Player = this;
                 Graphic.Visible = false;
                 oldColor = worm.Color;
                 worm.Color = playerColor;
@@ -101,6 +95,7 @@ namespace WormGame.GameObject
             worm.Disable();
             brick = wormScene.SpawnBrick(worm);
             if (brick == null) return;
+            brick.Player = worm.Player;
             brick.Color = worm.Color;
             worm = null;
         }
