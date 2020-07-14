@@ -1,4 +1,5 @@
-﻿using Otter.Graphics;
+﻿using Otter.Core;
+using Otter.Graphics;
 
 namespace WormGame.Core
 {
@@ -7,7 +8,7 @@ namespace WormGame.Core
     /// <summary>
     /// Class for poolable entities.
     /// </summary>
-    public class Poolable : Otter.Core.Entity
+    public class Poolable : Entity
     {
         /// <summary>
         /// Disables Otter2D collision checks.
