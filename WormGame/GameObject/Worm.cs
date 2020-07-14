@@ -21,7 +21,7 @@ namespace WormGame.GameObject
         private Vector2[] targets;
         private Vector2[] directions;
 
-        public bool Posessed { get; set; }
+        public Player Player { get; set; }
         public int Length { get; private set; }
         public override Color Color { get { return graphics[0].Color ?? null; } set { SetColor(value); } }
         public Vector2 Direction { get { return directions[0]; } set { if (Help.ValidateDirection(field, targets[0], size, value)) direction = value; } }
@@ -124,7 +124,7 @@ namespace WormGame.GameObject
             }
             else
             {
-                if (!Posessed && !retry)
+                if (Player == null && !retry)
                 {
                     direction = Random.ValidDirection(field, targets[0], size);
                     retry = true;
