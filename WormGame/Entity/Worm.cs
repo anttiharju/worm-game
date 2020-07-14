@@ -1,8 +1,8 @@
 ﻿using Otter.Graphics;
 using Otter.Utility.MonoGame;
+using Otter.Graphics.Drawables;
 using WormGame.Core;
 using WormGame.Static;
-using Otter.Graphics.Drawables;
 
 namespace WormGame.Entity
 {
@@ -68,6 +68,11 @@ namespace WormGame.Entity
             return this;
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// TODO: Fix a minor bug where another worm can temporarily go inside a newly grown part.
         public void Grow()
         {
             if (Length == graphics.Length) return;
@@ -108,7 +113,7 @@ namespace WormGame.Entity
             {
                 if (rampUp < Length - 1)
                     rampUp++;
-                else
+                else if (!grow)
                     field.Set(null, targets[Length - 1]);
                 Follow(ref directions, direction);
                 Follow(ref targets, target);
@@ -130,10 +135,11 @@ namespace WormGame.Entity
                 newGraphic.Visible = true;
                 newGraphic.X = graphics[Length - 1].X;
                 newGraphic.Y = graphics[Length - 1].Y;
-                targets[Length].X = graphics[Length - 1].X - directions[Length - 1].X * size;
-                targets[Length].Y = graphics[Length - 1].Y - directions[Length - 1].Y * size;
+                targets[Length].X = Position.X + newGraphic.X;
+                targets[Length].Y = Position.Y + newGraphic.Y;
                 newGraphic.Color = Color;
                 Length++;
+                rampUp++;
                 grow = false;
             }
         }

@@ -34,7 +34,7 @@ namespace WormGame
             field = config.field;
 
             worms = new Pool<Worm>(this, config, config.brainAmount);
-            fruits = new Pool<Fruit>(this, config, config.fruitAmount);
+            fruits = new Pool<Fruit>(this, config, 3);
             bricks = new Pool<Brick>(this, config, config.brainAmount);
 
             // Entity setup
@@ -42,15 +42,17 @@ namespace WormGame
             if (density > 0)
                 for (int x = 0; x < config.width; x += density)
                     for (int y = 0; y < config.height; y += density)
-                        SpawnWorm(x, y, config.maxWormLength - 2);
+                        SpawnWorm(x, y, config.maxWormLength - 4);
+//            SpawnWorm(4, 4, config.maxWormLength - 2);
 
-            /*Fruit fruit = fruits.Enable();
-            fruit.Spawn(1, 1, Random.Color());
+            fruits.Enable().Spawn(1, 1, Random.Color());
+            fruits.Enable().Spawn(3, 2, Random.Color());
+            fruits.Enable().Spawn(2, 4, Random.Color());
 
             Vector2 random = Random.ValidPosition(field, config.width, config.height);
             random.X = field.EntityX(Mathf.FastRound(random.X));
             random.Y = field.EntityY(Mathf.FastRound(random.Y));
-            */
+            
             SpawnPlayer(config.windowWidth / 2, config.windowHeight / 2, Color.Red);
         }
 
