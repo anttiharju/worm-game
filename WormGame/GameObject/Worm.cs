@@ -4,7 +4,7 @@ using Otter.Graphics.Drawables;
 using WormGame.Core;
 using WormGame.Static;
 
-namespace WormGame.Entity
+namespace WormGame.GameObject
 {
     public class Worm : Poolable
     {
@@ -109,8 +109,11 @@ namespace WormGame.Entity
             bool retry = false;
         Retry:
             target = targets[0] + direction * size;
-            if (field.Check(target))
+            int check = field.Check(target);
+            if (check != 2)
             {
+                if (check == 1)
+                    Grow();
                 if (rampUp < Length - 1)
                     rampUp++;
                 else if (!grow)
