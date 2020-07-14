@@ -2,7 +2,7 @@
 using System.Text;
 using Otter.Utility.MonoGame;
 using WormGame.Static;
-using WormGame.Entity;
+using WormGame.GameObject;
 
 namespace WormGame.Core
 {
@@ -22,7 +22,7 @@ namespace WormGame.Core
         private readonly int topBorder;
 
         /// <summary>
-        /// Initializes the field which is a 2d array of poolables used for collision.
+        /// Initializes the collision field which is a 2d array of poolables used for collision.
         /// </summary>
         /// <param name="game">Required so we know the window dimensions</param>
         /// <param name="width">Field width</param>
@@ -66,8 +66,8 @@ namespace WormGame.Core
         /// Checks wheter a cell on the field is occupied.
         /// </summary>
         /// <param name="target">Entity position</param>
-        /// <returns>Wheter or not position is occupied</returns>
-        public bool Check(Vector2 target)
+        /// <returns>0 if free, 1 if fruit, 2 if occupied</returns>
+        public int Check(Vector2 target)
         {
             return Check(X(target.X), Y(target.Y));
         }
@@ -78,16 +78,23 @@ namespace WormGame.Core
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
-        /// <returns></returns>
-        public bool Check(int x, int y)
+        /// <returns>0 if free, 1 if fruit, 2 if occupied</returns>
+        public int Check(int x, int y)
         {
-            if (x <= -1 ||
+            if (x < 0 ||
+                y < 0 ||
                 x >= width ||
-                y <= -1 ||
-                y >= height ||
-                Get(x, y) != null)
-                return false;
-            return true;
+                y >= height)
+                return 2;
+            Poolable cell = Get(x, y);
+            if (cell is Fruit)
+            {
+                cell.Disable();
+                return 1;
+            }
+            if (cell != null)
+                return 2;
+            return 0;
         }
 
 

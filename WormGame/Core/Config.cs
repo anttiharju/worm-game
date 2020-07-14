@@ -8,7 +8,7 @@ namespace WormGame.Core
     public class Config
     {
 #if DEBUG
-        public bool visualizeCollision = true;
+        public bool visualizeCollision = false;
 #endif
         public readonly bool fullscreen = false;
         public readonly int windowWidth = 1280;
@@ -16,15 +16,16 @@ namespace WormGame.Core
         public readonly int refreshRate = 144;
         public readonly int imageSize = 64; // 52x25+4 results in size of 32 on 1080p so 64 should be large enough to support 4k displays properly
 
+        public readonly WormScene scene;
         public readonly Collision field;
-        public readonly int width = 7;
-        public readonly int height = 7;
+        public readonly int width = 52; // both width and height should fullfill (n % 2) == 0
+        public readonly int height = 24;
         public readonly int margin = 4;
 
         public readonly int maxWormLength = 5;
-        public readonly int wormSpeed = 6; // 12 supports 144hz, 120hz, 60hz, 6 supports those plus 30hz. Doesn't scale with size.
-        public readonly int brickFreq = 4; // bricks update every nth worm update, has to fulfill (n % 2) == 0.
-        public readonly int density = 8;
+        public readonly int wormSpeed = 6; // 6 because 144, 120, 60 and 30 are evenly dividable by it
+        public readonly int brickFreq = 4;
+        public readonly int density = 4;
 
         // Dynamic values
         public readonly int fruitAmount;
@@ -47,6 +48,7 @@ namespace WormGame.Core
             size = CalculateSize(windowWidth, windowHeight);
             step = (float)wormSpeed / refreshRate * size;
             field = new Collision(windowWidth, windowHeight, this);
+            scene = new WormScene(this);
         }
 
 

@@ -1,21 +1,23 @@
 ﻿using Otter.Graphics;
 using Otter.Graphics.Drawables;
+using Otter.Utility.MonoGame;
 using System;
 using WormGame.Core;
 using WormGame.Static;
 
-namespace WormGame.Entity
+namespace WormGame.GameObject
 {
     public class Brick : Poolable
     {
+        private readonly int size;
         private readonly Image[] graphics;
         private readonly Collision field;
-        private readonly int size;
-        private int maxLength;
 
         private int anchorIndex;
+        private int maxLength;
         private Player player;
         private WormScene scene;
+        private Vector2[] positions;
 
 
         public int Count { get; private set; }
@@ -25,10 +27,11 @@ namespace WormGame.Entity
 
         public Brick(Config config)
         {
+            scene = config.scene;
             size = config.size;
             field = config.field;
             maxLength = config.maxWormLength;
-
+            positions = new Vector2[maxLength];
             graphics = new Image[maxLength];
             for (int i = 0; i < maxLength; i++)
             {
@@ -42,37 +45,39 @@ namespace WormGame.Entity
         }
 
 
-        public Brick Spawn(WormScene scene, Worm worm)
+        public Brick Spawn(Worm worm)
         {
             Position = worm.GetTarget(0);
             Count = worm.Length;
             Color = worm.Color;
+            anchorIndex = (int)Count / 2;
             for (int i = 0; i < Count; i++)
             {
-                graphics[i].X = worm.GetTarget(i).X - worm.GetTarget(0).X;
-                graphics[i].Y = worm.GetTarget(i).Y - worm.GetTarget(0).Y;
+                positions[i] = worm.GetTarget(i) - worm.GetTarget(0);
+                graphics[i].X = positions[i].X;
+                graphics[i].Y = positions[i].Y;
                 graphics[i].Visible = true;
             }
             return this;
         }
 
-        internal void Right()
+        public void Right()
         {
         }
 
-        internal void Left()
+        public void Left()
         {
         }
 
-        internal void SoftDrop()
+        public void SoftDrop()
         {
         }
 
-        internal void HardDrop()
+        public void HardDrop()
         {
         }
 
-        internal void Rotate(bool ccw = false)
+        public void Rotate(bool ccw = false)
         {
         }
 

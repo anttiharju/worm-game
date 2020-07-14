@@ -3,7 +3,8 @@ using Otter.Graphics;
 using Otter.Utility.MonoGame;
 using WormGame.Core;
 using WormGame.Static;
-using WormGame.Entity;
+using WormGame.GameObject;
+using Otter.Graphics.Drawables;
 
 namespace WormGame
 {
@@ -33,6 +34,9 @@ namespace WormGame
             this.config = config;
             field = config.field;
 
+            CreateBackground(config.size / 3, Color.Gray);
+            CreateBackground(0, Color.Black);
+
             worms = new Pool<Worm>(this, config, config.brainAmount);
             fruits = new Pool<Fruit>(this, config, 3);
             bricks = new Pool<Brick>(this, config, config.brainAmount);
@@ -42,17 +46,13 @@ namespace WormGame
             if (density > 0)
                 for (int x = 0; x < config.width; x += density)
                     for (int y = 0; y < config.height; y += density)
-                        SpawnWorm(x, y, config.maxWormLength - 4);
-//            SpawnWorm(4, 4, config.maxWormLength - 2);
+                        SpawnWorm(x, y, config.maxWormLength - 2);
 
-            fruits.Enable().Spawn(1, 1, Random.Color());
-            fruits.Enable().Spawn(3, 2, Random.Color());
-            fruits.Enable().Spawn(2, 4, Random.Color());
-
+            fruits.Enable().Spawn(1, 1, Color.Gold);
             Vector2 random = Random.ValidPosition(field, config.width, config.height);
             random.X = field.EntityX(Mathf.FastRound(random.X));
             random.Y = field.EntityY(Mathf.FastRound(random.Y));
-            
+
             SpawnPlayer(config.windowWidth / 2, config.windowHeight / 2, Color.Red);
         }
 
@@ -110,7 +110,7 @@ namespace WormGame
         {
             Brick brick = bricks.Enable();
             if (brick == null) return null;
-            brick.Spawn(this, worm);
+            brick.Spawn(worm);
             return brick;
         }
 
@@ -154,15 +154,29 @@ namespace WormGame
             }
         }
 
+
         public void BrickUpdate()
         {
         }
+
 
         public void WormUpdate()
         {
             foreach (Worm worm in worms)
                 if (worm.Enabled)
                     worm.Move();
+        }
+
+
+        private void CreateBackground(int offset, Color color)
+        {
+            Image backgroundGraphic = Image.CreateRectangle(config.width * config.size + offset, config.height * config.size + offset, color);
+            backgroundGraphic.CenterOrigin();
+            Entity background = new Entity(config.windowWidth / 2, config.windowHeight / 2, backgroundGraphic)
+            {
+                Collidable = false
+            };
+            Add(background);
         }
     }
 }

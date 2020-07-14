@@ -4,7 +4,7 @@ using Otter.Graphics.Drawables;
 using WormGame.Static;
 using WormGame.Core;
 
-namespace WormGame.Entity
+namespace WormGame.GameObject
 {
     /// @author Antti Harju
     /// @version 08.07.2020
