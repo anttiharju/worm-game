@@ -2,7 +2,7 @@
 using Otter.Graphics.Drawables;
 using WormGame.Core;
 
-namespace WormGame.Entity
+namespace WormGame.GameObject
 {
     public class Fruit : Poolable
     {

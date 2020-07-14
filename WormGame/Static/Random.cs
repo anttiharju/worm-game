@@ -54,11 +54,11 @@ namespace WormGame.Static
         {
             int randomX = Range(0, width);
             int randomY = Range(0, height);
-            if (!field.Check(randomX, randomY))
+            if (!(field.Check(randomX, randomY) <= 1 ? true : false))
             {
                 for (int y = randomY; y < height; y++)
                     for (int x = randomX; x < width; x++)
-                        if (field.Check(x, y))
+                        if (field.Check(x, y) <= 1 ? true : false)
                         {
                             randomX = x;
                             randomY = y;
@@ -66,7 +66,7 @@ namespace WormGame.Static
                         }
                 for (int y = randomY; y >= 0; y--)
                     for (int x = randomX; x >= 0; x--)
-                        if (field.Check(x, y))
+                        if (field.Check(x, y) <= 1 ? true : false)
                         {
                             randomX = x;
                             randomY = y;
