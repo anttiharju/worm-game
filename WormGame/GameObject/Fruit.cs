@@ -38,6 +38,7 @@ namespace WormGame.GameObject
 
         public void Respawn()
         {
+            field.Set(null, Position);
             Vector2 random = Random.ValidPosition(field, width, height);
             X = field.EntityX(Mathf.FastRound(random.X));
             Y = field.EntityY(Mathf.FastRound(random.Y));

@@ -236,6 +236,11 @@ namespace WormGame.Core
                         Console.Write("x");
                         continue;
                     }
+                    if (current is Fruit)
+                    {
+                        Console.Write("+");
+                        continue;
+                    }
                 }
             }
         }
