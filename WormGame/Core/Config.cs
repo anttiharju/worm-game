@@ -1,4 +1,6 @@
-﻿using WormGame.Static;
+﻿using System;
+using System.IO;
+using WormGame.Static;
 
 namespace WormGame.Core
 {
@@ -14,7 +16,7 @@ namespace WormGame.Core
         public readonly int windowWidth = 1280;
         public readonly int windowHeight = 720;
         public readonly int refreshRate = 144;
-        public readonly int imageSize = 64; // 52x25+4 results in size of 32 on 1080p so 64 should be large enough to support 4k displays properly
+        public readonly int imageSize = 64; // 52x24+4 results in size of 32 on 1080p so 64 should be large enough to support 4k displays properly
 
         public readonly WormScene scene;
         public readonly Collision field;
@@ -40,6 +42,68 @@ namespace WormGame.Core
         /// </summary>
         public Config()
         {
+#if !DEBUG
+            string path = AppDomain.CurrentDomain.BaseDirectory + "settings.cfg";
+            string[] lines;
+            try
+            {
+                lines = File.ReadAllLines(path);
+            }
+            catch (FileNotFoundException)
+            {
+                goto Skip;
+            }
+
+            foreach (string line in lines)
+            {
+                if (line[0] == '#') continue;
+                int equalIndex = line.IndexOf('=');
+                int endStartIndex = equalIndex + 2;
+                int endIndex = line.IndexOf('#');
+                if (endIndex == -1)
+                    endIndex = line.Length;
+                string name = line.Substring(0, equalIndex).Trim();
+                string value = line.Substring(endStartIndex, endIndex - endStartIndex).Trim();
+                switch (name)
+                {
+                    case "fullscreen":
+                        fullscreen = bool.Parse(value);
+                        break;
+                    case "windowWidth":
+                        windowWidth = int.Parse(value);
+                        break;
+                    case "windowHeight":
+                        windowHeight = int.Parse(value);
+                        break;
+                    case "refreshRate":
+                        refreshRate = int.Parse(value);
+                        break;
+                    case "imageSize":
+                        imageSize = int.Parse(value);
+                        break;
+                    case "width":
+                        width = int.Parse(value);
+                        break;
+                    case "height":
+                        height = int.Parse(value);
+                        break;
+                    case "margin":
+                        margin = int.Parse(value);
+                        break;
+                    case "maxWormLength":
+                        maxWormLength = int.Parse(value);
+                        break;
+                    case "wormSpeed":
+                        wormSpeed = int.Parse(value);
+                        break;
+                    case "brickFreq":
+                        brickFreq = int.Parse(value);
+                        break;
+                }
+            }
+        Skip:
+            // End file reading
+#endif
             if (brickFreq % 2 != 0)
                 brickFreq++;
             fruitAmount = Mathf.FastRound(Mathf.Bigger(width, height)) / 3;
@@ -50,7 +114,6 @@ namespace WormGame.Core
             field = new Collision(windowWidth, windowHeight, this);
             scene = new WormScene(this);
         }
-
 
         /// <summary>
         /// Calculates entity size based on window and collision field dimensions.
