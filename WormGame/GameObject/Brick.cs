@@ -1,7 +1,6 @@
 ﻿using Otter.Graphics;
 using Otter.Graphics.Drawables;
 using Otter.Utility.MonoGame;
-using System.Security.Cryptography.X509Certificates;
 using WormGame.Core;
 using WormGame.Static;
 
@@ -9,18 +8,16 @@ namespace WormGame.GameObject
 {
     public class Brick : Poolable
     {
-        private readonly int size;
-        private readonly Image[] graphics;
         private readonly Collision field;
+        private readonly Vector2[] positions;
+        private readonly Vector2[] next;
+        private readonly Image[] graphics;
+        private readonly int kickLimit = 2;
+        private readonly int maxLength;
+        private readonly int size;
 
         private int anchorIndex;
-        private int maxLength;
         private int kickCounter;
-        private int kickLimit = 2;
-        private WormScene scene;
-        private Vector2[] positions;
-        private Vector2[] next;
-
 
         public int Count { get; private set; }
         public Player Player { get; set; }
@@ -29,7 +26,6 @@ namespace WormGame.GameObject
 
         public Brick(Config config)
         {
-            scene = config.scene;
             size = config.size;
             field = config.field;
             maxLength = config.maxWormLength;

@@ -1,13 +1,11 @@
-﻿using System;
-using System.IO;
-using WormGame.Static;
+﻿using WormGame.Static;
 
 namespace WormGame.Core
 {
     /// <summary>
     /// Configuration.
     /// </summary>
-    /// TODO: There's still some bugs with scaling that might cause stack overflow
+    /// TODO: Fix crashes caused by different refresh rates
     public class Config
     {
 #if DEBUG
@@ -45,13 +43,13 @@ namespace WormGame.Core
         {
             #region File reading
 #if !DEBUG
-            string path = AppDomain.CurrentDomain.BaseDirectory + "settings.cfg";
+            string path = System.AppDomain.CurrentDomain.BaseDirectory + "settings.cfg";
             string[] lines;
             try
             {
-                lines = File.ReadAllLines(path);
+                lines = System.IO.File.ReadAllLines(path);
             }
-            catch (FileNotFoundException)
+            catch (System.IO.FileNotFoundException)
             {
                 goto Skip;
             }
@@ -103,10 +101,10 @@ namespace WormGame.Core
                         break;
                 }
             }
-        Skip:
-            // End file reading
+        Skip: // End file reading
 #endif
             #endregion
+
             if (brickFreq % 2 != 0)
                 brickFreq++;
             fruitAmount = Mathf.FastRound(Mathf.Bigger(width, height)) / 3;
@@ -114,7 +112,7 @@ namespace WormGame.Core
             brainAmount = bodyAmount / maxWormLength;
             size = CalculateSize(windowWidth, windowHeight);
             step = (float)wormSpeed / refreshRate * size;
-            field = new Collision(windowWidth, windowHeight, this);
+            field = new Collision(this);
             scene = new WormScene(this);
         }
 

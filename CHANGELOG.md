@@ -1,3 +1,31 @@
+# 15.07.2020
+- Hello! I've been negleting updating changelog and working on a bunch of boring stuff, here's a little status update:
+    - Configuration can now be loaded from a file (settings.cfg), the file has to be in the same folder as the executable.
+        - The application is riddled with hidden bugs right now, most emerging from different configurations.
+    - Read a book! It's called 14 Habits of Highly Productive Developers and well now I know I really should be testing and measuring more.
+        - Going to add tests everywhere I can and merge to master soon.
+        - Although I'm not even a junior developer yet and I'm trying to improve so perhaps I can be forgiven for my bad habits at this stage.
+    - I've fully switched over to single-entity model, as it's WAY MORE PERFORMANT than the old model.
+        - Spending some time reading the documentation is a really good idea, future me.
+        - I decided to do this so I could simplify the pooling system, but now the project doesn't show my usage of generics as much :(
+            - See <https://github.com/anvemaha/worm-bricks/tree/6e8e8e0794b29cb76de68f59b70f1b3c006bb2ae/WormGame/Pooling>
+    - I checked out Otter2ds' discord server and I don't seem to be the only one having a GPU usage issue lol.
+        - Apparently Otter is using whatever the OS gives it.
+        - Otter (SFML?) might have memory leaks? Apparently shutting down the application by pressing escape skips some important deconstructors.
+            - Haven't noticed it myself.
+    - Soon I'm going to have to abandon this project to move on to my next summer project (Java + SQLite personal budgeting program)
+        - There's still some features I want to finish, but whatever happens I'll start the new project this month.
+            - Complete bricks (really messy)
+            - Separate Player.cs to Ghost.cs and Player.cs
+            - Make the game "playable" with multiple controls
+                - Playable in quotes because it's not even close to a game I'd release.
+            - Look into some basic texture pack system.
+            - Iron out any know issues (excluding GPU usage because that's beyond what I have the skills for)
+            - Leave the project in an maintainable state (add missing documentation, improve current documentation and add tests)
+                - Also maybe do some doodles about how different class are interlinked so I have a better mental model and perhaps could spot some issues.
+    - Controls.cs is dead again. It wasn't flexible enough and the current dumb system is good enough.
+
+
 # 08.07.2020
 - Been working on making worms move smooth, which led to me accidentally improving collision and pooling and overall code structure.
     - Big commits (bad) but once I hammer the last bugs with worms we have a really solid foundation to build on.

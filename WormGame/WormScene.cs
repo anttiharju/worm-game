@@ -54,7 +54,7 @@ namespace WormGame
                 int randomX = Mathf.FastRound(random.X);
                 int randomY = Mathf.FastRound(random.Y);
                 Fruit fruit = fruits.Enable();
-                fruit.Spawn(randomX, randomY, Random.Color());
+                fruit.Spawn(randomX, randomY, Random.Color);
             }
 
             SpawnPlayer(config.windowWidth / 2, config.windowHeight / 2, Color.Red);
@@ -98,7 +98,7 @@ namespace WormGame
         public Worm SpawnWorm(int x, int y, int length = 0, Color color = null)
         {
             if (length == 0) length = config.maxWormLength;
-            if (color == null) color = Random.Color();
+            if (color == null) color = Random.Color;
             Worm worm = worms.Enable();
             if (worm == null) return null;
             worm.Spawn(x, y, length, color);
