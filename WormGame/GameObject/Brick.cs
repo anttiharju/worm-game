@@ -1,7 +1,9 @@
 ﻿using Otter.Graphics;
 using Otter.Graphics.Drawables;
 using Otter.Utility.MonoGame;
+using System.Security.Cryptography.X509Certificates;
 using WormGame.Core;
+using WormGame.Static;
 
 namespace WormGame.GameObject
 {
@@ -13,8 +15,11 @@ namespace WormGame.GameObject
 
         private int anchorIndex;
         private int maxLength;
+        private int kickCounter;
+        private int kickLimit = 2;
         private WormScene scene;
         private Vector2[] positions;
+        private Vector2[] next;
 
 
         public int Count { get; private set; }
@@ -30,6 +35,7 @@ namespace WormGame.GameObject
             maxLength = config.maxWormLength;
             positions = new Vector2[maxLength];
             graphics = new Image[maxLength];
+            next = new Vector2[maxLength];
             for (int i = 0; i < maxLength; i++)
             {
                 Image tmp = Image.CreateRectangle(config.imageSize);
@@ -48,8 +54,10 @@ namespace WormGame.GameObject
             Count = worm.Length;
             Color = worm.Color;
             anchorIndex = (int)Count / 2;
+            kickCounter = 0;
             for (int i = 0; i < Count; i++)
             {
+                field.Set(this, worm.GetTarget(i));
                 positions[i] = worm.GetTarget(i) - worm.GetTarget(0);
                 graphics[i].X = positions[i].X;
                 graphics[i].Y = positions[i].Y;
@@ -58,87 +66,15 @@ namespace WormGame.GameObject
             return this;
         }
 
-        public void Right()
-        {
-        }
-
-        public void Left()
-        {
-        }
-
-        public void SoftDrop()
-        {
-        }
-
-        public void HardDrop()
-        {
-        }
-
-        public void Rotate(bool ccw = false)
-        {
-        }
-
-        /*
-        public void Rotate(bool clockwise = false)
-        {
-            SetNull();
-            BrickEntity anchor = graphics[anchorIndex];
-            for (int i = 0; i < Count; i++)
-            {
-                next[i] = graphics[i].Position; // When moving horizontally rotation fucks up sometimes without this line 
-                if (i == anchorIndex) i++;
-                Vector2 rotationVector = graphics[i].Position - anchor.Position;
-                rotationVector = clockwise ? Mathf.RotateCW(rotationVector) : Mathf.RotateCCW(rotationVector);
-                next[i] = anchor.Position + rotationVector;
-            }
-            for (int i = 0; i < Count; i++)
-                if (!field.Check(next[i]))
-                {
-                    Reset();
-                    return;
-                }
-            Set();
-        }
-
-
-        private void SetNull()
-        {
-            for (int j = 0; j < Count; j++)
-                field.Set(null, graphics[j].Position);
-        }
-
-
-        private void Reset()
-        {
-            for (int i = 0; i < Count; i++)
-                field.Set(graphics[i]);
-        }
-
-
-        private void Set()
-        {
-            for (int i = 0; i < Count; i++)
-            {
-                graphics[i].Position = next[i];
-                field.Set(graphics[i]);
-            }
-        }
-
-
-        public void Left()
-        {
-            Right(-1);
-        }
-
-
         public void Right(int amount = 1)
         {
             SetNull();
             for (int i = 0; i < Count; i++)
             {
-                next[i] = graphics[i].Position;
+                next[i].X = graphics[i].X;
+                next[i].Y = graphics[i].Y;
                 next[i].X += size * amount;
-                if (!field.Check(next[i]))
+                if (field.Check(next[i] + Position) == 2)
                 {
                     Reset(); return;
                 }
@@ -146,6 +82,36 @@ namespace WormGame.GameObject
             Set();
         }
 
+        public void Left()
+        {
+            Right(-1);
+        }
+
+        public void SoftDrop()
+        {
+            SetNull();
+            for (int i = 0; i < Count; i++)
+            {
+                next[i].X = graphics[i].X;
+                next[i].Y = graphics[i].Y;
+                next[i].Y += size;
+                if (field.Check(next[i] + Position) == 2)
+                {
+                    if (Player != null)
+                    {
+                        kickCounter++;
+                        if (kickCounter >= kickLimit)
+                        {
+                            Player.LeaveBrick();
+                        }
+                    }
+                    Reset();
+                    return;
+                }
+            }
+            kickCounter = 0;
+            Set();
+        }
 
         public void HardDrop()
         {
@@ -153,12 +119,12 @@ namespace WormGame.GameObject
             int dropAmount = HardDropAmount();
             for (int i = 0; i < Count; i++)
             {
-                next[i] = graphics[i].Position;
+                next[i].X = graphics[i].X;
+                next[i].Y = graphics[i].Y;
                 next[i].Y += size * dropAmount;
             }
             Set();
         }
-
 
         public int HardDropAmount()
         {
@@ -167,70 +133,87 @@ namespace WormGame.GameObject
             int startY = Lowest() - 1;
             for (int x = startX; x <= endX; x++)
                 for (int y = startY; y >= 0; y--)
-                    if (!field.Check(x, y))
+                    if (field.Check(x, y) == 2)
                         return startY - y;
             return startY + 1;
         }
 
-
-        public void Fall()
+        public void Rotate(bool clockwise = false)
         {
             SetNull();
+            next[anchorIndex].X = graphics[anchorIndex].X;
+            next[anchorIndex].Y = graphics[anchorIndex].Y;
             for (int i = 0; i < Count; i++)
             {
-                next[i] = graphics[i].Position;
-                next[i].Y += size;
-                if (!field.Check(next[i]))
+                if (i == anchorIndex) i++;
+                next[i].X = graphics[i].X;
+                next[i].Y = graphics[i].Y;
+                Vector2 rotationVector = next[i] - next[anchorIndex];
+                rotationVector = clockwise ? Mathf.RotateCW(rotationVector) : Mathf.RotateCCW(rotationVector);
+                next[i] = next[anchorIndex] + rotationVector;
+            }
+            for (int i = 0; i < Count; i++)
+                if (field.Check(Position + next[i]) == 2)
                 {
                     Reset();
-                    kickCounter++;
-                    if (kickCounter >= kickBuffer)
-                    {
-
-                    }
                     return;
                 }
-            }
             Set();
         }
 
-
-        public override void Disable()
+        private void SetNull()
         {
             for (int i = 0; i < Count; i++)
-            {
-                field.Set(null, graphics[i].Position);
-                graphics[i].Enabled = false;
-                graphics[i].Parent = null;
-            }
+                field.Set(null, X + graphics[i].X, Y + graphics[i].Y);
         }
 
 
+        private void Reset()
+        {
+            for (int i = 0; i < Count; i++)
+                field.Set(this, X + graphics[i].X, Y + graphics[i].Y);
+        }
+
+
+        private void Set()
+        {
+            graphics[0].X = 0;
+            graphics[0].Y = 0;
+            Position += next[0];
+            field.Set(this, Position);
+            for (int i = 1; i < Count; i++)
+            {
+                field.Set(this, Position + next[i] - next[0]);
+                graphics[i].X = next[i].X - next[0].X;
+                graphics[i].Y = next[i].Y - next[0].Y;
+            }
+        }
+
         private int Leftmost()
         {
-            float smallest = float.MaxValue;
+            float leftmost = float.MaxValue;
             for (int i = 0; i < Count; i++)
-                smallest = Mathf.Smaller(graphics[i].X, smallest);
-            return field.X(smallest);
+                leftmost = Mathf.Smaller(graphics[i].X, leftmost);
+            return field.X(X + leftmost);
         }
 
 
         private int Rightmost()
         {
-            float biggest = 0;
+            float rightmost = float.MinValue;
             for (int i = 0; i < Count; i++)
-                biggest = Mathf.Bigger(graphics[i].X, biggest);
-            return field.X(biggest);
+                rightmost = Mathf.Bigger(graphics[i].X, rightmost);
+            return field.X(X + rightmost);
         }
 
 
         private int Lowest()
         {
-            float biggest = 0;
+            float lowest = float.MinValue;
             for (int i = 0; i < Count; i++)
-                biggest = Mathf.Bigger(graphics[i].Y, biggest);
-            return field.Y(biggest);
-        }*/
+                lowest = Mathf.Bigger(graphics[i].Y, lowest);
+            return field.Y(Y + lowest);
+        }
 
 
         public void SetColor(Color color)
