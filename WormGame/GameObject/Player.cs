@@ -75,6 +75,17 @@ namespace WormGame.GameObject
             }
         }
 
+        public void LeaveBrick()
+        {
+            if (brick != null)
+            {
+                brick.Color = oldColor;
+                Position = brick.Position;
+                brick.Player = null;
+                brick = null;
+                Graphic.Visible = true;
+            }
+        }
 
         /// <summary>
         /// Kills the posessed worm
