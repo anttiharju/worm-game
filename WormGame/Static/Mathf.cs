@@ -53,9 +53,9 @@ namespace WormGame.Static
 
 
         /// <summary>
-        /// Lightweight version of Math.Round() for converting floats to ints accurately. Doesn't work for negative floats.
+        /// Lightweight version of Math.Round() for converting whole number floats to ints accurately.
         /// </summary>
-        /// <param name="number">float</param>
+        /// <param name="number">float > 0</param>
         /// <returns>int</returns>
         /// <example>
         /// <pre name="test">
@@ -67,7 +67,7 @@ namespace WormGame.Static
         {
 #if DEBUG
             if (number < 0)
-                throw new Exception("FastRound() is not valid for negative floats.");
+                throw new Exception("FastRound() is not valid for floats <= 0.");
 #endif
             int integer = (int)number;
             if (number < integer + 0.5f) return integer;
