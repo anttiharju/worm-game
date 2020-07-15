@@ -12,7 +12,34 @@ namespace WormGame.Static
     public static class Random
     {
         private static readonly System.Random randomGenerator = new System.Random();
-        private static readonly Color[] colors = { Otter.Graphics.Color.Blue, Otter.Graphics.Color.Cyan, Otter.Graphics.Color.Green, Otter.Graphics.Color.Magenta, Otter.Graphics.Color.Orange, Otter.Graphics.Color.Yellow };
+        private static readonly Color[] colors = { Color.Blue, Color.Cyan, Color.Green, Color.Magenta, Color.Orange, Color.Yellow };
+
+
+        /// <summary>
+        /// Returns a random Color from a predetermined array.
+        /// </summary>
+        /// <returns>Random color</returns>
+        public static Color Color
+        {
+            get
+            {
+                return colors[Range(0, colors.Length)];
+            }
+        }
+
+
+        /// <summary>
+        /// Returns a random direction.
+        /// </summary>
+        /// <returns>Random color</returns>
+        public static Vector2 Direction
+        {
+            get
+            {
+                return Help.directions[Range(0, Help.directions.Length)];
+            }
+        }
+
 
         /// <summary>
         /// Returns a random number between a and b, b exclusive.
@@ -23,26 +50,6 @@ namespace WormGame.Static
         public static int Range(int min, int max)
         {
             return randomGenerator.Next(min, max);
-        }
-
-
-        /// <summary>
-        /// Returns a random Color from a predetermined array.
-        /// </summary>
-        /// <returns>Random color</returns>
-        public static Color Color()
-        {
-            return colors[Range(0, colors.Length)];
-        }
-
-
-        /// <summary>
-        /// Returns a random direction.
-        /// </summary>
-        /// <returns>Random color</returns>
-        public static Vector2 Direction()
-        {
-            return Help.directions[Range(0, Help.directions.Length)];
         }
 
 

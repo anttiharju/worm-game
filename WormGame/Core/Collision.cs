@@ -13,13 +13,13 @@ namespace WormGame.Core
     /// </summary>
     public class Collision
     {
-        private readonly int width;
-        private readonly int height;
-        private readonly int size;
-
+        private readonly WormScene scene;
         private readonly Poolable[,] field;
         private readonly int leftBorder;
         private readonly int topBorder;
+        private readonly int width;
+        private readonly int height;
+        private readonly int size;
 
         /// <summary>
         /// Initializes the collision field which is a 2d array of poolables used for collision.
@@ -28,14 +28,15 @@ namespace WormGame.Core
         /// <param name="width">Field width</param>
         /// <param name="height">Field height</param>
         /// <param name="margin">Field margin</param>
-        public Collision(int windowWidth, int windowHeight, Config config)
+        public Collision(Config config)
         {
+            scene = config.scene;
             width = config.width;
             height = config.height;
             size = config.size;
             field = new Poolable[width, height];
-            leftBorder = windowWidth / 2 - width / 2 * size + size / 2;
-            topBorder = windowHeight / 2 + height / 2 * size - size / 2;
+            leftBorder = config.windowWidth / 2 - width / 2 * size + size / 2;
+            topBorder = config.windowHeight / 2 + height / 2 * size - size / 2;
         }
 
 
