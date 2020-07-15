@@ -49,6 +49,10 @@ namespace WormGame.Core
             return ref Get(X(target.X), Y(target.Y));
         }
 
+        public ref Poolable Get(float x, float y)
+        {
+            return ref Get(X(x), Y(y));
+        }
 
         /// <summary>
         /// Get a cells value from the field.
@@ -100,20 +104,6 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Occupy a cell from the field.
-        /// </summary>
-        /// <param name="entity">Entity</param>
-        public void Set(Poolable entity)
-        {
-#if DEBUG
-            if (entity is Worm)
-                throw new Exception("Set(entity) is not valid for Worms. Use Set(entity, x, y) instead.");
-#endif
-            Get(entity.Position) = entity;
-        }
-
-
-        /// <summary>
         /// Occupy a cell from the field for an entity.
         /// </summary>
         /// <param name="wormEntity">Worm</param>
@@ -123,6 +113,15 @@ namespace WormGame.Core
             Get(target) = entity;
         }
 
+        /// <summary>
+        /// Occupy a cell from the field for an entity.
+        /// </summary>
+        /// <param name="wormEntity">Worm</param>
+        /// <param name="target">Worm target</param>
+        public void Set(Poolable entity, float x, float y)
+        {
+            Get(x, y) = entity;
+        }
 
         /// <summary>
         /// Occupy a cell from the field for an entity.
@@ -136,7 +135,7 @@ namespace WormGame.Core
         }
 
         /// <summary>
-        /// Translates a horizontal entity position to a field one.
+        /// Get horizontal field position from an entity one.
         /// </summary>
         /// <param name="x">Horizontal entity position</param>
         /// <returns>Horizontal field position</returns>
@@ -147,7 +146,7 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Translates a vertical entity position to a field one.
+        /// Get vertical field position from an entity one.
         /// </summary>
         /// <param name="y">Vertical entity position</param>
         /// <returns>Vertical field position</returns>
@@ -158,7 +157,7 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Translates a horizontal field position to an entity one.
+        /// Get horizontal entity position from a field one.
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <returns>Horizontal entity position</returns>
@@ -169,7 +168,7 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Translates a vertical field position to an entity one.
+        /// Get vertical entity position from a field one.
         /// </summary>
         /// <param name="y">Vertical field position</param>
         /// <returns>Vertical entity position</returns>
@@ -197,7 +196,7 @@ namespace WormGame.Core
 
 #if DEBUG
         /// <summary>
-        /// Visualises the collision field as ASCII art. Used for debugging and looks cool as shit. Large fields cause lag (low tens by low tens are fine). 
+        /// Visualises collision field in console as text.
         /// </summary>
         public void Visualize(Config config)
         {

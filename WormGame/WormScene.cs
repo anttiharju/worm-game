@@ -161,6 +161,9 @@ namespace WormGame
 
         public void BrickUpdate()
         {
+            foreach (Brick brick in bricks)
+                if (brick.Enabled)
+                    brick.SoftDrop();
         }
 
 

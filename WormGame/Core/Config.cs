@@ -7,10 +7,11 @@ namespace WormGame.Core
     /// <summary>
     /// Configuration.
     /// </summary>
+    /// TODO: There's still some bugs with scaling that might cause stack overflow
     public class Config
     {
 #if DEBUG
-        public bool visualizeCollision = false;
+        public bool visualizeCollision = true;
 #endif
         public readonly bool fullscreen = false;
         public readonly int windowWidth = 1280;
@@ -20,8 +21,8 @@ namespace WormGame.Core
 
         public readonly WormScene scene;
         public readonly Collision field;
-        public readonly int width = 52; // both width and height should fullfill (n % 2) == 0
-        public readonly int height = 24;
+        public readonly int width = 14; // both width and height should fullfill (n % 2) == 0
+        public readonly int height = 14;
         public readonly int margin = 4;
 
         public readonly int maxWormLength = 5;
@@ -42,6 +43,7 @@ namespace WormGame.Core
         /// </summary>
         public Config()
         {
+            #region File reading
 #if !DEBUG
             string path = AppDomain.CurrentDomain.BaseDirectory + "settings.cfg";
             string[] lines;
@@ -104,6 +106,7 @@ namespace WormGame.Core
         Skip:
             // End file reading
 #endif
+            #endregion
             if (brickFreq % 2 != 0)
                 brickFreq++;
             fruitAmount = Mathf.FastRound(Mathf.Bigger(width, height)) / 3;
