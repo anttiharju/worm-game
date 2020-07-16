@@ -1,19 +1,19 @@
 ﻿using Otter.Core;
 using Otter.Graphics;
 
-namespace WormGame.Core
+namespace WormGame.Pooling
 {
     /// @author Antti Harju
     /// @version 13.07.2020
     /// <summary>
     /// Class for poolable entities.
     /// </summary>
-    public class Poolable : Entity
+    public class PoolableEntity : Entity, IPoolable
     {
         /// <summary>
         /// Disables Otter2D collision checks.
         /// </summary>
-        public Poolable()
+        public PoolableEntity()
         {
             Collidable = false;
         }

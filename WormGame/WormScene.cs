@@ -4,6 +4,7 @@ using Otter.Utility.MonoGame;
 using Otter.Graphics.Drawables;
 using WormGame.Core;
 using WormGame.Static;
+using WormGame.Pooling;
 using WormGame.GameObject;
 
 namespace WormGame
@@ -37,9 +38,12 @@ namespace WormGame
             CreateBackground(config.size / 3, Color.Gray);
             CreateBackground(0, Color.Black);
 
-            worms = new Pool<Worm>(this, config, config.brainAmount);
-            fruits = new Pool<Fruit>(this, config, 3);
-            bricks = new Pool<Brick>(this, config, config.brainAmount);
+            worms = new Pool<Worm>(config, config.brainAmount);
+            fruits = new Pool<Fruit>(config, 3);
+            bricks = new Pool<Brick>(config, config.brainAmount);
+            AddMultiple(worms.Objects);
+            AddMultiple(fruits.Objects);
+            AddMultiple(bricks.Objects);
 
             // Entity setup
             int density = config.density;

@@ -3,10 +3,11 @@ using Otter.Graphics.Drawables;
 using Otter.Utility.MonoGame;
 using WormGame.Core;
 using WormGame.Static;
+using WormGame.Pooling;
 
 namespace WormGame.GameObject
 {
-    public class Brick : Poolable
+    public class Brick : PoolableEntity
     {
         private readonly Collision field;
         private readonly Vector2[] positions;

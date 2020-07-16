@@ -2,6 +2,7 @@
 using System.Text;
 using Otter.Utility.MonoGame;
 using WormGame.Static;
+using WormGame.Pooling;
 using WormGame.GameObject;
 
 namespace WormGame.Core
@@ -14,7 +15,7 @@ namespace WormGame.Core
     public class Collision
     {
         private readonly WormScene scene;
-        private readonly Poolable[,] field;
+        private readonly PoolableEntity[,] field;
         private readonly int leftBorder;
         private readonly int topBorder;
         private readonly int width;
@@ -34,7 +35,7 @@ namespace WormGame.Core
             width = config.width;
             height = config.height;
             size = config.size;
-            field = new Poolable[width, height];
+            field = new PoolableEntity[width, height];
             leftBorder = config.windowWidth / 2 - width / 2 * size + size / 2;
             topBorder = config.windowHeight / 2 + height / 2 * size - size / 2;
         }
@@ -45,12 +46,12 @@ namespace WormGame.Core
         /// </summary>
         /// <param name="target">Entity target position</param>
         /// <returns>Field value</returns>
-        public ref Poolable Get(Vector2 target)
+        public ref PoolableEntity Get(Vector2 target)
         {
             return ref Get(X(target.X), Y(target.Y));
         }
 
-        public ref Poolable Get(float x, float y)
+        public ref PoolableEntity Get(float x, float y)
         {
             return ref Get(X(x), Y(y));
         }
@@ -61,7 +62,7 @@ namespace WormGame.Core
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
         /// <returns>Field value</returns>
-        private ref Poolable Get(int x, int y)
+        private ref PoolableEntity Get(int x, int y)
         {
             return ref field[x, y];
         }
@@ -91,7 +92,7 @@ namespace WormGame.Core
                 x >= width ||
                 y >= height)
                 return 2;
-            Poolable cell = Get(x, y);
+            PoolableEntity cell = Get(x, y);
             if (cell is Fruit fruit)
             {
                 if (eatFruit)
@@ -109,7 +110,7 @@ namespace WormGame.Core
         /// </summary>
         /// <param name="wormEntity">Worm</param>
         /// <param name="target">Worm target</param>
-        public void Set(Poolable entity, Vector2 target)
+        public void Set(PoolableEntity entity, Vector2 target)
         {
             Get(target) = entity;
         }
@@ -119,7 +120,7 @@ namespace WormGame.Core
         /// </summary>
         /// <param name="wormEntity">Worm</param>
         /// <param name="target">Worm target</param>
-        public void Set(Poolable entity, float x, float y)
+        public void Set(PoolableEntity entity, float x, float y)
         {
             Get(x, y) = entity;
         }
@@ -130,7 +131,7 @@ namespace WormGame.Core
         /// <param name="wormEntity">Worm</param>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
-        public void Set(Poolable entity, int x, int y)
+        public void Set(PoolableEntity entity, int x, int y)
         {
             Get(x, y) = entity;
         }
@@ -142,7 +143,7 @@ namespace WormGame.Core
         /// <returns>Horizontal field position</returns>
         public int X(float x)
         {
-            return ((Mathf.FastRound(x) - leftBorder) / size);
+            return (Mathf.FastRound(x) - leftBorder) / size;
         }
 
 
@@ -220,7 +221,7 @@ namespace WormGame.Core
                         Console.WriteLine(message.ToString());
                         return;
                     }
-                    Poolable current = field[x, y];
+                    PoolableEntity current = field[x, y];
                     if (current == null)
                     {
                         Console.Write(".");

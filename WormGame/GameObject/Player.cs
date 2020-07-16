@@ -1,8 +1,8 @@
 ﻿using Otter.Core;
 using Otter.Graphics;
 using Otter.Graphics.Drawables;
-using WormGame.Core;
 using WormGame.Static;
+using WormGame.Pooling;
 
 namespace WormGame.GameObject
 {
@@ -11,7 +11,7 @@ namespace WormGame.GameObject
     /// <summary>
     /// Player class (Ghost class). Work in progress.
     /// </summary>
-    public class Player : Poolable
+    public class Player : PoolableEntity
     {
         private readonly WormScene wormScene;
         private readonly Color playerColor;

@@ -1,3 +1,12 @@
+# 16.07.2020
+- Fix fruit spawning
+    - Fruits were spawning on top each other, fixed that and now we don't get "ghost fruits" anymore.
+- New idea; the point of the project is to show that I can program; (:D) maxWormLength is no fun, I'm sad I removed the extra-generic pooling system.
+    - Bring back the extra generic pooling system.
+    - Do a new class, that is for the *worm graphic*, it's not actual entity so it shouldn't put too much load on Otter, but it should allow for insanely long worms. 
+        - I'm going to do this lmao.
+
+
 # 15.07.2020
 - Hello! I've been negleting updating changelog and working on a bunch of boring stuff, here's a little status update:
     - Configuration can now be loaded from a file (settings.cfg), the file has to be in the same folder as the executable.
