@@ -54,7 +54,7 @@ namespace WormGame
                 int randomX = Mathf.FastRound(random.X);
                 int randomY = Mathf.FastRound(random.Y);
                 Fruit fruit = fruits.Enable();
-                fruit.Spawn(randomX, randomY, Random.Color);
+                fruit.Spawn();
             }
 
             SpawnPlayer(config.windowWidth / 2, config.windowHeight / 2, Color.Red);
