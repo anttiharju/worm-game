@@ -109,7 +109,7 @@ namespace WormGame.GameObject
             bool retry = false;
         Retry:
             target = targets[0] + direction * size;
-            int check = field.Check(target);
+            int check = field.Check(target, true);
             if (check != 2)
             {
                 if (check == 1)
