@@ -53,19 +53,16 @@ namespace WormGame.Static
         }
 
 
-        /// <summary>
-        /// Returns a random direction.
-        /// </summary>
-        /// <returns>Random color</returns>
-        public static Vector2 ValidPosition(Collision field, int width, int height)
+
+        public static Vector2 ValidPosition(Collision field, int width, int height, int validity = 2)
         {
             int randomX = Range(0, width);
             int randomY = Range(0, height);
-            if (!(field.Check(randomX, randomY) <= 1 ? true : false))
+            if (field.Check(randomX, randomY) != validity)
             {
                 for (int y = randomY; y < height; y++)
                     for (int x = randomX; x < width; x++)
-                        if (field.Check(x, y) <= 1 ? true : false)
+                        if (field.Check(x, y) == 0)
                         {
                             randomX = x;
                             randomY = y;
@@ -73,7 +70,7 @@ namespace WormGame.Static
                         }
                 for (int y = randomY; y >= 0; y--)
                     for (int x = randomX; x >= 0; x--)
-                        if (field.Check(x, y) <= 1 ? true : false)
+                        if (field.Check(x, y) == 0)
                         {
                             randomX = x;
                             randomY = y;
@@ -81,7 +78,7 @@ namespace WormGame.Static
                         }
             }
         End:
-            return new Vector2(randomX, randomY);
+            return new Vector2(field.EntityX(randomX), field.EntityY(randomY));
         }
 
 

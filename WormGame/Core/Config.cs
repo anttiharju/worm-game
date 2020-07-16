@@ -19,14 +19,14 @@ namespace WormGame.Core
 
         public readonly WormScene scene;
         public readonly Collision field;
-        public readonly int width = 14; // both width and height should fullfill (n % 2) == 0
-        public readonly int height = 14;
+        public readonly int width = 18; // both width and height should fullfill (n % 2) == 0
+        public readonly int height = 2;
         public readonly int margin = 4;
 
         public readonly int maxWormLength = 5;
         public readonly int wormSpeed = 6; // 6 because 144, 120, 60 and 30 are evenly dividable by it
         public readonly int brickFreq = 4;
-        public readonly int density = 8;
+        public readonly int density = 20;
 
         // Dynamic values
         public readonly int fruitAmount;

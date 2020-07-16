@@ -26,23 +26,13 @@ namespace WormGame.GameObject
             AddGraphic(image2);
         }
 
-
-        public Fruit Spawn(int x, int y, Color color)
+        public Fruit Spawn()
         {
-            X = field.EntityX(x);
-            Y = field.EntityY(y);
+            Vector2 random = Random.ValidPosition(field, width, height, 0);
+            X = random.X;
+            Y = random.Y;
             field.Set(this, Position);
             return this;
-        }
-
-
-        public void Respawn()
-        {
-            field.Set(null, Position);
-            Vector2 random = Random.ValidPosition(field, width, height);
-            X = field.EntityX(Mathf.FastRound(random.X));
-            Y = field.EntityY(Mathf.FastRound(random.Y));
-            field.Set(this, Position);
         }
     }
 }
