@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections;
+using WormGame.Core;
 
-namespace WormGame.Core
+namespace WormGame.Pooling
 {
     /// @author Antti Harju
     /// @version 13.07.2020
@@ -10,7 +11,7 @@ namespace WormGame.Core
     /// </summary>
     /// <typeparam name="T">Poolable entity type</typeparam>
     /// TODO: Write tests
-    public class Pool<T> : IEnumerable where T : Poolable
+    public class Pool<T> : IEnumerable where T : class, IPoolable
     {
         private readonly T[] pool;
         private readonly int lastIndex;
@@ -24,11 +25,17 @@ namespace WormGame.Core
 
 
         /// <summary>
+        /// Returns pooled objects.
+        /// </summary>
+        public T[] Objects { get { return pool; } }
+
+
+        /// <summary>
         /// Initializes the object pool. If you're pooling Poolables (not BasicPoolables) they have to be manually added to the scene with GetPool().
         /// </summary>
         /// <param name="config">Configuration object</param>
         /// <param name="capacity">Pool size</param>
-        public Pool(WormScene scene, Config config, int capacity)
+        public Pool(Config config, int capacity)
         {
             lastIndex = capacity - 1;
             pool = new T[capacity];
@@ -38,7 +45,6 @@ namespace WormGame.Core
                 tmp.Enabled = false;
                 pool[i] = tmp;
             }
-            scene.AddMultiple(pool);
         }
 
 
