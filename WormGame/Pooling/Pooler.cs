@@ -10,40 +10,38 @@ namespace WormGame.Pooling
     /// Entity pooler.
     /// </summary>
     /// <typeparam name="T">Poolable entity type</typeparam>
-    /// TODO: Write tests
-    public class Pool<T> : IEnumerable where T : class, IPoolable
+    public class Pooler<T> : IEnumerable where T : class, IPoolable
     {
-        private readonly T[] pool;
-        private readonly int lastIndex;
+        private readonly int endIndex;
         private int enablingIndex = 0;
 
 
         /// <summary>
-        /// Returns pool max capacity.
+        /// Returns the pool.
         /// </summary>
-        public int Count { get { return pool.Length; } }
+        public T[] Pool { get; }
 
 
         /// <summary>
-        /// Returns pooled objects.
+        /// Returns pools capacity.
         /// </summary>
-        public T[] Objects { get { return pool; } }
+        public int Count { get { return Pool.Length; } }
 
 
         /// <summary>
-        /// Initializes the object pool. If you're pooling Poolables (not BasicPoolables) they have to be manually added to the scene with GetPool().
+        /// Initializes the object pool. If you're pooling PoolableEntities they have to be manually added to the scene through Pool property.
         /// </summary>
         /// <param name="config">Configuration object</param>
         /// <param name="capacity">Pool size</param>
-        public Pool(Config config, int capacity)
+        public Pooler(Config config, int capacity)
         {
-            lastIndex = capacity - 1;
-            pool = new T[capacity];
+            endIndex = capacity - 1;
+            Pool = new T[capacity];
             for (int i = 0; i < capacity; i++)
             {
                 T tmp = (T)Activator.CreateInstance(typeof(T), new object[] { config });
                 tmp.Enabled = false;
-                pool[i] = tmp;
+                Pool[i] = tmp;
             }
         }
 
@@ -54,10 +52,10 @@ namespace WormGame.Pooling
         /// <returns>Enabled entity</returns>
         public T Enable()
         {
-            if (enablingIndex == lastIndex && pool[enablingIndex].Enabled)
+            if (enablingIndex == endIndex && Pool[enablingIndex].Enabled)
             {
                 Defrag(); // Moves enablingIndex
-                if (enablingIndex == lastIndex)
+                if (enablingIndex == endIndex)
                 {
 #if DEBUG
                     Console.WriteLine("[EMPTY] " + this);
@@ -66,10 +64,10 @@ namespace WormGame.Pooling
                 }
             }
             int current = enablingIndex;
-            pool[current].Enabled = true;
-            if (enablingIndex != lastIndex)
+            Pool[current].Enabled = true;
+            if (enablingIndex != endIndex)
                 enablingIndex++;
-            return pool[current];
+            return Pool[current];
         }
 
 
@@ -81,17 +79,17 @@ namespace WormGame.Pooling
             int i = 0;
             while (i < enablingIndex)
             {
-                if (pool[i].Enabled)
+                if (Pool[i].Enabled)
                     i++;
                 else
                 {
                     for (int j = enablingIndex; j > i; j--)
                     {
-                        if (pool[j].Enabled)
+                        if (Pool[j].Enabled)
                         {
-                            T tmp = pool[j];
-                            pool[j] = pool[i];
-                            pool[i] = tmp;
+                            T tmp = Pool[j];
+                            Pool[j] = Pool[i];
+                            Pool[i] = tmp;
                             i++;
                             break;
                         }
@@ -111,7 +109,7 @@ namespace WormGame.Pooling
         /// <returns>Pool enumerator</returns>
         public IEnumerator GetEnumerator()
         {
-            return pool.GetEnumerator();
+            return Pool.GetEnumerator();
         }
     }
 }

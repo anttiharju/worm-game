@@ -10,7 +10,6 @@ namespace WormGame.GameObject
     public class Worm : PoolableEntity
     {
         private readonly Collision field;
-        private readonly Image[] graphics;
         private readonly int size;
         private readonly float step;
 
@@ -19,13 +18,13 @@ namespace WormGame.GameObject
         private bool moving;
         private Vector2 target;
         private Vector2 direction;
-        private Vector2[] targets;
-        private Vector2[] directions;
+        private WormBody firstBody;
+        private Pooler<WormBody> wormBodies;
 
         public Player Player { get; set; }
         public int Length { get; private set; }
-        public override Color Color { get { return graphics[0].Color ?? null; } set { SetColor(value); } }
-        public Vector2 Direction { get { return directions[0]; } set { if (Help.ValidateDirection(field, targets[0], size, value)) direction = value; } }
+        public override Color Color { get { return firstBody.GetGraphic().Color ?? null; } set { SetColor(value); } }
+        public Vector2 Direction { get { return firstBody.GetDirection(); } set { if (Help.ValidateDirection(field, firstBody.GetTarget(), size, value)) direction = value; } }
 
 
         public Worm(Config config) : base()
@@ -33,36 +32,33 @@ namespace WormGame.GameObject
             size = config.size;
             step = config.step;
             field = config.field;
-
-            int maxLength = config.maxWormLength;
-            graphics = new Image[maxLength];
-            targets = new Vector2[maxLength];
-            directions = new Vector2[maxLength];
-
-            for (int i = 0; i < maxLength; i++)
-            {
-                Image tmp = Image.CreateCircle(config.imageSize / 2);
-                tmp.Scale = (float)config.size / config.imageSize;
-                tmp.Visible = false;
-                tmp.CenterOrigin();
-                graphics[i] = tmp;
-                AddGraphic(tmp);
-            }
         }
 
-        public Worm Spawn(int x, int y, int length, Color color)
+        public Worm Spawn(Pooler<WormBody> wormBodies, int x, int y, int length, Color color)
         {
+            this.wormBodies = wormBodies;
             X = field.EntityX(x);
             Y = field.EntityY(y);
             Length = length;
-            Color = color;
-            for (int i = 0; i < Length; i++)
+            firstBody = wormBodies.Enable();
+            firstBody.GetGraphic().X = 0;
+            firstBody.GetGraphic().Y = 0;
+            firstBody.GetGraphic().Visible = true;
+            firstBody.GetTarget() = Position;
+            AddGraphic(firstBody.GetGraphic());
+            WormBody previous = firstBody;
+            for (int i = 1; i < Length; i++)
             {
-                graphics[i].X = 0; graphics[i].Y = 0;
-                graphics[i].Visible = true;
-                targets[i] = Position;
+                WormBody current = wormBodies.Enable();
+                current.GetGraphic().X = 0;
+                current.GetGraphic().Y = 0;
+                current.GetGraphic().Visible = true;
+                current.GetTarget() = Position;
+                previous.GetNext() = current;
+                AddGraphic(firstBody.GetGraphic(i));
             }
 
+            Color = color;
             direction = Random.ValidDirection(field, Position, size);
             field.Set(this, x, y);
             grow = false;
@@ -70,34 +66,24 @@ namespace WormGame.GameObject
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// TODO: Fix a minor bug where another worm can temporarily go inside a newly grown part.
         public void Grow()
         {
-            if (Length == graphics.Length) return;
             grow = true;
         }
 
         public Vector2 GetTarget(int index)
         {
-            return targets[index];
+            return firstBody.GetTarget(index);
         }
 
         public void SetColor(Color color)
         {
-            for (int i = 0; i < Length; i++)
-                graphics[i].Color = color;
+            firstBody.SetColor(color);
         }
 
         public override void Disable()
         {
-            for (int i = 0; i < Length; i++)
-            {
-                graphics[i].Visible = false;
-                directions[i].X = 0; directions[i].Y = 0;
-            }
+            firstBody.Disable();
             Enabled = false;
         }
 
@@ -109,7 +95,7 @@ namespace WormGame.GameObject
             moving = true;
             bool retry = false;
         Retry:
-            target = targets[0] + direction * size;
+            target = firstBody.GetTarget() + direction * size;
             int check = field.Check(target, true);
             if (check != 2)
             {
@@ -118,16 +104,16 @@ namespace WormGame.GameObject
                 if (rampUp < Length - 1)
                     rampUp++;
                 else if (!grow)
-                    field.Set(null, targets[Length - 1]);
-                Follow(ref directions, direction);
-                Follow(ref targets, target);
+                    field.Set(null, firstBody.GetTarget(Length - 1));
+                firstBody.DirectionFollow(direction);
+                firstBody.TargetFollow(target);
                 field.Set(this, target);
             }
             else
             {
                 if (Player == null && !retry)
                 {
-                    direction = Random.ValidDirection(field, targets[0], size);
+                    direction = Random.ValidDirection(field, firstBody.GetTarget(), size);
                     retry = true;
                     goto Retry;
                 }
@@ -135,25 +121,19 @@ namespace WormGame.GameObject
             }
             if (grow && moving)
             {
-                Image newGraphic = graphics[Length];
+                WormBody current = wormBodies.Enable();
+                firstBody.GetNext(Length) = current;
+                Image newGraphic = current.GetGraphic();
                 newGraphic.Visible = true;
-                newGraphic.X = graphics[Length - 1].X;
-                newGraphic.Y = graphics[Length - 1].Y;
-                targets[Length].X = Position.X + newGraphic.X;
-                targets[Length].Y = Position.Y + newGraphic.Y;
+                newGraphic.X = firstBody.GetGraphic(Length - 1).X;
+                newGraphic.Y = firstBody.GetGraphic(Length - 1).Y;
+                firstBody.GetTarget(Length).X = Position.X + newGraphic.X;
+                firstBody.GetTarget(Length).Y = Position.Y + newGraphic.Y;
                 newGraphic.Color = Color;
                 Length++;
                 rampUp++;
                 grow = false;
             }
-        }
-
-
-        public void Follow(ref Vector2[] array, Vector2 newVector)
-        {
-            for (int i = Length - 1; i > 0; i--)
-                array[i] = array[i - 1];
-            array[0] = newVector;
         }
 
 
@@ -167,13 +147,13 @@ namespace WormGame.GameObject
             {
                 for (int i = 0; i < Length; i++)
                 {
-                    Vector2 positionDelta = directions[0] * step;
+                    Vector2 positionDelta = firstBody.GetDirection() * step;
                     if (i == 0)
                         Position += positionDelta;
                     else
                     {
-                        Vector2 graphicDelta = directions[i] * step - positionDelta;
-                        graphics[i].X += graphicDelta.X; graphics[i].Y += graphicDelta.Y;
+                        Vector2 graphicDelta = firstBody.GetDirection(i) * step - positionDelta;
+                        firstBody.GetGraphic(i).X += graphicDelta.X; firstBody.GetGraphic(i).Y += graphicDelta.Y;
                     }
                 }
             }

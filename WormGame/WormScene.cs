@@ -19,9 +19,11 @@ namespace WormGame
         private readonly Config config;
         private readonly Collision field;
 
-        private readonly Pool<Worm> worms;
-        private readonly Pool<Fruit> fruits;
-        private readonly Pool<Brick> bricks;
+        private readonly Pooler<Worm> worms;
+        private readonly Pooler<Fruit> fruits;
+        private readonly Pooler<Brick> bricks;
+
+        private readonly Pooler<WormBody> wormBodies;
 
         private float wormCounter = 0;
         private int brickCounter = 0;
@@ -38,12 +40,16 @@ namespace WormGame
             CreateBackground(config.size / 3, Color.Gray);
             CreateBackground(0, Color.Black);
 
-            worms = new Pool<Worm>(config, config.brainAmount);
-            fruits = new Pool<Fruit>(config, 3);
-            bricks = new Pool<Brick>(config, config.brainAmount);
-            AddMultiple(worms.Objects);
-            AddMultiple(fruits.Objects);
-            AddMultiple(bricks.Objects);
+            // Entity pools
+            worms = new Pooler<Worm>(config, config.brainAmount);
+            fruits = new Pooler<Fruit>(config, 3);
+            bricks = new Pooler<Brick>(config, config.brainAmount);
+            AddMultiple(worms.Pool);
+            AddMultiple(fruits.Pool);
+            AddMultiple(bricks.Pool);
+
+            // Object pools
+            wormBodies = new Pooler<WormBody>(config, config.bodyAmount);
 
             // Entity setup
             int density = config.density;
@@ -53,13 +59,7 @@ namespace WormGame
                         SpawnWorm(x, y, config.maxWormLength - 2);
 
             for (int i = 0; i < fruits.Count; i++)
-            {
-                Vector2 random = Random.ValidPosition(field, config.width, config.height);
-                int randomX = Mathf.FastRound(random.X);
-                int randomY = Mathf.FastRound(random.Y);
-                Fruit fruit = fruits.Enable();
-                fruit.Spawn();
-            }
+                fruits.Enable().Spawn();
 
             SpawnPlayer(config.windowWidth / 2, config.windowHeight / 2, Color.Red);
         }
@@ -105,7 +105,7 @@ namespace WormGame
             if (color == null) color = Random.Color;
             Worm worm = worms.Enable();
             if (worm == null) return null;
-            worm.Spawn(x, y, length, color);
+            worm.Spawn(wormBodies, x, y, length, color);
             return worm;
         }
 

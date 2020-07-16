@@ -11,7 +11,7 @@ namespace WormGame.Pooling
     public class PoolableEntity : Entity, IPoolable
     {
         /// <summary>
-        /// Disables Otter2D collision checks.
+        /// Disables Otter2D collision.
         /// </summary>
         public PoolableEntity()
         {

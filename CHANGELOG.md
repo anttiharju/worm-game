@@ -1,10 +1,14 @@
 # 16.07.2020
 - Fix fruit spawning
     - Fruits were spawning on top each other, fixed that and now we don't get "ghost fruits" anymore.
-- New idea; the point of the project is to show that I can program; (:D) maxWormLength is no fun, I'm sad I removed the extra-generic pooling system.
-    - Bring back the extra generic pooling system.
-    - Do a new class, that is for the *worm graphic*, it's not actual entity so it shouldn't put too much load on Otter, but it should allow for insanely long worms. 
-        - I'm going to do this lmao.
+- EVOLUTION OF WORMS: *multi-entity entity*, *single-entity* and the hopefully final, best of both worlds: **multi-object entity**
+    - Worm used to be made out of WormEntities, but now it will be made out of WormParts, which are not Otter2d entities and thus shouldn't be as performance-heavy.
+        - This requires bringing back the old, flexible pooling system which makes it possible to pool non-entity objects.
+            - Also I was proud of it so I want to keep it and this is a great excuse for that
+            - Also now that it has been brought back, I'm happy with the WormGame.GameObject namescape name, before it only contained Entities but I can't call it that due to conflicts with Otter (d'oh)
+    - I can replace maxWormLength with minWormLength, because WormPart amount is just width * height and WormAmount is that amount divided by minWormLength.
+        - Also it's no fun that worms have a max length.
+    - Even though *single-entity* model is good enough for bricks, I'm thinking of bringing them over to *multi-object entity* model once it has been proven to be great with worms, because embracing the modular nature of entities produces cleaner code. Right now with *single-entity* model Brick.cs is awfully bloated, constantly compensated with ifs and probably heavier than it needs to be because of all the (unnecessary) for loops it has to make the code manageable.
 
 
 # 15.07.2020
