@@ -1,5 +1,4 @@
-﻿using System;
-using Otter.Utility.MonoGame;
+﻿using Otter.Utility.MonoGame;
 
 namespace WormGame.Static
 {
@@ -61,17 +60,17 @@ namespace WormGame.Static
         /// <pre name="test">
         ///  FastRound(1.9f) === 2;
         ///  FastRound(4.1f) === 4;
+        ///  FastRound(0.1f) === 0;
+        ///  FastRound(-0.1f) === 0;
+        ///  FastRound(-2.9f) === -3;
+        ///  FastRound(-3.9f) === -4;
         /// </pre>
         /// </example>
         public static int FastRound(float number)
         {
-#if DEBUG
             if (number < 0)
-                throw new Exception("FastRound() is not valid for floats <= 0.");
-#endif
-            int integer = (int)number;
-            if (number < integer + 0.5f) return integer;
-            return ++integer;
+                return (int)(number - 0.5f);
+            return (int)(number + 0.5f);
         }
 
 

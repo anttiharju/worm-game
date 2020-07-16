@@ -72,9 +72,9 @@ namespace WormGame.Core
         /// </summary>
         /// <param name="target">Entity position</param>
         /// <returns>0 if free, 1 if fruit, 2 if occupied</returns>
-        public int Check(Vector2 target)
+        public int Check(Vector2 target, bool eatFruit = false)
         {
-            return Check(X(target.X), Y(target.Y));
+            return Check(X(target.X), Y(target.Y), eatFruit);
         }
 
 
@@ -84,7 +84,7 @@ namespace WormGame.Core
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
         /// <returns>0 if free, 1 if fruit, 2 if occupied</returns>
-        public int Check(int x, int y)
+        public int Check(int x, int y, bool eatFruit = false)
         {
             if (x < 0 ||
                 y < 0 ||
@@ -92,10 +92,10 @@ namespace WormGame.Core
                 y >= height)
                 return 2;
             Poolable cell = Get(x, y);
-            if (cell is Fruit)
+            if (cell is Fruit fruit)
             {
-                Fruit fruit = (Fruit)cell;
-                fruit.Respawn();
+                if (eatFruit)
+                    fruit.Spawn();
                 return 1;
             }
             if (cell != null)

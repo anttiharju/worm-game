@@ -31,6 +31,10 @@ namespace TestWormGame.Static
 		{
 			Assert.AreEqual( 2, FastRound(1.9f) , "in method FastRound, line 62");
 			Assert.AreEqual( 4, FastRound(4.1f) , "in method FastRound, line 63");
+			Assert.AreEqual( 0, FastRound(0.1f) , "in method FastRound, line 64");
+			Assert.AreEqual( 0, FastRound(-0.1f) , "in method FastRound, line 65");
+			Assert.AreEqual( -3, FastRound(-2.9f) , "in method FastRound, line 66");
+			Assert.AreEqual( -4, FastRound(-3.9f) , "in method FastRound, line 67");
 		}
 		[Test]
 		public  void TestRotateCCW84()
