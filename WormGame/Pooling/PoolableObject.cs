@@ -10,7 +10,7 @@
         /// <summary>
         /// Tells wheter or not the object is in use.
         /// </summary>
-        public bool Enabled { get; set; }
+        public virtual bool Enabled { get; set; }
 
 
         /// <summary>

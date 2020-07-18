@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using Otter.Utility.MonoGame;
 using WormGame.Static;
 using WormGame.Pooling;
@@ -216,9 +215,10 @@ namespace WormGame.Core
                         config.visualizeCollision = false;
                         Console.CursorLeft = 0;
                         Console.CursorTop = height - y;
-                        StringBuilder message = new StringBuilder("[COLLISION] Max visualizable field width is ").Append(Console.BufferWidth).Append(".");
-                        message.Append(new string(' ', Console.BufferWidth - message.Length));
-                        Console.WriteLine(message.ToString());
+                        Console.WriteLine(new string(' ', Console.BufferWidth));
+                        Console.CursorLeft = 0;
+                        Console.CursorTop = 1;
+                        Console.WriteLine("[COLLISION] Can't visualize a field wider than " + Console.BufferWidth + ".");
                         return;
                     }
                     PoolableEntity current = field[x, y];
