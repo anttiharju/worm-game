@@ -14,17 +14,17 @@ namespace WormGame.GameObject
         private readonly float step;
 
         private int rampUp;
-        private bool grow;
         private bool moving;
         private Vector2 target;
         private Vector2 direction;
         private WormBody firstBody;
+        private WormBody lastBody;
         private Pooler<WormBody> wormBodies;
 
         public Player Player { get; set; }
         public int Length { get; private set; }
-        public override Color Color { get { return firstBody.GetGraphic().Color ?? null; } set { SetColor(value); } }
-        public Vector2 Direction { get { return firstBody.GetDirection(); } set { if (Help.ValidateDirection(field, firstBody.GetTarget(), size, value)) direction = value; } }
+        public override Color Color { get { return firstBody.Graphic.Color ?? null; } set { SetColor(value); } }
+        public Vector2 Direction { get { return firstBody.Direction; } set { if (Help.ValidateDirection(field, firstBody.Direction, size, value)) direction = value; } }
 
 
         public Worm(Config config) : base()
@@ -40,40 +40,34 @@ namespace WormGame.GameObject
             X = field.EntityX(x);
             Y = field.EntityY(y);
             Length = length;
+
+            lastBody = null;
             firstBody = wormBodies.Enable();
-            firstBody.GetGraphic().X = 0;
-            firstBody.GetGraphic().Y = 0;
-            firstBody.GetGraphic().Visible = true;
-            firstBody.GetTarget() = Position;
-            AddGraphic(firstBody.GetGraphic());
-            WormBody previous = firstBody;
-            for (int i = 1; i < Length; i++)
+            WormBody current = firstBody;
+            for (int i = 0; i < Length; i++)
             {
-                WormBody current = wormBodies.Enable();
-                current.GetGraphic().X = 0;
-                current.GetGraphic().Y = 0;
-                current.GetGraphic().Visible = true;
-                current.GetTarget() = Position;
-                previous.GetNext() = current;
-                AddGraphic(firstBody.GetGraphic(i));
+                current.Graphic.X = 0;
+                current.Graphic.Y = 0;
+                current.Graphic.Visible = true;
+                current.Target = Position;
+
+                if (lastBody != null)
+                    lastBody.Next = current;
+                AddGraphic(current.Graphic);
+                lastBody = current;
+                if (i != Length - 1)
+                    current = wormBodies.Enable();
             }
 
-            Color = color;
             direction = Random.ValidDirection(field, Position, size);
             field.Set(this, x, y);
-            grow = false;
+            Color = color;
             return this;
         }
 
-
-        public void Grow()
+        public Vector2 GetTarget(int wantedIndex)
         {
-            grow = true;
-        }
-
-        public Vector2 GetTarget(int index)
-        {
-            return firstBody.GetTarget(index);
+            return firstBody.GetTarget(wantedIndex);
         }
 
         public void SetColor(Color color)
@@ -93,18 +87,19 @@ namespace WormGame.GameObject
         public void Move()
         {
             moving = true;
+            bool grow = false;
             bool retry = false;
         Retry:
-            target = firstBody.GetTarget() + direction * size;
+            target = firstBody.Target + direction * size;
             int check = field.Check(target, true);
             if (check != 2)
             {
                 if (check == 1)
-                    Grow();
+                    grow = true;
                 if (rampUp < Length - 1)
                     rampUp++;
                 else if (!grow)
-                    field.Set(null, firstBody.GetTarget(Length - 1));
+                    field.Set(null, lastBody.Target);
                 firstBody.DirectionFollow(direction);
                 firstBody.TargetFollow(target);
                 field.Set(this, target);
@@ -113,7 +108,7 @@ namespace WormGame.GameObject
             {
                 if (Player == null && !retry)
                 {
-                    direction = Random.ValidDirection(field, firstBody.GetTarget(), size);
+                    direction = Random.ValidDirection(field, firstBody.Target, size);
                     retry = true;
                     goto Retry;
                 }
@@ -121,18 +116,19 @@ namespace WormGame.GameObject
             }
             if (grow && moving)
             {
-                WormBody current = wormBodies.Enable();
-                firstBody.GetNext(Length) = current;
-                Image newGraphic = current.GetGraphic();
+                WormBody newBody = wormBodies.Enable();
+                if (newBody == null) return;
+                Image newGraphic = newBody.Graphic;
                 newGraphic.Visible = true;
-                newGraphic.X = firstBody.GetGraphic(Length - 1).X;
-                newGraphic.Y = firstBody.GetGraphic(Length - 1).Y;
-                firstBody.GetTarget(Length).X = Position.X + newGraphic.X;
-                firstBody.GetTarget(Length).Y = Position.Y + newGraphic.Y;
+                newGraphic.X = lastBody.Graphic.X;
+                newGraphic.Y = lastBody.Graphic.Y;
+                newBody.Target = new Vector2(Position.X + newGraphic.X, Position.Y + newGraphic.Y);
                 newGraphic.Color = Color;
                 Length++;
                 rampUp++;
-                grow = false;
+                AddGraphic(newGraphic);
+                lastBody.Next = newBody;
+                lastBody = newBody;
             }
         }
 
@@ -145,17 +141,9 @@ namespace WormGame.GameObject
             base.Update();
             if (moving)
             {
-                for (int i = 0; i < Length; i++)
-                {
-                    Vector2 positionDelta = firstBody.GetDirection() * step;
-                    if (i == 0)
-                        Position += positionDelta;
-                    else
-                    {
-                        Vector2 graphicDelta = firstBody.GetDirection(i) * step - positionDelta;
-                        firstBody.GetGraphic(i).X += graphicDelta.X; firstBody.GetGraphic(i).Y += graphicDelta.Y;
-                    }
-                }
+                Vector2 positionDelta = firstBody.Direction * step;
+                Position += positionDelta;
+                firstBody.Next.Follow(positionDelta, step);
             }
         }
     }

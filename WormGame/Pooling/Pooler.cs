@@ -58,7 +58,7 @@ namespace WormGame.Pooling
                 if (enablingIndex == endIndex)
                 {
 #if DEBUG
-                    Console.WriteLine("[EMPTY] " + this);
+                    Console.WriteLine("[POOLER] Ran out of poolables (" + Pool[0].GetType() + ").");
 #endif
                     return null;
                 }
