@@ -5,14 +5,15 @@ using WormGame.Core;
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 13.07.2020
+    /// @version 18.07.2020
     /// <summary>
-    /// Entity pooler.
+    /// Object pooler.
     /// </summary>
-    /// <typeparam name="T">Poolable entity type</typeparam>
+    /// <typeparam name="T">Poolable object type</typeparam>
     public class Pooler<T> : IEnumerable where T : class, IPoolable
     {
         private readonly int endIndex;
+
         private int enablingIndex = 0;
 
 
@@ -29,7 +30,7 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Initializes the object pool. If you're pooling PoolableEntities they have to be manually added to the scene through Pool property.
+        /// Initializes the object pool. PoolableEntities have to be manually added to the scene through Pool property.
         /// </summary>
         /// <param name="config">Configuration object</param>
         /// <param name="capacity">Pool size</param>
@@ -47,14 +48,14 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Enables a disabled entity from the pool.
+        /// Enables a disabled object from the pool.
         /// </summary>
-        /// <returns>Enabled entity</returns>
+        /// <returns>Enabled object</returns>
         public T Enable()
         {
             if (enablingIndex == endIndex && Pool[enablingIndex].Enabled)
             {
-                Defrag(); // Moves enablingIndex
+                Sort(); // Moves enablingIndex
                 if (enablingIndex == endIndex)
                 {
 #if DEBUG
@@ -72,9 +73,9 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Defragments the pool. This is way cheaper than looping through the entire pool every time something needs to be enabled.
+        /// Sorts the pools so that objects in use are at the beginning.
         /// </summary>
-        private void Defrag()
+        private void Sort()
         {
             int i = 0;
             while (i < enablingIndex)
@@ -102,9 +103,7 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// We need to be able to loop through the pools contents to make calls to the entities in it.
-        /// I would love to give an enumerator that only has the enabled ones, but that would mean 
-        /// disabling poolables through the pool and I don't want that.
+        /// So we can foreach through the objects in the pool. Used in wormScene.
         /// </summary>
         /// <returns>Pool enumerator</returns>
         public IEnumerator GetEnumerator()
