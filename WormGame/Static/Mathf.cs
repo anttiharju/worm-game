@@ -3,7 +3,7 @@
 namespace WormGame.Static
 {
     /// @author Antti Harju
-    /// @version 08.07.2020
+    /// @version 18.07.2020
     /// <summary>
     /// Class for miscellaneous mathematical functions.
     /// </summary>
@@ -33,7 +33,7 @@ namespace WormGame.Static
 
 
         /// <summary>
-        /// Lightweight version of Math.Abs().
+        /// Lite version of Math.Abs().
         /// </summary>
         /// <param name="number">Number</param>
         /// <returns>Absolute value of number</returns>
@@ -52,18 +52,17 @@ namespace WormGame.Static
 
 
         /// <summary>
-        /// Lightweight version of Math.Round() for converting whole number floats to ints accurately.
+        /// Function to convert whole number floats to integers. Lite version of Math.Round().
         /// </summary>
         /// <param name="number">float</param>
         /// <returns>int</returns>
         /// <example>
         /// <pre name="test">
-        ///  FastRound(1.9f) === 2;
-        ///  FastRound(4.1f) === 4;
-        ///  FastRound(0.1f) === 0;
-        ///  FastRound(-0.1f) === 0;
-        ///  FastRound(-2.9f) === -3;
-        ///  FastRound(-3.9f) === -4;
+        ///  FastRound(2.0000000000000000000000001f) === 2;
+        ///  FastRound(0.9999999999999999999999999f) === 1;
+        ///  FastRound(0.0000000000000000000000001f) === 0;
+        ///  FastRound(-0.9999999999999999999999999f) === -1;
+        ///  FastRound(-2.0000000000000000000000001f) === -2;
         /// </pre>
         /// </example>
         public static int FastRound(float number)

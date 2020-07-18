@@ -4,7 +4,7 @@ using Otter.Graphics;
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 13.07.2020
+    /// @version 18.07.2020
     /// <summary>
     /// Class for poolable entities.
     /// </summary>
@@ -26,13 +26,13 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Sets graphic visibility and various other Otter2d entity variables.
+        /// Sets graphic visibility and various other Otter2d entity properties.
         /// </summary>
         public bool Enabled { get { return Visible; } set { AutoUpdate = value; AutoRender = value; Visible = value; } }
 
 
         /// <summary>
-        /// Improves code readability: entity.Disable() is way easier to understand than entity.Enabled = false;
+        /// Frees the entity back to the pool.
         /// </summary>
         public virtual void Disable()
         {

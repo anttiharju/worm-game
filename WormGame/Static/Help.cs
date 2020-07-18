@@ -3,6 +3,8 @@ using WormGame.Core;
 
 namespace WormGame.Static
 {
+    /// @author Antti Harju
+    /// @version 18.07.2020
     /// <summary>
     /// Class for static things that don't belong anywhere else.
     /// </summary>
@@ -13,10 +15,10 @@ namespace WormGame.Static
         /// <summary>
         /// Validates directions
         /// </summary>
-        /// <param name="field"></param>
-        /// <param name="target"></param>
-        /// <param name="direction"></param>
-        /// <returns></returns>
+        /// <param name="field">Collision</param>
+        /// <param name="target">Target</param>
+        /// <param name="direction">Direction to check</param>
+        /// <returns>Is direction valid or not</returns>
         public static bool ValidateDirection(Collision field, Vector2 target, int size, Vector2 direction)
         {
             target += direction * size;

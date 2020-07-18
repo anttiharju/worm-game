@@ -45,26 +45,11 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Get a cells value from the field at an entity position.
-        /// </summary>
-        /// <param name="target">Entity target position</param>
-        /// <returns>Field value</returns>
-        public ref PoolableEntity Get(Vector2 target)
-        {
-            return ref Get(X(target.X), Y(target.Y));
-        }
-
-        public ref PoolableEntity Get(float x, float y)
-        {
-            return ref Get(X(x), Y(y));
-        }
-
-        /// <summary>
         /// Get a cells value from the field.
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
-        /// <returns>Field value</returns>
+        /// <returns>Field cell value</returns>
         private ref PoolableEntity Get(int x, int y)
         {
             return ref field[x, y];
@@ -72,9 +57,33 @@ namespace WormGame.Core
 
 
         /// <summary>
+        /// Get a cells value from the field at an entity position.
+        /// </summary>
+        /// <param name="position">Entity position</param>
+        /// <returns>Field cell value</returns>
+        public ref PoolableEntity Get(Vector2 position)
+        {
+            return ref Get(X(position.X), Y(position.Y));
+        }
+
+
+        /// <summary>
+        /// Get a cells value from the field at an entity position.
+        /// </summary>
+        /// <param name="x">Horizontal entity position</param>
+        /// <param name="y">Vertical entity position</param>
+        /// <returns>Field cell value</returns>
+        public ref PoolableEntity Get(float x, float y)
+        {
+            return ref Get(X(x), Y(y));
+        }
+
+
+        /// <summary>
         /// Checks wheter a cell on the field is occupied.
         /// </summary>
         /// <param name="target">Entity position</param>
+        /// <param name="eatFruit">Wheter or not check should activate fruits</param>
         /// <returns>0 if free, 1 if fruit, 2 if occupied</returns>
         public int Check(Vector2 target, bool eatFruit = false)
         {
@@ -87,6 +96,7 @@ namespace WormGame.Core
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
+        /// <param name="eatFruit">Wheter or not check should activate fruits</param>
         /// <returns>0 if free, 1 if fruit, 2 if occupied</returns>
         public int Check(int x, int y, bool eatFruit = false)
         {
@@ -111,25 +121,29 @@ namespace WormGame.Core
         /// <summary>
         /// Occupy a cell from the field for an entity.
         /// </summary>
-        /// <param name="wormEntity">Worm</param>
-        /// <param name="target">Worm target</param>
-        public void Set(PoolableEntity entity, Vector2 target)
+        /// <param name="entity">Entity</param>
+        /// <param name="position">Entity position</param>
+        public void Set(PoolableEntity entity, Vector2 position)
         {
-            Get(target) = entity;
+            Get(position) = entity;
         }
 
+
+
         /// <summary>
-        /// Occupy a cell from the field for an entity.
+        /// Occupy a cell from the field.
         /// </summary>
-        /// <param name="wormEntity">Worm</param>
-        /// <param name="target">Worm target</param>
+        /// <param name="entity">Entity</param>
+        /// <param name="x">Horizontal entity position</param>
+        /// <param name="y">Vertical entity position</param>
         public void Set(PoolableEntity entity, float x, float y)
         {
             Get(x, y) = entity;
         }
 
+
         /// <summary>
-        /// Occupy a cell from the field for an entity.
+        /// Occupy a cell from the field.
         /// </summary>
         /// <param name="wormEntity">Worm</param>
         /// <param name="x">Horizontal field position</param>
@@ -138,6 +152,7 @@ namespace WormGame.Core
         {
             Get(x, y) = entity;
         }
+
 
         /// <summary>
         /// Get horizontal field position from an entity one.
@@ -182,6 +197,10 @@ namespace WormGame.Core
             return topBorder - size * y;
         }
 
+
+        /// <summary>
+        /// Scan for full brick rows to destroy.
+        /// </summary>
         public void Scan()
         {
             for (int y = 0; y < height; y++)
@@ -194,10 +213,11 @@ namespace WormGame.Core
                 }
                 if (full)
                 {
-                    // TODO
+                    // TODO: Remove full brick rows.
                 }
             }
         }
+
 
 #if DEBUG
         /// <summary>

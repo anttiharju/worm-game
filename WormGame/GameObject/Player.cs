@@ -7,36 +7,38 @@ using WormGame.Pooling;
 namespace WormGame.GameObject
 {
     /// @author Antti Harju
-    /// @version 08.07.2020
+    /// @version 18.07.2020
     /// <summary>
-    /// Player class (Ghost class). Work in progress.
+    /// Player class. Work in progress.
     /// </summary>
+    /// TODO: Embrace pooling, separate player and ghost to separate classes.
     public class Player : PoolableEntity
     {
         private readonly WormScene wormScene;
         private readonly Color playerColor;
+        private readonly float speedModifier = 0.05f;
         private readonly int playerNumber;
         private readonly int axisDeadZone = 10;
-        private readonly float speedModifier = 0.05f;
 
-        private Worm worm;
-        private Brick brick;
         private Color oldColor;
+        private Brick brick;
+        private Worm worm;
         private float leftX;
         private float leftY;
         private float dpadX;
         private float dpadY;
         private bool dropAction = true;
 
+
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="wormScene">Scene where the player should be</param>
-        /// <param name="playerNumber">1-4</param>
-        /// <param name="x">Ghost horizontal position</param>
-        /// <param name="y">Ghost vertical position</param>
-        /// <param name="playerColor">Ghost color</param>
-        /// <param name="size">Ghost size</param>
+        /// <param name="wormScene">Scene. Required because of NearestWorm()</param>
+        /// <param name="playerNumber">Player number, 0 - 3</param>
+        /// <param name="x">Horizontal position</param>
+        /// <param name="y">Vertical position</param>
+        /// <param name="playerColor">Posessed entity color</param>
+        /// <param name="size">Entity size</param>
         public Player(WormScene wormScene, int playerNumber, float x, float y, Color playerColor, int size)
         {
             this.wormScene = wormScene;
@@ -51,7 +53,7 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Handles posessing at different states of being
+        /// Handles player controlled posessing.
         /// </summary>
         private void Posess()
         {
@@ -75,6 +77,10 @@ namespace WormGame.GameObject
             }
         }
 
+
+        /// <summary>
+        /// Unposess brick. Called from Brick.
+        /// </summary>
         public void LeaveBrick()
         {
             if (brick != null)
@@ -87,18 +93,9 @@ namespace WormGame.GameObject
             }
         }
 
-        /// <summary>
-        /// Kills the posessed worm
-        /// </summary>
-        private void KillWorm()
-        {
-            worm.Disable();
-            worm = null;
-        }
-
 
         /// <summary>
-        /// Turns a worm into a collection of bricks
+        /// Turn the posessed worm into posessed brick.
         /// </summary>
         private void Brickify()
         {
@@ -113,7 +110,7 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Bricks' controls
+        /// Brick controls.
         /// </summary>
         private void BrickControl()
         {
@@ -164,7 +161,7 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Worms controls
+        /// Worms controls.
         /// </summary>
         private void WormControl()
         {
@@ -182,7 +179,7 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Ghosts controls
+        /// Ghosts controls.
         /// </summary>
         private void GhostControl()
         {
@@ -286,7 +283,7 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Timers to slow down inputs when holding dpad down
+        /// Timers to slow down inputs when holding dpad down.
         /// </summary>
         private void Timers()
         {

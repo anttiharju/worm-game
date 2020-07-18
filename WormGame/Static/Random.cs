@@ -5,7 +5,7 @@ using WormGame.Core;
 namespace WormGame.Static
 {
     /// @author Antti Harju
-    /// @version 08.07.2020
+    /// @version 18.07.2020
     /// <summary>
     /// Class for generating random stuff.
     /// </summary>
@@ -42,18 +42,25 @@ namespace WormGame.Static
 
 
         /// <summary>
-        /// Returns a random number between a and b, b exclusive.
+        /// Returns a random number between min and max (exclusive).
         /// </summary>
         /// <param name="min">Minimum value</param>
-        /// <param name="max">Maximum value</param>
-        /// <returns>Random number between a and b</returns>
+        /// <param name="max">Maximum value, exclusive</param>
+        /// <returns>Random number between min and max</returns>
         public static int Range(int min, int max)
         {
             return randomGenerator.Next(min, max);
         }
 
 
-
+        /// <summary>
+        /// Generates a random valid position.
+        /// </summary>
+        /// <param name="field">Collision</param>
+        /// <param name="width">Field width</param>
+        /// <param name="height">Field height</param>
+        /// <param name="stritness">What is considered a valid position. See Collision.Check()</param>
+        /// <returns>Random valid position</returns>
         public static Vector2 ValidPosition(Collision field, int width, int height, int stritness = 0)
         {
             int randomX = Range(0, width);

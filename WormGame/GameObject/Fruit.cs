@@ -7,6 +7,10 @@ using WormGame.Pooling;
 
 namespace WormGame.GameObject
 {
+    /// <summary>
+    /// Fruit class. Spawns automatically to a free position.
+    /// </summary>
+    /// TODO: What if there's no free positions?
     public class Fruit : PoolableEntity
     {
         private readonly Collision field;
@@ -14,6 +18,10 @@ namespace WormGame.GameObject
         private readonly int height;
 
 
+        /// <summary>
+        /// Constructor. Creates + sign graphic from two rectangles.
+        /// </summary>
+        /// <param name="config"></param>
         public Fruit(Config config) : base()
         {
             field = config.field;
@@ -27,6 +35,11 @@ namespace WormGame.GameObject
             AddGraphic(image2);
         }
 
+
+        /// <summary>
+        /// Spawns fruit to a free position.
+        /// </summary>
+        /// <returns>Fruit</returns>
         public Fruit Spawn()
         {
             Vector2 random = Random.ValidPosition(field, width, height);

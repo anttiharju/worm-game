@@ -2,33 +2,36 @@
 
 namespace WormGame.Core
 {
+    /// @author Antti Harju
+    /// @version 18.07.2020
     /// <summary>
     /// Configuration.
     /// </summary>
     public class Config
     {
 #if DEBUG
-        public bool visualizeCollision = true;
+        public bool visualizeCollision = false;
 #endif
-        public readonly bool fullscreen = false;
-        public readonly int windowWidth = 1280;
-        public readonly int windowHeight = 720;
+        public readonly bool fullscreen = true;
+        public readonly int windowWidth = 1920;
+        public readonly int windowHeight = 1080;
         public readonly int refreshRate = 144;
         public readonly int imageSize = 32;
 
         public readonly WormScene scene;
         public readonly Collision field;
-        public readonly int width = 20;
-        public readonly int height = 10;
+        public readonly int width = 96;
+        public readonly int height = 54;
         public readonly int margin = 2;
 
         public readonly int minWormLength = 3;
         public readonly int wormSpeed = 6; // Refresh rate has to be evenly divisible by this (6 supports 144, 120, 60 and 30). If not, this will be subtracted by one until it is.
         public readonly int brickFreq = 4;
 
-        // Not loaded from settings.cfg
-        public readonly bool fruits = false;
-        public readonly int density = 3;
+        // Not loaded from settings.cfg (yet?)
+        public readonly bool fruits = true;
+        public readonly float fruitPercentage = 0.015f;
+        public readonly int density = 5;
 
         // Dynamic values
         public readonly int fruitAmount;
@@ -111,10 +114,9 @@ namespace WormGame.Core
             if (height < 2) height = 2;
             while (refreshRate % wormSpeed != 0)
                 wormSpeed--;
-
             if (brickFreq % 2 != 0)
                 brickFreq++;
-            fruitAmount = (int)(width * height * 0.025f);
+            fruitAmount = (int)(width * height * fruitPercentage);
             bodyAmount = width * height;
             brainAmount = bodyAmount / minWormLength;
             size = CalculateSize(windowWidth, windowHeight);
@@ -125,8 +127,10 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Calculates entity size based on window and collision field dimensions.
+        /// Calculates a entity size so that the whole field fits in the window.
         /// </summary>
+        /// <param name="windowWidth">Window width</param>
+        /// <param name="windowHeight">Window height</param>
         /// <returns>Entity size</returns>
         private int CalculateSize(int windowWidth, int windowHeight)
         {
