@@ -10,7 +10,8 @@ namespace WormGame.GameObject
     {
         public WormBody Next { get; set; }
         public Image Graphic { get; set; }
-        public Vector2 Target { get; set; }
+        private Vector2 target;
+        public Vector2 Target { get { return target; } set { target = value; } }
         public Vector2 Direction { get; set; }
 
         private bool enabled;
@@ -29,6 +30,11 @@ namespace WormGame.GameObject
             if (i == wantedIndex)
                 return Target;
             return Next.GetTarget(wantedIndex, ++i);
+        }
+
+        public ref Vector2 GetTarget()
+        {
+            return ref target;
         }
 
         public void TargetFollow(Vector2 newTarget)
