@@ -1,9 +1,29 @@
+# 18.07.2020
+- Fix worm entity model
+    - Okay so now the multi-object entity model (architecture? idk) is properly implemented to worms and with the test scenario of 200x100 field, worm length of 3 and density of 3 the framerate is in the low 50s (the same as with single entity model), so it really is the best of both worlds!
+    - Now the worms can be however long we want like in snake and while one long worm is not as impressive as thousands of smaller worms, it's nice.
+- Fix fruit spawning and configuration scaling issues
+    - Fruits sometimes spawned inside worms.
+    - Field size didn't work with uneven dimensions.
+    - Collision visualizer no longer obstructs other console writes.
+    - Implemented safeguards to configuration variables.
+        - Refresh rate has to be evenly dividable by wormSpeed, if not we subtract wormSpeed by one until it is.
+            - Worms move slightly off grid otherwise
+        - Minimum field size is 2x2
+    - Fixed wormUpdate (wormscene.wormCounter) floating point inaccuracy error with Mathf.FastRound
+        - It created a new problem:
+            - wormCounter value of 17.625 would get rounded up to 18, which would desync the worms from the grid.
+            - Fixed it by changing the +/- value of FastRound from 0.5 to 0.01 which is more than enough since I only use it to deal with floating point inaccuracy.
+            - Did the bold move of changing wormCounter check from >= to == so problems would arise more cleary.
+                - In theory we shouldn't have any issues thanks to configuration safeguards. But I'm not a perfect programmer.
+
+
 # 16.07.2020
 - Fix fruit spawning
     - Fruits were spawning on top each other, fixed that and now we don't get "ghost fruits" anymore.
 - EVOLUTION OF WORMS: *multi-entity entity*, *single-entity* and the hopefully final, best of both worlds: **multi-object entity**
     - Worm used to be made out of WormEntities, but now it will be made out of WormParts, which are not Otter2d entities and thus shouldn't be as performance-heavy.
-        - This requires bringing back the old, flexible pooling system which makes it possible to pool non-entity objects.
+        - This requires bringing back the old, flexible **pooling system** which makes it possible to pool non-entity objects.
             - Also I was proud of it so I want to keep it and this is a great excuse for that
             - Also now that it has been brought back, I'm happy with the WormGame.GameObject namescape name, before it only contained Entities but I can't call it that due to conflicts with Otter (d'oh)
     - I can replace maxWormLength with minWormLength, because WormPart amount is just width * height and WormAmount is that amount divided by minWormLength.

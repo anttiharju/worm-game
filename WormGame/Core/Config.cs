@@ -5,27 +5,29 @@ namespace WormGame.Core
     /// <summary>
     /// Configuration.
     /// </summary>
-    /// TODO: Fix crashes caused by different refresh rates
     public class Config
     {
 #if DEBUG
-        public bool visualizeCollision = false;
+        public bool visualizeCollision = true;
 #endif
         public readonly bool fullscreen = false;
         public readonly int windowWidth = 1280;
         public readonly int windowHeight = 720;
         public readonly int refreshRate = 144;
-        public readonly int imageSize = 64; // 52x24+4 results in size of 32 on 1080p so 64 should be large enough to support 4k displays properly
+        public readonly int imageSize = 32;
 
         public readonly WormScene scene;
         public readonly Collision field;
-        public readonly int width = 64; // both width and height should fullfill (n % 2) == 0
-        public readonly int height = 32;
-        public readonly int margin = 4;
+        public readonly int width = 20;
+        public readonly int height = 10;
+        public readonly int margin = 2;
 
         public readonly int minWormLength = 3;
-        public readonly int wormSpeed = 6; // 6 because 144, 120, 60 and 30 are evenly dividable by it
+        public readonly int wormSpeed = 6; // Refresh rate has to be evenly divisible by this (6 supports 144, 120, 60 and 30). If not, this will be subtracted by one until it is.
         public readonly int brickFreq = 4;
+
+        // Not loaded from settings.cfg
+        public readonly bool fruits = false;
         public readonly int density = 3;
 
         // Dynamic values
@@ -90,8 +92,8 @@ namespace WormGame.Core
                     case "margin":
                         margin = int.Parse(value);
                         break;
-                    case "maxWormLength":
-                        maxWormLength = int.Parse(value);
+                    case "minWormLength":
+                        minWormLength = int.Parse(value);
                         break;
                     case "wormSpeed":
                         wormSpeed = int.Parse(value);
@@ -105,16 +107,22 @@ namespace WormGame.Core
 #endif
             #endregion
 
+            if (width < 2) width = 2;
+            if (height < 2) height = 2;
+            while (refreshRate % wormSpeed != 0)
+                wormSpeed--;
+
             if (brickFreq % 2 != 0)
                 brickFreq++;
-            fruitAmount = (int)(width * height * 0.2f);
+            fruitAmount = (int)(width * height * 0.025f);
             bodyAmount = width * height;
             brainAmount = bodyAmount / minWormLength;
             size = CalculateSize(windowWidth, windowHeight);
-            step = (float)wormSpeed / refreshRate * size;
+            step = (float)wormSpeed / refreshRate * (float)size;
             field = new Collision(this);
             scene = new WormScene(this);
         }
+
 
         /// <summary>
         /// Calculates entity size based on window and collision field dimensions.

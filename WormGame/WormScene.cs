@@ -56,8 +56,9 @@ namespace WormGame
                     for (int y = 0; y < config.height; y += density)
                         SpawnWorm(x, y);
 
-            //for (int i = 0; i < fruits.Count; i++)
-              //  fruits.Enable().Spawn();
+            if (config.fruits)
+                for (int i = 0; i < fruits.Count; i++)
+                    fruits.Enable().Spawn();
 
             SpawnPlayer(config.windowWidth / 2, config.windowHeight / 2, Color.Red);
         }
@@ -142,10 +143,10 @@ namespace WormGame
         public override void Update()
         {
             wormCounter += config.step;
-            if (wormCounter >= config.size)
+            if (Mathf.FastRound(wormCounter) >= config.size)
             {
                 brickCounter++;
-                if (brickCounter >= config.brickFreq)
+                if (brickCounter == config.brickFreq)
                 {
                     foreach (Brick brick in bricks)
                         if (brick.Enabled)

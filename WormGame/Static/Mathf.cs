@@ -69,8 +69,8 @@ namespace WormGame.Static
         public static int FastRound(float number)
         {
             if (number < 0)
-                return (int)(number - 0.5f);
-            return (int)(number + 0.5f);
+                return (int)(number - 0.01f);
+            return (int)(number + 0.01f);
         }
 
 

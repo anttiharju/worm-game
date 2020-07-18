@@ -35,8 +35,12 @@ namespace WormGame.Core
             height = config.height;
             size = config.size;
             field = new PoolableEntity[width, height];
-            leftBorder = config.windowWidth / 2 - width / 2 * size + size / 2;
-            topBorder = config.windowHeight / 2 + height / 2 * size - size / 2;
+            leftBorder = config.windowWidth / 2 - width / 2 * size;
+            topBorder = config.windowHeight / 2 + height / 2 * size;
+            if (width % 2 == 0)
+                leftBorder += size / 2;
+            if (height % 2 == 0)
+                topBorder -= size / 2;
         }
 
 
@@ -244,6 +248,8 @@ namespace WormGame.Core
                     }
                 }
             }
+            Console.CursorLeft = 0;
+            Console.CursorTop = height + 1;
         }
 #endif
     }
