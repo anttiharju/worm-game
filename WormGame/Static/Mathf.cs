@@ -54,7 +54,7 @@ namespace WormGame.Static
         /// <summary>
         /// Lightweight version of Math.Round() for converting whole number floats to ints accurately.
         /// </summary>
-        /// <param name="number">float > 0</param>
+        /// <param name="number">float</param>
         /// <returns>int</returns>
         /// <example>
         /// <pre name="test">

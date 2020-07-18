@@ -29,7 +29,7 @@ namespace WormGame.GameObject
         {
             size = config.size;
             field = config.field;
-            maxLength = config.maxWormLength;
+            maxLength = config.minWormLength;
             positions = new Vector2[maxLength];
             graphics = new Image[maxLength];
             next = new Vector2[maxLength];

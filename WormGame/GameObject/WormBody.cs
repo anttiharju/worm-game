@@ -8,74 +8,65 @@ namespace WormGame.GameObject
 {
     public class WormBody : PoolableObject
     {
-        public WormBody next;
-        public Image graphic;
-        public Vector2 target;
-        public Vector2 direction;
+        public WormBody Next { get; set; }
+        public Image Graphic { get; set; }
+        public Vector2 Target { get; set; }
+        public Vector2 Direction { get; set; }
+
+        private bool enabled;
+        public override bool Enabled { get { return enabled; } set { enabled = value; Graphic.Visible = value; } }
+
 
         public WormBody(Config config)
         {
-            graphic = Image.CreateCircle(config.imageSize / 2);
-            graphic.Scale = (float)config.size / config.imageSize;
-            graphic.Visible = false;
-            graphic.CenterOrigin();
+            Graphic = Image.CreateCircle(config.imageSize / 2);
+            Graphic.Scale = (float)config.size / config.imageSize;
+            Graphic.CenterOrigin();
+        }
+
+        public Vector2 GetTarget(int wantedIndex, int i = 0)
+        {
+            if (i == wantedIndex)
+                return Target;
+            return Next.GetTarget(wantedIndex, ++i);
         }
 
         public void TargetFollow(Vector2 newTarget)
         {
-            if (next != null)
-                next.TargetFollow(target);
-            target = newTarget;
+            if (Next != null)
+                Next.TargetFollow(Target);
+            Target = newTarget;
         }
 
         public void DirectionFollow(Vector2 newDirection)
         {
-            if (next != null)
-                next.DirectionFollow(direction);
-            direction = newDirection;
-        }
-
-        public ref Image GetGraphic(int wantedIndex = 0, int i = 0)
-        {
-            if (wantedIndex != i && next != null)
-                return ref next.GetGraphic(wantedIndex, ++i);
-            return ref graphic;
-        }
-
-        public ref WormBody GetNext(int wantedIndex = 0, int i = 0)
-        {
-            if (wantedIndex != i && next != null)
-                return ref next.GetNext(wantedIndex, ++i);
-            return ref next;
-        }
-
-        public ref Vector2 GetTarget(int wantedIndex = 0, int i = 0)
-        {
-            if (wantedIndex != i && next != null)
-                return ref next.GetTarget(wantedIndex, ++i);
-            return ref target;
-        }
-
-        public ref Vector2 GetDirection(int wantedIndex = 0, int i = 0)
-        {
-            if (wantedIndex != i && next != null)
-                return ref next.GetDirection(wantedIndex, ++i);
-            return ref direction;
+            if (Next != null)
+                Next.DirectionFollow(Direction);
+            Direction = newDirection;
         }
 
         public void SetColor(Color color)
         {
-            if (next != null)
-                next.SetColor(color);
-            graphic.Color = color;
+            if (Next != null)
+                Next.SetColor(color);
+            Graphic.Color = color;
         }
 
         public override void Disable()
         {
-            if (next != null)
-                next.Disable();
-            graphic.Visible = false;
+            if (Next != null)
+                Next.Disable();
+            Graphic.Visible = false;
             Enabled = false;
+        }
+
+        public void Follow(Vector2 positionDelta, float step)
+        {
+            Vector2 delta = Direction * step - positionDelta;
+            Graphic.X += delta.X;
+            Graphic.Y += delta.Y;
+            if (Next != null)
+                Next.Follow(positionDelta, step);
         }
     }
 }
