@@ -6,18 +6,50 @@ using WormGame.Pooling;
 
 namespace WormGame.GameObject
 {
+    /// @author Antti Harju
+    /// @version 18.07.2020
+    /// <summary>
+    /// Class for worm bodies. Worm is still a single entity, but a modular one thanks to this class.
+    /// </summary>
     public class WormBody : PoolableObject
     {
+        /// <summary>
+        /// Get and set next WormBody in worm.
+        /// </summary>
         public WormBody Next { get; set; }
-        public Image Graphic { get; set; }
-        private Vector2 target;
+
+
+        /// <summary>
+        /// Get WormBody graphic.
+        /// </summary>
+        public Image Graphic { get; private set; }
+
+
+        /// <summary>
+        /// Get and set target position.
+        /// Implemented this way because we need to be able to return it by reference to avoid creating a new Vector2 every wormUpdate per worm.
+        /// </summary>
         public Vector2 Target { get { return target; } set { target = value; } }
+        private Vector2 target;
+
+
+        /// <summary>
+        /// Get and set worm direction.
+        /// </summary>
         public Vector2 Direction { get; set; }
 
-        private bool enabled;
+
+        /// <summary>
+        /// Set or get wheter or not object is in use.
+        /// </summary>
         public override bool Enabled { get { return enabled; } set { enabled = value; Graphic.Visible = value; } }
+        private bool enabled;
 
 
+        /// <summary>
+        /// Constructor. Initializes graphic.
+        /// </summary>
+        /// <param name="config">Configuration class</param>
         public WormBody(Config config)
         {
             Graphic = Image.CreateCircle(config.imageSize / 2);
@@ -25,18 +57,50 @@ namespace WormGame.GameObject
             Graphic.CenterOrigin();
         }
 
-        public Vector2 GetTarget(int wantedIndex, int i = 0)
+
+        /// <summary>
+        /// So we can get specific WormBody target positions. Try to use recursive methods instead of this in loops.
+        /// </summary>
+        /// <param name="n">Target index</param>
+        /// <param name="i">Index to keep track of where we are</param>
+        /// <returns>nth WormBody target position</returns>
+        public Vector2 GetTarget(int n, int i = 0)
         {
-            if (i == wantedIndex)
+            if (n == i)
                 return Target;
-            return Next.GetTarget(wantedIndex, ++i);
+            return Next.GetTarget(n, ++i);
         }
 
+
+        /// <summary>
+        /// Returns target. With this we can directly set target.X instead of creating a new Vector every time we want to modify it.
+        /// </summary>
+        /// <returns>Target (reference)</returns>
         public ref Vector2 GetTarget()
         {
             return ref target;
         }
 
+
+        /// <summary>
+        /// Updates WormBodies graphic positions
+        /// </summary>
+        /// <param name="positionDelta">Worm entitys position delta</param>
+        /// <param name="step">Worm step</param>
+        public void GraphicFollow(Vector2 positionDelta, float step)
+        {
+            Vector2 delta = Direction * step - positionDelta;
+            Graphic.X += delta.X;
+            Graphic.Y += delta.Y;
+            if (Next != null)
+                Next.GraphicFollow(positionDelta, step);
+        }
+
+
+        /// <summary>
+        /// Updates worms target positions recursively.
+        /// </summary>
+        /// <param name="newTarget">New target for worm body</param>
         public void TargetFollow(Vector2 newTarget)
         {
             if (Next != null)
@@ -44,6 +108,11 @@ namespace WormGame.GameObject
             Target = newTarget;
         }
 
+
+        /// <summary>
+        /// Updates worms directions recursively.
+        /// </summary>
+        /// <param name="newDirection"></param>
         public void DirectionFollow(Vector2 newDirection)
         {
             if (Next != null)
@@ -51,6 +120,11 @@ namespace WormGame.GameObject
             Direction = newDirection;
         }
 
+
+        /// <summary>
+        /// Recursively sets the whole worms color.
+        /// </summary>
+        /// <param name="color"></param>
         public void SetColor(Color color)
         {
             if (Next != null)
@@ -58,21 +132,16 @@ namespace WormGame.GameObject
             Graphic.Color = color;
         }
 
+
+        /// <summary>
+        /// Disables all of worms WormBodies.
+        /// </summary>
         public override void Disable()
         {
             if (Next != null)
                 Next.Disable();
             Graphic.Visible = false;
             Enabled = false;
-        }
-
-        public void Follow(Vector2 positionDelta, float step)
-        {
-            Vector2 delta = Direction * step - positionDelta;
-            Graphic.X += delta.X;
-            Graphic.Y += delta.Y;
-            if (Next != null)
-                Next.Follow(positionDelta, step);
         }
     }
 }

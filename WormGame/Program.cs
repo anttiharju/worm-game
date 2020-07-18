@@ -4,9 +4,9 @@ using WormGame.Core;
 namespace WormGame
 {
     /// @author Antti Harju
-    /// @version 08.07.2020
+    /// @version 18.07.2020
     /// <summary>
-    /// Program starts here.
+    /// Program entry point. Initializes and starts the game.
     /// </summary>
     public class Program
     {

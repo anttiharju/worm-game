@@ -16,6 +16,9 @@
             - Fixed it by changing the +/- value of FastRound from 0.5 to 0.01 which is more than enough since I only use it to deal with floating point inaccuracy.
             - Did the bold move of changing wormCounter check from >= to == so problems would arise more cleary.
                 - In theory we shouldn't have any issues thanks to configuration safeguards. But I'm not a perfect programmer.
+- Update documentation
+    - Nothing special, went through everything and hopefully updated everything that needed updating.
+    - I now refer to multi-object entity model as modular entities.
 
 
 # 16.07.2020
