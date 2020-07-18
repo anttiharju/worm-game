@@ -19,8 +19,8 @@ namespace WormGame.GameObject
             field = config.field;
             width = config.width;
             height = config.height;
-            Image image = Image.CreateRectangle(config.size / 3, config.size / 10 * 9, Color.Red);
-            Image image2 = Image.CreateRectangle(config.size / 10 * 9, config.size / 3, Color.Red);
+            Image image = Image.CreateRectangle(config.size / 4, config.size / 2, Color.Red);
+            Image image2 = Image.CreateRectangle(config.size / 2, config.size / 4, Color.Red);
             image.CenterOrigin();
             image2.CenterOrigin();
             AddGraphic(image);
@@ -29,7 +29,7 @@ namespace WormGame.GameObject
 
         public Fruit Spawn()
         {
-            Vector2 random = Random.ValidPosition(field, width, height, 0);
+            Vector2 random = Random.ValidPosition(field, width, height);
             X = random.X;
             Y = random.Y;
             field.Set(this, Position);
