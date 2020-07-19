@@ -19,7 +19,7 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Constructor. Creates + sign graphic from two rectangles.
+        /// Constructor.
         /// </summary>
         /// <param name="config"></param>
         public Fruit(Config config) : base()
