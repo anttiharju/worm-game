@@ -98,7 +98,7 @@ namespace WormGame.Core
                 return 4;
             if (cell is Worm)
                 return 1;
-            if (cell is Brick)
+            if (cell is Block)
                 return 2;
             if (cell is Fruit fruit)
             {
@@ -200,7 +200,7 @@ namespace WormGame.Core
                 bool full = true;
                 for (int x = 0; x < width; x++)
                 {
-                    if (!(field[x, y] is Brick))
+                    if (!(field[x, y] is Block))
                         full = false;
                 }
                 if (full)
@@ -248,7 +248,7 @@ namespace WormGame.Core
                         Console.Write("o");
                         continue;
                     }
-                    if (current is Brick)
+                    if (current is Block)
                     {
                         Console.Write("x");
                         continue;

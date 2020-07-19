@@ -20,13 +20,14 @@ namespace WormGame
         private readonly Collision field;
         private readonly Pooler<Worm> worms;
         private readonly Pooler<Fruit> fruits;
-        private readonly Pooler<Brick> bricks;
+        private readonly Pooler<Block> bricks;
         private readonly Pooler<WormModule> wormModules;
-        private readonly Pooler<BrickModule> brickModules;
+        private readonly Pooler<BlockModule> blockModules;
 
         private float wormCounter;
 
         public int wormCount;
+        public int maxWormCount = 5;
 
 
         /// <summary>
@@ -42,16 +43,16 @@ namespace WormGame
             CreateBackground(0, Color.Black);
 
             // Entity pools
-            worms = new Pooler<Worm>(config, config.entityAmount);
+            bricks = new Pooler<Block>(config, config.entityAmount);
             fruits = new Pooler<Fruit>(config, config.fruitAmount);
-            bricks = new Pooler<Brick>(config, config.entityAmount);
-            AddMultiple(worms.Pool);
-            AddMultiple(fruits.Pool);
+            worms = new Pooler<Worm>(config, config.entityAmount);
             AddMultiple(bricks.Pool);
+            AddMultiple(fruits.Pool);
+            AddMultiple(worms.Pool);
 
             // Object pools
             wormModules = new Pooler<WormModule>(config, config.moduleAmount);
-            brickModules = new Pooler<BrickModule>(config, config.moduleAmount);
+            blockModules = new Pooler<BlockModule>(config, config.moduleAmount);
 
             // Entity setup
             /*
@@ -121,12 +122,12 @@ namespace WormGame
         /// </summary>
         /// <param name="worm">Worm to transform</param>
         /// <returns>Brick</returns>
-        public Brick SpawnBrick(Worm worm)
+        public Block SpawnBrick(Worm worm)
         {
             wormCount--;
-            Brick brick = bricks.Enable();
+            Block brick = bricks.Enable();
             if (brick == null) return null;
-            brick.Spawn(worm, brickModules);
+            brick.Spawn(worm, blockModules);
             return brick;
         }
 
@@ -157,11 +158,16 @@ namespace WormGame
                         worm.Move();
                 wormCounter = 0;
                 field.Scan();
-                if (wormCount < 5)
+                if (wormCount < maxWormCount)
                 {
                     Vector2 random = Random.ValidPosition(field, config.width, config.height, 4);
-                    SpawnWorm(field.X(random.X), field.Y(random.Y));
-                    wormCount++;
+                    if (field.Get(random) == null)
+                    {
+                        SpawnWorm(field.X(random.X), field.Y(random.Y));
+                        wormCount++;
+                    }
+                    else
+                        wormCount--;
                 }
 #if DEBUG
                 if (config.visualizeCollision)

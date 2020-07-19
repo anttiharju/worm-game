@@ -1,5 +1,5 @@
 # Worm Blocks (2d game)
-Educational project. The point wasn't to make a good game, but learn git and practise C#. I tried to make it as scalable as possible so decent computers can handle several thousand worms. ~~Please see [concept.svg](https://raw.githubusercontent.com/anvemaha/worm-bricks/master/concept.svg) to understand the game.~~ <- outdated.
+Educational project. The point wasn't to make a good game, but learn git and practise C#. I tried to make it as scalable as possible so computers with decent CPUs can handle thousands of worms. ~~Please see [concept.svg](https://raw.githubusercontent.com/anvemaha/worm-bricks/master/concept.svg) to understand the game.~~ (outdated).
 - Field
     - Fruits and worms spawn on it
 - Worms

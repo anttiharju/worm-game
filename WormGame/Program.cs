@@ -13,7 +13,7 @@ namespace WormGame
         static void Main()
         {
             Config config = new Config();
-            Game game = new Game("Worm Bricks", config.windowWidth, config.windowHeight, config.refreshRate, config.fullscreen)
+            Game game = new Game("Worm Blocks", config.windowWidth, config.windowHeight, config.refreshRate, config.fullscreen)
             {
                 WindowResize = false,
                 AlwaysUpdate = true,

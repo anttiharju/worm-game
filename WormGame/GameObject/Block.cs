@@ -9,19 +9,15 @@ namespace WormGame.GameObject
     /// <summary>
     /// Brick class. Work in progress.
     /// </summary>
-    public class Brick : PoolableEntity
+    public class Block : PoolableEntity
     {
-        private BrickModule firstModule;
+        private BlockModule firstModule;
 
         public int Count { get; private set; }
 
-
-        public Player Player { get; set; }
-
-
         public override Color Color { get { return firstModule.Graphic.Color ?? null; } set { SetColor(value); } }
 
-        public Brick(Config config) : base() { }
+        public Block(Config config) : base() { }
 
 
         public void SetColor(Color color)
@@ -29,7 +25,7 @@ namespace WormGame.GameObject
             firstModule.SetColor(color);
         }
 
-        public Brick Spawn(Worm worm, Pooler<BrickModule> brickModules)
+        public Block Spawn(Worm worm, Pooler<BlockModule> brickModules)
         {
             Count = worm.Length;
 
@@ -37,12 +33,13 @@ namespace WormGame.GameObject
             Y = worm.Y;
 
             firstModule = brickModules.Enable();
+            if (firstModule == null) return null;
             firstModule.Graphic.X = 0;
             firstModule.Graphic.Y = 0;
             bool neighbours = firstModule.CopyWorm(worm, worm.firstModule, this, brickModules);
+            Color = worm.Color;
             if (neighbours)
                 Disable();
-            Color = worm.Color;
 
             return this;
         }
@@ -50,7 +47,8 @@ namespace WormGame.GameObject
         public override void Disable()
         {
             firstModule.Disable(Position);
-            base.Disable();
+            firstModule = null;
+            Enabled = false;
         }
     }
 }

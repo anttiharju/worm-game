@@ -6,10 +6,18 @@
     - Game sustains x amount of worms at all times.
     - Not all of this will get done today, but I like it better and it turns a problem (worms getting stuck) into a feature! :D
     - Also bricks are now modular entities.
-- Clean player class
+- Clean up player class
     - Also did a bunch other stuff but uh oh
     - Renamed project to worm-blocks from worm-bricks
         - Updated README.md
+- Investigating bugs
+    - Probably changed a bunch of stuff, but most importantly made nicer debug messages for pooling. :-)
+        - This isn't a good look. Perhaps I could later on update here what I actually changed? ("we'll fix it in prod") lol like that's going to happen.
+    - The bugs are hard to debug as, well I don't really have the means to reproduce them in the exact same manner every time.
+        - Sometimes worms have tumors, probably due to WormModules not being reset properly between recycles.
+            - This shouldn't be the root cause anymore as I applied some dumb safeguards.
+        - Sometimes blocks spawn outside of the play area. I suspect worms turning into blocks before they have fully ramped up (they have overlapping parts)
+            - BlockModule pooler keeps going empty before it should, probably due to overlapping BlockModules due to the thing explained in the line above
 
 # 18.07.2020
 - Fix worm entity model
