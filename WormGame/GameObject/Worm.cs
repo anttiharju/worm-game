@@ -12,6 +12,7 @@ namespace WormGame.GameObject
     /// <summary>
     /// Worm entity. Worms are modular entities; it consists of one Otter2d entity and several normal objects so it can grow and be any length.
     /// </summary>
+    /// TODO: Weird behaviour if turn into a brick in a tight space.
     public class Worm : PoolableEntity
     {
         private readonly Collision field;
@@ -87,10 +88,8 @@ namespace WormGame.GameObject
             newModule = firstModule;
             for (int i = 0; i < Length; i++)
             {
+                newModule.Reset();
                 newGraphic = newModule.Graphic;
-                newGraphic.X = 0;
-                newGraphic.Y = 0;
-                newGraphic.Visible = true;
                 newModule.Target = Position;
 
                 if (lastModule != null)
@@ -150,6 +149,7 @@ namespace WormGame.GameObject
             if (grow && moving)
             {
                 newModule = modules.Enable();
+                newModule.Reset();
                 if (newModule == null) return;
                 newGraphic = newModule.Graphic;
                 newGraphic.X = lastModule.Graphic.X;
