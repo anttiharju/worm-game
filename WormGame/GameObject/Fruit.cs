@@ -42,7 +42,7 @@ namespace WormGame.GameObject
         /// <returns>Fruit</returns>
         public Fruit Spawn()
         {
-            Vector2 random = Random.ValidPosition(field, width, height);
+            Vector2 random = Random.ValidPosition(field, width, height, 4);
             X = random.X;
             Y = random.Y;
             field.Set(this, Position);

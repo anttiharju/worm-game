@@ -24,7 +24,6 @@ namespace WormGame
         private readonly Pooler<WormModule> wormModules;
         private readonly Pooler<BrickModule> brickModules;
 
-        private int brickCounter = 0;
         private float wormCounter = 0;
 
 
@@ -148,14 +147,6 @@ namespace WormGame
             wormCounter += config.step;
             if (Mathf.FastRound(wormCounter) >= config.size)
             {
-                brickCounter++;
-                if (brickCounter == config.brickFreq)
-                {
-                    foreach (Brick brick in bricks)
-                        if (brick.Enabled)
-                            brick.SoftDrop();
-                    brickCounter = 0;
-                }
                 foreach (Worm worm in worms)
                     if (worm.Enabled)
                         worm.Move();

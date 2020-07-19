@@ -20,6 +20,12 @@ namespace WormGame.Pooling
 
 
         /// <summary>
+        /// Entity identifier.
+        /// </summary>
+        public int Id { get; set; }
+
+
+        /// <summary>
         /// Set entity color.
         /// </summary>
         public virtual Color Color { get { return Graphic.Color ?? null; } set { Graphic.Color = value; } }

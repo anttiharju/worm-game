@@ -42,6 +42,7 @@ namespace WormGame.Pooling
             {
                 T tmp = (T)Activator.CreateInstance(typeof(T), new object[] { config });
                 tmp.Enabled = false;
+                tmp.Id = i;
                 Pool[i] = tmp;
             }
         }
