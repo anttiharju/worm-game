@@ -14,13 +14,11 @@ namespace WormGame.GameObject
     /// TODO: Embrace pooling, separate player and ghost to separate classes.
     public class Player : PoolableEntity
     {
-        private readonly WormScene wormScene;
-        private readonly Color playerColor;
+        public readonly WormScene scene;
         private readonly float speedModifier = 0.05f;
         private readonly int playerNumber;
         private readonly int axisDeadZone = 10;
 
-        private Color oldColor;
         private Brick brick;
         private Worm worm;
         private float leftX;
@@ -37,16 +35,18 @@ namespace WormGame.GameObject
         /// <param name="playerNumber">Player number, 0 - 3</param>
         /// <param name="x">Horizontal position</param>
         /// <param name="y">Vertical position</param>
-        /// <param name="playerColor">Posessed entity color</param>
+        /// <param name="color">Posessed entity color</param>
         /// <param name="size">Entity size</param>
-        public Player(WormScene wormScene, int playerNumber, float x, float y, Color playerColor, int size)
+        public Player(WormScene wormScene, int playerNumber, float x, float y, Color color, int size)
         {
-            this.wormScene = wormScene;
+            scene = wormScene;
             this.playerNumber = playerNumber;
-            this.playerColor = playerColor;
-            Image image = Image.CreateRectangle(size / 2, size, playerColor);
-            AddGraphic(image);
+            Image border = Image.CreateCircle(size / 3 + size / 15, Color.Black);
+            Image image = Image.CreateCircle(size / 3, color);
+            border.CenterOrigin();
             image.CenterOrigin();
+            AddGraphic(border);
+            AddGraphic(image);
             X = x;
             Y = y;
         }
@@ -60,20 +60,20 @@ namespace WormGame.GameObject
             if (brick != null) return;
             if (worm != null)
             {
-                worm.Color = oldColor;
-                Position = worm.Position;
+                //worm.Color = oldColor;
+                //Position = worm.Position;
                 worm.Player = null;
                 worm = null;
-                Graphic.Visible = true;
+                //Graphic.Visible = true;
             }
             else
             {
-                worm = wormScene.NearestWorm(Position, 250);
+                worm = scene.NearestWorm(Position, 250);
                 if (worm == null) return;
                 worm.Player = this;
-                Graphic.Visible = false;
-                oldColor = worm.Color;
-                worm.Color = playerColor;
+                //Graphic.Visible = false;
+                //oldColor = worm.Color;
+                //worm.Color = playerColor;
             }
         }
 
@@ -85,11 +85,11 @@ namespace WormGame.GameObject
         {
             if (brick != null)
             {
-                brick.Color = oldColor;
-                Position = brick.Position;
+                //brick.Color = oldColor;
+                //Position = brick.Position;
                 brick.Player = null;
                 brick = null;
-                Graphic.Visible = true;
+                //Graphic.Visible = true;
             }
         }
 
@@ -101,10 +101,10 @@ namespace WormGame.GameObject
         {
             if (worm == null) return;
             worm.Disable();
-            brick = wormScene.SpawnBrick(worm);
+            brick = scene.SpawnBrick(worm);
             if (brick == null) return;
             brick.Player = worm.Player;
-            brick.Color = worm.Color;
+            //brick.Color = worm.Color;
             worm = null;
         }
 
@@ -166,6 +166,7 @@ namespace WormGame.GameObject
         private void WormControl()
         {
             if (worm == null) return;
+            Position = worm.Position;
             float deadZone = 90;
             if (leftY < -deadZone)
                 worm.Direction = Help.directions[0]; // UP

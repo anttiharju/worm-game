@@ -10,18 +10,18 @@ namespace WormGame.Core
     public class Config
     {
 #if DEBUG
-        public bool visualizeCollision = false;
+        public bool visualizeCollision = true;
 #endif
-        public readonly bool fullscreen = true;
-        public readonly int windowWidth = 1920;
-        public readonly int windowHeight = 1080;
+        public readonly bool fullscreen = false;
+        public readonly int windowWidth = 1280;
+        public readonly int windowHeight = 720;
         public readonly int refreshRate = 144;
         public readonly int imageSize = 32;
 
         public readonly WormScene scene;
         public readonly Collision field;
-        public readonly int width = 96;
-        public readonly int height = 54;
+        public readonly int width = 20;
+        public readonly int height = 10;
         public readonly int margin = 2;
 
         public readonly int minWormLength = 3;
@@ -35,8 +35,8 @@ namespace WormGame.Core
 
         // Dynamic values
         public readonly int fruitAmount;
-        public readonly int brainAmount;
-        public readonly int bodyAmount;
+        public readonly int entityAmount;
+        public readonly int moduleAmount;
         public readonly float step;
         public readonly int size;
 
@@ -117,8 +117,8 @@ namespace WormGame.Core
             if (brickFreq % 2 != 0)
                 brickFreq++;
             fruitAmount = (int)(width * height * fruitPercentage);
-            bodyAmount = width * height;
-            brainAmount = bodyAmount / minWormLength;
+            moduleAmount = width * height;
+            entityAmount = moduleAmount / minWormLength;
             size = CalculateSize(windowWidth, windowHeight);
             step = (float)wormSpeed / refreshRate * (float)size;
             field = new Collision(this);
