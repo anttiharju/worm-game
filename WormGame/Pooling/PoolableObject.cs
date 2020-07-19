@@ -8,6 +8,12 @@
     public class PoolableObject : IPoolable
     {
         /// <summary>
+        /// Entity identifier.
+        /// </summary>
+        public int Id { get; set; }
+
+
+        /// <summary>
         /// Get or set wheter the object is in use or not.
         /// </summary>
         public virtual bool Enabled { get; set; }
