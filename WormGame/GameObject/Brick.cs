@@ -16,6 +16,73 @@ namespace WormGame.GameObject
     public class Brick : PoolableEntity
     {
         private readonly Collision field;
+        private readonly int kickLimit = 2;
+        private readonly int size;
+
+        private Pooler<BrickModule> modules;
+        private BrickModule firstModule;
+        private BrickModule newModule;
+        private Image newGraphic;
+        private int anchorIndex;
+        private int kickCounter;
+
+        public int Count { get; private set; }
+
+        public Player Player { get; set; }
+
+        public override Color Color { get { return firstModule.Graphic.Color ?? null; } set { SetColor(value); } }
+
+
+        public Brick(Config config)
+        {
+            size = config.size;
+            field = config.field;
+        }
+
+
+        public void SetColor(Color color)
+        {
+            firstModule.SetColor(color);
+        }
+
+        public Brick Spawn(Worm worm, Pooler<BrickModule> brickModules)
+        {
+            modules = brickModules;
+            Count = worm.Length;
+
+            X = worm.X;
+            Y = worm.Y;
+
+            firstModule = brickModules.Enable();
+            firstModule.CopyWorm(worm, worm.firstModule, this, brickModules, field);
+
+            Color = worm.Color;
+
+            return this;
+        }
+
+        public void SoftDrop()
+        {
+
+        }
+        public void Right()
+        {
+
+        }
+        public void Left()
+        {
+
+        }
+        public void HardDrop()
+        {
+
+        }
+        public void Rotate(bool clockwise = false)
+        {
+
+        }
+        /*
+        private readonly Collision field;
         private readonly Vector2[] positions;
         private readonly Vector2[] next;
         private readonly Image[] graphics;
@@ -300,6 +367,6 @@ namespace WormGame.GameObject
         {
             for (int i = 0; i < Count; i++)
                 graphics[i].Color = color;
-        }
+        }*/
     }
 }

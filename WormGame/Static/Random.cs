@@ -12,7 +12,7 @@ namespace WormGame.Static
     public static class Random
     {
         private static readonly System.Random randomGenerator = new System.Random();
-        private static readonly Color[] colors = { Color.Blue, Color.Cyan, Color.Green, Color.Magenta, Color.Orange, Color.Yellow };
+        private static readonly Color[] colors = { Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Magenta, Color.Orange, Color.Cyan };
 
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace WormGame.Static
         public static Vector2 ValidDirection(Collision field, Vector2 position, int size)
         {
             int direction = Range(0, Help.directions.Length);
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < Help.directions.Length; i++)
             {
                 if (Help.ValidateDirection(field, position, size, Help.directions[direction]))
                     break;
