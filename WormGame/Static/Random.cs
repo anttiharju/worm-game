@@ -59,17 +59,17 @@ namespace WormGame.Static
         /// <param name="field">Collision</param>
         /// <param name="width">Field width</param>
         /// <param name="height">Field height</param>
-        /// <param name="stritness">What is considered a valid position. See Collision.Check()</param>
+        /// <param name="validity">0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 free</param>
         /// <returns>Random valid position</returns>
-        public static Vector2 ValidPosition(Collision field, int width, int height, int stritness = 0)
+        public static Vector2 ValidPosition(Collision field, int width, int height, int validity)
         {
             int randomX = Range(0, width);
             int randomY = Range(0, height);
-            if (field.Check(randomX, randomY) > stritness)
+            if (field.Check(randomX, randomY) < validity)
             {
                 for (int y = randomY; y < height; y++)
                     for (int x = randomX; x < width; x++)
-                        if (field.Check(x, y) <= stritness)
+                        if (field.Check(x, y) >= validity)
                         {
                             randomX = x;
                             randomY = y;
@@ -77,7 +77,7 @@ namespace WormGame.Static
                         }
                 for (int y = randomY; y >= 0; y--)
                     for (int x = randomX; x >= 0; x--)
-                        if (field.Check(x, y) <= stritness)
+                        if (field.Check(x, y) >= validity)
                         {
                             randomX = x;
                             randomY = y;

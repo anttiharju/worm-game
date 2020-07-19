@@ -8,6 +8,12 @@
     public interface IPoolable
     {
         /// <summary>
+        /// Entity identifier.
+        /// </summary>
+        public int Id { get; set; }
+
+
+        /// <summary>
         /// Set / get wheter or not object is in use.
         /// </summary>
         public bool Enabled { get; set; }

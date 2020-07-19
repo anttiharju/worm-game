@@ -22,7 +22,7 @@ namespace WormGame.Static
         public static bool ValidateDirection(Collision field, Vector2 target, int size, Vector2 direction)
         {
             target += direction * size;
-            return field.Check(field.X(target.X), field.Y(target.Y)) != 2;
+            return field.Check(field.X(target.X), field.Y(target.Y)) >= 3;
         }
     }
 }
