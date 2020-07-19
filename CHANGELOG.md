@@ -6,6 +6,10 @@
     - Game sustains x amount of worms at all times.
     - Not all of this will get done today, but I like it better and it turns a problem (worms getting stuck) into a feature! :D
     - Also bricks are now modular entities.
+- Clean player class
+    - Also did a bunch other stuff but uh oh
+    - Renamed project to worm-blocks from worm-bricks
+        - Updated README.md
 
 # 18.07.2020
 - Fix worm entity model

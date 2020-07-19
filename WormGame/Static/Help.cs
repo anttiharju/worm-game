@@ -1,4 +1,5 @@
-﻿using Otter.Utility.MonoGame;
+﻿using Otter.Graphics;
+using Otter.Utility.MonoGame;
 using WormGame.Core;
 
 namespace WormGame.Static
@@ -11,6 +12,7 @@ namespace WormGame.Static
     public static class Help
     {
         public static readonly Vector2[] directions = { new Vector2(0, -1), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(1, 0) };
+        public static readonly Color[] colors = { Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Magenta, Color.Orange, Color.Cyan };
 
         /// <summary>
         /// Validates directions
@@ -23,6 +25,13 @@ namespace WormGame.Static
         {
             target += direction * size;
             return field.Check(field.X(target.X), field.Y(target.Y)) >= 3;
+        }
+
+        public static bool ColorCheck(Color a, Color b)
+        {
+            if (a.R == b.R && a.G == b.G && a.B == b.B)
+                return true;
+            return false;
         }
     }
 }

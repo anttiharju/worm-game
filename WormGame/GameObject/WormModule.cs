@@ -36,7 +36,8 @@ namespace WormGame.GameObject
         /// <summary>
         /// Get and set worm direction.
         /// </summary>
-        public Vector2 Direction { get; set; }
+        public Vector2 Direction { get { return direction; } set { direction = value; } }
+        private Vector2 direction;
 
 
         /// <summary>
@@ -57,6 +58,17 @@ namespace WormGame.GameObject
             Graphic.CenterOrigin();
         }
 
+
+        public void Reset()
+        {
+            Next = null;
+            Graphic.X = 0;
+            Graphic.Y = 0;
+            target.X = 0;
+            target.Y = 0;
+            direction.X = 0;
+            direction.Y = 0;
+        }
 
         /// <summary>
         /// So we can get specific WormBody target positions. Try to use recursive methods instead of this in loops.

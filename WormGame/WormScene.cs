@@ -24,7 +24,9 @@ namespace WormGame
         private readonly Pooler<WormModule> wormModules;
         private readonly Pooler<BrickModule> brickModules;
 
-        private float wormCounter = 0;
+        private float wormCounter;
+
+        public int wormCount;
 
 
         /// <summary>
@@ -52,17 +54,22 @@ namespace WormGame
             brickModules = new Pooler<BrickModule>(config, config.moduleAmount);
 
             // Entity setup
+            /*
             int density = config.density;
             if (density > 0)
                 for (int x = 0; x < config.width; x += density)
                     for (int y = 0; y < config.height; y += density)
+                    {
                         SpawnWorm(x, y);
-
+                        wormCount++;
+                    }
+            */
             if (config.fruits)
                 for (int i = 0; i < fruits.Count; i++)
                     fruits.Enable().Spawn();
 
-            SpawnPlayer(config.windowWidth / 2, config.windowHeight / 2, Color.Red);
+            for (int i = 0; i < 3; i++)
+                SpawnPlayer(i);
         }
 
 
@@ -116,6 +123,7 @@ namespace WormGame
         /// <returns>Brick</returns>
         public Brick SpawnBrick(Worm worm)
         {
+            wormCount--;
             Brick brick = bricks.Enable();
             if (brick == null) return null;
             brick.Spawn(worm, brickModules);
@@ -126,14 +134,11 @@ namespace WormGame
         /// <summary>
         /// Spawn a player.
         /// </summary>
-        /// <param name="x">Horizontal position</param>
-        /// <param name="y">Vertical position</param>
-        /// <param name="color">Color</param>
+        /// <param name="playerNumber">Player number</param>
         /// <returns>Player</returns>
-        /// TODO: Use pooling
-        public Player SpawnPlayer(float x, float y, Color color)
+        public Player SpawnPlayer(int playerNumber)
         {
-            Player player = new Player(this, 0, x, y, color, config.size);
+            Player player = new Player(this, playerNumber, config.windowWidth / 2, config.windowHeight / 2, config.size);
             Add(player);
             return player;
         }
@@ -152,6 +157,12 @@ namespace WormGame
                         worm.Move();
                 wormCounter = 0;
                 field.Scan();
+                if (wormCount < 5)
+                {
+                    Vector2 random = Random.ValidPosition(field, config.width, config.height, 4);
+                    SpawnWorm(field.X(random.X), field.Y(random.Y));
+                    wormCount++;
+                }
 #if DEBUG
                 if (config.visualizeCollision)
                     field.Visualize(config);

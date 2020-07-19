@@ -13,7 +13,6 @@ namespace WormGame.GameObject
     {
         private BrickModule firstModule;
 
-
         public int Count { get; private set; }
 
 
@@ -38,11 +37,11 @@ namespace WormGame.GameObject
             Y = worm.Y;
 
             firstModule = brickModules.Enable();
-            bool neighbour = firstModule.CopyWorm(worm, worm.firstModule, this, brickModules);
-            if (neighbour)
-            {
+            firstModule.Graphic.X = 0;
+            firstModule.Graphic.Y = 0;
+            bool neighbours = firstModule.CopyWorm(worm, worm.firstModule, this, brickModules);
+            if (neighbours)
                 Disable();
-            }
             Color = worm.Color;
 
             return this;
