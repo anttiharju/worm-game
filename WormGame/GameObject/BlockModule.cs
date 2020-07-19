@@ -30,6 +30,7 @@ namespace WormGame.GameObject
         public bool CopyWorm(Worm worm, WormModule wormModule, Block brick, Pooler<BlockModule> brickModules, bool disable = false)
         {
             Next = brickModules.Enable();
+            if (Next == null) return false;
             Next.Next = null;
             Next.Graphic.X = wormModule.Target.X - worm.Position.X;
             Next.Graphic.Y = wormModule.Target.Y - worm.Position.Y;
@@ -44,11 +45,14 @@ namespace WormGame.GameObject
 
         private bool NeighbourCheck(Block parent, Color color, int positionX, int positionY)
         {
-            if (Check(parent, color, positionX + 1, positionY)) return true;
-            if (Check(parent, color, positionX - 1, positionY)) return true;
-            if (Check(parent, color, positionX, positionY + 1)) return true;
-            if (Check(parent, color, positionX, positionY - 1)) return true;
-            return false;
+            int[] x = { 1, -1, 0, 0 };
+            int[] y = { 0, 0, 1, -1 };
+
+            bool disable = false;
+
+            for (int i = 0; i < 4; i++)
+                if (Check(parent, color, positionX + x[i], positionY + y[i]) && !disable) disable = true;
+            return disable;
         }
 
         private bool Check(Block parent, Color color, int positionX, int positionY)
@@ -77,10 +81,10 @@ namespace WormGame.GameObject
         public void Disable(Vector2 parentPosition)
         {
             field.Set(null, parentPosition.X + Graphic.X, parentPosition.Y + Graphic.Y);
-            Graphic.Visible = false;
-            Enabled = false;
             if (Next != null)
                 Next.Disable(parentPosition);
+            Enabled = false;
+            Next = null;
         }
     }
 }

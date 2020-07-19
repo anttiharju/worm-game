@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections;
+#if DEBUG
+using System.Text.RegularExpressions;
+#endif
 using WormGame.Core;
 
 namespace WormGame.Pooling
@@ -12,6 +15,10 @@ namespace WormGame.Pooling
     /// <typeparam name="T">Poolable object type</typeparam>
     public class Pooler<T> : IEnumerable where T : class, IPoolable
     {
+#if DEBUG
+        private readonly string type;
+        private readonly int length;
+#endif
         private readonly int endIndex;
 
         private int enablingIndex = 0;
@@ -45,6 +52,14 @@ namespace WormGame.Pooling
                 tmp.Id = i;
                 Pool[i] = tmp;
             }
+
+#if DEBUG
+            length = capacity.ToString().Length;
+            var pattern = @"\.([^\.]*)$";
+            var matches = Regex.Matches("" + Pool[0].GetType(), pattern);
+            if (matches.Count > 0 && matches[0].Groups.Count > 1)
+                type = matches[0].Groups[1].Value;
+#endif
         }
 
 
@@ -56,11 +71,16 @@ namespace WormGame.Pooling
         {
             if (enablingIndex == endIndex && Pool[enablingIndex].Enabled)
             {
-                Sort(); // Moves enablingIndex
+                Defrag(); // Moves enablingIndex
                 if (enablingIndex == endIndex)
                 {
 #if DEBUG
-                    Console.WriteLine("[POOLER] Ran out of poolables (" + Pool[0].GetType() + ").");
+                    Console.Write("[POOLER] ");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write("Empty        ");
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine($"{type}");
+                    Console.ForegroundColor = ConsoleColor.Gray;
 #endif
                     return null;
                 }
@@ -76,8 +96,11 @@ namespace WormGame.Pooling
         /// <summary>
         /// Sorts the pools so that objects in use are at the beginning.
         /// </summary>
-        private void Sort()
+        private void Defrag()
         {
+#if DEBUG
+            int delta = enablingIndex;
+#endif
             int i = 0;
             while (i < enablingIndex)
             {
@@ -100,6 +123,19 @@ namespace WormGame.Pooling
                     }
                 }
             }
+#if DEBUG
+            delta -= enablingIndex;
+            if (delta == 0) return;
+            Console.Write($"[POOLER] ");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("Defrag ");
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.Write($"{delta,5} ");
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.Write($"{type}");
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.WriteLine();
+#endif
         }
 
 

@@ -10,7 +10,7 @@ namespace WormGame.Core
     public class Config
     {
 #if DEBUG
-        public bool visualizeCollision = true;
+        public bool visualizeCollision = false;
 #endif
         public readonly bool fullscreen = false;
         public readonly int windowWidth = 1280;
@@ -25,7 +25,7 @@ namespace WormGame.Core
         public readonly int margin = 2;
 
         public readonly int minWormLength = 3;
-        public readonly int wormSpeed = 6; // Refresh rate has to be evenly divisible by this (6 supports 144, 120, 60 and 30). If not, this will be subtracted by one until it is.
+        public readonly int wormSpeed = 144; // Refresh rate has to be evenly divisible by this (6 supports 144, 120, 60 and 30). If not, this will be subtracted by one until it is.
         public readonly int brickFreq = 4;
 
         // Not loaded from settings.cfg (yet?)

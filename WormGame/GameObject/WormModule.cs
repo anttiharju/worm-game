@@ -70,6 +70,7 @@ namespace WormGame.GameObject
             direction.Y = 0;
         }
 
+
         /// <summary>
         /// So we can get specific WormBody target positions. Try to use recursive methods instead of this in loops.
         /// </summary>
@@ -139,9 +140,9 @@ namespace WormGame.GameObject
         /// <param name="color"></param>
         public void SetColor(Color color)
         {
+            Graphic.Color = color;
             if (Next != null)
                 Next.SetColor(color);
-            Graphic.Color = color;
         }
 
 
@@ -154,6 +155,11 @@ namespace WormGame.GameObject
                 Next.Disable();
             Graphic.Visible = false;
             Enabled = false;
+            Next = null;
+            target.X = 0;
+            target.Y = 0;
+            direction.X = 0;
+            direction.Y = 0;
         }
     }
 }
