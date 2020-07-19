@@ -21,16 +21,16 @@ namespace WormGame.GameObject
         private int rampUp;
         private bool moving;
         private Vector2 target;
-        private Vector2 direction;
-        private WormBody newBody;
-        private WormBody lastBody;
-        private WormBody firstBody;
+        private WormModule newModule;
+        private WormModule lastModule;
         private Graphic newGraphic;
-        private Pooler<WormBody> wormBodies;
+        private Pooler<WormModule> modules;
+
+        public WormModule firstModule;
 
 
         /// <summary>
-        /// Not used by worm, but required by brick later on.
+        /// We can access scene through player.
         /// </summary>
         public Player Player { get; set; }
 
@@ -44,13 +44,14 @@ namespace WormGame.GameObject
         /// <summary>
         /// Get and set worm color.
         /// </summary>
-        public override Color Color { get { return firstBody.Graphic.Color ?? null; } set { SetColor(value); } }
+        public override Color Color { get { return firstModule.Graphic.Color ?? null; } set { SetColor(value); } }
 
 
         /// <summary>
         /// Get and set the worm direction.
         /// </summary>
-        public Vector2 Direction { get { return firstBody.Direction; } set { if (Help.ValidateDirection(field, firstBody.Direction, size, value)) direction = value; } }
+        public Vector2 Direction { get { return direction; } set { if (Help.ValidateDirection(field, firstModule.Target, size, value)) direction = value; } }
+        private Vector2 direction;
 
 
         /// <summary>
@@ -68,35 +69,36 @@ namespace WormGame.GameObject
         /// <summary>
         /// Spawns the worm.
         /// </summary>
-        /// <param name="wormBodies">WormBody pool so the worm can grow.</param>
+        /// <param name="wormModules">WormBody pool so the worm can grow.</param>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
         /// <param name="length">Worm length</param>
         /// <param name="color">Worm color</param>
         /// <returns>Worm</returns>
-        public Worm Spawn(Pooler<WormBody> wormBodies, int x, int y, int length, Color color)
+        public Worm Spawn(Pooler<WormModule> wormModules, int x, int y, int length, Color color)
         {
-            this.wormBodies = wormBodies;
+            modules = wormModules;
             X = field.EntityX(x);
             Y = field.EntityY(y);
             Length = length;
 
-            lastBody = null;
-            firstBody = wormBodies.Enable();
-            newBody = firstBody;
+            lastModule = null;
+            firstModule = wormModules.Enable();
+            newModule = firstModule;
             for (int i = 0; i < Length; i++)
             {
-                newBody.Graphic.X = 0;
-                newBody.Graphic.Y = 0;
-                newBody.Graphic.Visible = true;
-                newBody.Target = Position;
+                newGraphic = newModule.Graphic;
+                newGraphic.X = 0;
+                newGraphic.Y = 0;
+                newGraphic.Visible = true;
+                newModule.Target = Position;
 
-                if (lastBody != null)
-                    lastBody.Next = newBody;
-                AddGraphic(newBody.Graphic);
-                lastBody = newBody;
+                if (lastModule != null)
+                    lastModule.Next = newModule;
+                AddGraphic(newGraphic);
+                lastModule = newModule;
                 if (i != Length - 1)
-                    newBody = wormBodies.Enable();
+                    newModule = wormModules.Enable();
             }
 
             direction = Random.ValidDirection(field, Position, size);
@@ -113,9 +115,9 @@ namespace WormGame.GameObject
         {
             moving = true;
             bool grow = false;
-            bool retry = false;
+            bool tryAgain = true;
         Retry:
-            target = firstBody.Target + direction * size;
+            target = firstModule.Target + Direction * size;
             int check = field.Check(target, true);
             if (check != 2)
             {
@@ -124,36 +126,42 @@ namespace WormGame.GameObject
                 if (rampUp < Length - 1)
                     rampUp++;
                 else if (!grow)
-                    field.Set(null, lastBody.Target);
-                firstBody.DirectionFollow(direction);
-                firstBody.TargetFollow(target);
+                    field.Set(null, lastModule.Target);
+                firstModule.DirectionFollow(direction);
+                firstModule.TargetFollow(target);
                 field.Set(this, target);
             }
             else
             {
-                if (Player == null && !retry)
+                if (!tryAgain)
                 {
-                    direction = Random.ValidDirection(field, firstBody.Target, size);
-                    retry = true;
+                    WormScene tmp = (WormScene)Scene;
+                    tmp.SpawnBrick(this);
+                    Disable();
+                }
+                else if (Player == null)
+                {
+                    direction = Random.ValidDirection(field, firstModule.Target, size);
+                    tryAgain = false;
                     goto Retry;
                 }
                 moving = false;
             }
             if (grow && moving)
             {
-                newBody = wormBodies.Enable();
-                if (newBody == null) return;
-                newGraphic = newBody.Graphic;
-                newGraphic.X = lastBody.Graphic.X;
-                newGraphic.Y = lastBody.Graphic.Y;
-                newBody.GetTarget().X = Position.X + newGraphic.X;
-                newBody.GetTarget().Y = Position.Y + newGraphic.Y;
+                newModule = modules.Enable();
+                if (newModule == null) return;
+                newGraphic = newModule.Graphic;
+                newGraphic.X = lastModule.Graphic.X;
+                newGraphic.Y = lastModule.Graphic.Y;
+                newModule.GetTarget().X = Position.X + newGraphic.X;
+                newModule.GetTarget().Y = Position.Y + newGraphic.Y;
                 newGraphic.Color = Color;
                 Length++;
                 rampUp++;
                 AddGraphic(newGraphic);
-                lastBody.Next = newBody;
-                lastBody = newBody;
+                lastModule.Next = newModule;
+                lastModule = newModule;
             }
         }
 
@@ -166,9 +174,9 @@ namespace WormGame.GameObject
             base.Update();
             if (moving)
             {
-                Vector2 positionDelta = firstBody.Direction * step;
+                Vector2 positionDelta = firstModule.Direction * step;
                 Position += positionDelta;
-                firstBody.Next.GraphicFollow(positionDelta, step);
+                firstModule.Next.GraphicFollow(positionDelta, step);
             }
         }
 
@@ -180,9 +188,8 @@ namespace WormGame.GameObject
         /// <returns>Worms nth WormBodies target position</returns>
         public Vector2 GetTarget(int n)
         {
-            return firstBody.GetTarget(n);
+            return firstModule.GetTarget(n);
         }
-
 
 
         /// <summary>
@@ -191,7 +198,7 @@ namespace WormGame.GameObject
         /// <param name="color"></param>
         public void SetColor(Color color)
         {
-            firstBody.SetColor(color);
+            firstModule.SetColor(color);
         }
 
 
@@ -200,7 +207,7 @@ namespace WormGame.GameObject
         /// </summary>
         public override void Disable()
         {
-            firstBody.Disable();
+            firstModule.Disable();
             Enabled = false;
         }
     }

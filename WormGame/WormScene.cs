@@ -21,7 +21,8 @@ namespace WormGame
         private readonly Pooler<Worm> worms;
         private readonly Pooler<Fruit> fruits;
         private readonly Pooler<Brick> bricks;
-        private readonly Pooler<WormBody> wormBodies;
+        private readonly Pooler<WormModule> wormModules;
+        private readonly Pooler<BrickModule> brickModules;
 
         private int brickCounter = 0;
         private float wormCounter = 0;
@@ -40,15 +41,16 @@ namespace WormGame
             CreateBackground(0, Color.Black);
 
             // Entity pools
-            worms = new Pooler<Worm>(config, config.brainAmount);
+            worms = new Pooler<Worm>(config, config.entityAmount);
             fruits = new Pooler<Fruit>(config, config.fruitAmount);
-            bricks = new Pooler<Brick>(config, config.brainAmount);
+            bricks = new Pooler<Brick>(config, config.entityAmount);
             AddMultiple(worms.Pool);
             AddMultiple(fruits.Pool);
             AddMultiple(bricks.Pool);
 
             // Object pools
-            wormBodies = new Pooler<WormBody>(config, config.bodyAmount);
+            wormModules = new Pooler<WormModule>(config, config.moduleAmount);
+            brickModules = new Pooler<BrickModule>(config, config.moduleAmount);
 
             // Entity setup
             int density = config.density;
@@ -103,7 +105,7 @@ namespace WormGame
             if (worm == null) return null;
             if (color == null) color = Random.Color;
             if (length < config.minWormLength) length = config.minWormLength;
-            worm.Spawn(wormBodies, x, y, length, color);
+            worm.Spawn(wormModules, x, y, length, color);
             return worm;
         }
 
@@ -117,7 +119,7 @@ namespace WormGame
         {
             Brick brick = bricks.Enable();
             if (brick == null) return null;
-            brick.Spawn(worm);
+            brick.Spawn(worm, brickModules);
             return brick;
         }
 

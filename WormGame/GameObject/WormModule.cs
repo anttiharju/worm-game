@@ -11,12 +11,12 @@ namespace WormGame.GameObject
     /// <summary>
     /// Class for worm bodies. Worm is still a single entity, but a modular one thanks to this class.
     /// </summary>
-    public class WormBody : PoolableObject
+    public class WormModule : PoolableObject
     {
         /// <summary>
         /// Get and set next WormBody in worm.
         /// </summary>
-        public WormBody Next { get; set; }
+        public WormModule Next { get; set; }
 
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace WormGame.GameObject
         /// Constructor. Initializes graphic.
         /// </summary>
         /// <param name="config">Configuration class</param>
-        public WormBody(Config config)
+        public WormModule(Config config)
         {
             Graphic = Image.CreateCircle(config.imageSize / 2);
             Graphic.Scale = (float)config.size / config.imageSize;
