@@ -12,7 +12,6 @@ namespace WormGame.Static
     public static class Random
     {
         private static readonly System.Random randomGenerator = new System.Random();
-        private static readonly Color[] colors = { Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Magenta, Color.Orange, Color.Cyan };
 
 
         /// <summary>
@@ -23,7 +22,7 @@ namespace WormGame.Static
         {
             get
             {
-                return colors[Range(0, colors.Length)];
+                return Help.colors[Range(0, Help.colors.Length)];
             }
         }
 
