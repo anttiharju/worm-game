@@ -27,8 +27,8 @@ namespace WormGame.GameObject
             field = config.field;
             width = config.width;
             height = config.height;
-            Image image = Image.CreateRectangle(config.size / 4, config.size / 2, Color.Red);
-            Image image2 = Image.CreateRectangle(config.size / 2, config.size / 4, Color.Red);
+            Image image = Image.CreateRectangle(config.size / 4, config.size / 2, Color.White);
+            Image image2 = Image.CreateRectangle(config.size / 2, config.size / 4, Color.White);
             image.CenterOrigin();
             image2.CenterOrigin();
             AddGraphic(image);

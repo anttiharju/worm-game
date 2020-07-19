@@ -1,3 +1,12 @@
+# 19.07.2020
+- New idea for the game! Remove the tetris part and:
+    - When worms gets stuck, it turns into a brick
+    - If two same-color bricks are next to each other, they disappear.
+    - Player / Ghost no longer posesses with color, but rather the ghost now stays on top of worms head.
+    - Game sustains x amount of worms at all times.
+- Not all of those will get done today, but I like it better and it turns a problem (worms getting stuck) into a feature! :D
+
+
 # 18.07.2020
 - Fix worm entity model
     - Okay so now the multi-object entity model (architecture? idk) is properly implemented to worms and with the test scenario of 200x100 field, worm length of 3 and density of 3 the framerate is in the low 50s (the same as with single entity model), so it really is the best of both worlds!
@@ -13,7 +22,7 @@
     - Fixed wormUpdate (wormscene.wormCounter) floating point inaccuracy error with Mathf.FastRound
         - It created a new problem:
             - wormCounter value of 17.625 would get rounded up to 18, which would desync the worms from the grid.
-            - Fixed it by changing the +/- value of FastRound from 0.5 to 0.01 which is more than enough since I only use it to deal with floating point inaccuracy.
+                - Fixed it by changing the +/- value of FastRound from 0.5 to 0.01 which is more than enough since I only use it to deal with floating point inaccuracy.
             - Did the bold move of changing wormCounter check from >= to == so problems would arise more cleary.
                 - In theory we shouldn't have any issues thanks to configuration safeguards. But I'm not a perfect programmer.
 - Update documentation
@@ -24,7 +33,7 @@
 # 16.07.2020
 - Fix fruit spawning
     - Fruits were spawning on top each other, fixed that and now we don't get "ghost fruits" anymore.
-- EVOLUTION OF WORMS: *multi-entity entity*, *single-entity* and the hopefully final, best of both worlds: **multi-object entity**
+- EVOLUTION OF WORMS: *multi-entity entity*, *single-entity* and the hopefully final, best of both worlds: **multi-object entity** (modular entity)
     - Worm used to be made out of WormEntities, but now it will be made out of WormParts, which are not Otter2d entities and thus shouldn't be as performance-heavy.
         - This requires bringing back the old, flexible **pooling system** which makes it possible to pool non-entity objects.
             - Also I was proud of it so I want to keep it and this is a great excuse for that
@@ -47,13 +56,14 @@
             - See <https://github.com/anvemaha/worm-bricks/tree/6e8e8e0794b29cb76de68f59b70f1b3c006bb2ae/WormGame/Pooling>
     - I checked out Otter2ds' discord server and I don't seem to be the only one having a GPU usage issue lol.
         - Apparently Otter is using whatever the OS gives it.
-        - Otter (SFML?) might have memory leaks? Apparently shutting down the application by pressing escape skips some important deconstructors.
+        - Otter (SFML?) might have memory leaks? Apparently shutting down the application by pressing escape skips some important destructors.
             - Haven't noticed it myself.
+                - It's fixed?
     - Soon I'm going to have to abandon this project to move on to my next summer project (Java + SQLite personal budgeting program)
         - There's still some features I want to finish, but whatever happens I'll start the new project this month.
             - Complete bricks (really messy)
             - Separate Player.cs to Ghost.cs and Player.cs
-            - Make the game "playable" with multiple controls
+            - Make the game "playable" with multiple players
                 - Playable in quotes because it's not even close to a game I'd release.
             - Look into some basic texture pack system.
             - Iron out any know issues (excluding GPU usage because that's beyond what I have the skills for)
