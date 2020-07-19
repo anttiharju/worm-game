@@ -45,18 +45,6 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Get a cells value from the field.
-        /// </summary>
-        /// <param name="x">Horizontal field position</param>
-        /// <param name="y">Vertical field position</param>
-        /// <returns>Field cell value</returns>
-        private ref PoolableEntity Get(int x, int y)
-        {
-            return ref field[x, y];
-        }
-
-
-        /// <summary>
         /// Get a cells value from the field at an entity position.
         /// </summary>
         /// <param name="position">Entity position</param>
@@ -68,14 +56,14 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Get a cells value from the field at an entity position.
+        /// Get a cells value from the field.
         /// </summary>
-        /// <param name="x">Horizontal entity position</param>
-        /// <param name="y">Vertical entity position</param>
+        /// <param name="x">Horizontal field position</param>
+        /// <param name="y">Vertical field position</param>
         /// <returns>Field cell value</returns>
-        public ref PoolableEntity Get(float x, float y)
+        public ref PoolableEntity Get(int x, int y)
         {
-            return ref Get(X(x), Y(y));
+            return ref field[x, y];
         }
 
 
@@ -84,7 +72,7 @@ namespace WormGame.Core
         /// </summary>
         /// <param name="target">Entity position</param>
         /// <param name="eatFruit">Wheter or not check should activate fruits</param>
-        /// <returns>0 if free, 1 if fruit, 2 if occupied</returns>
+        /// <returns>0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 free</returns>
         public int Check(Vector2 target, bool eatFruit = false)
         {
             return Check(X(target.X), Y(target.Y), eatFruit);
@@ -97,24 +85,28 @@ namespace WormGame.Core
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
         /// <param name="eatFruit">Wheter or not check should activate fruits</param>
-        /// <returns>0 if free, 1 if fruit, 2 if occupied</returns>
+        /// <returns>0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 free</returns>
         public int Check(int x, int y, bool eatFruit = false)
         {
             if (x < 0 ||
                 y < 0 ||
                 x >= width ||
                 y >= height)
-                return 2;
+                return 0;
             PoolableEntity cell = Get(x, y);
+            if (cell == null)
+                return 4;
+            if (cell is Worm)
+                return 1;
+            if (cell is Brick)
+                return 2;
             if (cell is Fruit fruit)
             {
                 if (eatFruit)
                     fruit.Spawn();
-                return 1;
+                return 3;
             }
-            if (cell != null)
-                return 2;
-            return 0;
+            return 4;
         }
 
 
@@ -138,7 +130,7 @@ namespace WormGame.Core
         /// <param name="y">Vertical entity position</param>
         public void Set(PoolableEntity entity, float x, float y)
         {
-            Get(x, y) = entity;
+            Get(X(x), Y(y)) = entity;
         }
 
 

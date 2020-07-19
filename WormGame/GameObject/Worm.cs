@@ -119,9 +119,9 @@ namespace WormGame.GameObject
         Retry:
             target = firstModule.Target + Direction * size;
             int check = field.Check(target, true);
-            if (check != 2)
+            if (check >= 3)
             {
-                if (check == 1)
+                if (check == 3)
                     grow = true;
                 if (rampUp < Length - 1)
                     rampUp++;

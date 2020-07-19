@@ -1,11 +1,11 @@
 # 19.07.2020
-- New idea for the game! Remove the tetris part and:
+- New direction for game mechanics
     - When worms gets stuck, it turns into a brick
     - If two same-color bricks are next to each other, they disappear.
     - Player / Ghost no longer posesses with color, but rather the ghost now stays on top of worms head.
     - Game sustains x amount of worms at all times.
-- Not all of those will get done today, but I like it better and it turns a problem (worms getting stuck) into a feature! :D
-
+    - Not all of this will get done today, but I like it better and it turns a problem (worms getting stuck) into a feature! :D
+    - Also bricks are now modular entities.
 
 # 18.07.2020
 - Fix worm entity model
