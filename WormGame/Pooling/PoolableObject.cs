@@ -1,4 +1,6 @@
-﻿namespace WormGame.Pooling
+﻿using WormGame.Core;
+
+namespace WormGame.Pooling
 {
     /// @author Antti Harju
     /// @version 18.07.2020
@@ -7,8 +9,17 @@
     /// </summary>
     public class PoolableObject : IPoolable
     {
+#if DEBUG
         /// <summary>
-        /// Entity identifier.
+        /// Constructor. Exists for testing purposes.
+        /// </summary>
+        /// <param name="config">Config</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Has to exist for proper Pooler testing.")]
+        public PoolableObject(Config config = null) { }
+#endif
+
+        /// <summary>
+        /// Entity identifier. Unique within the same pool.
         /// </summary>
         public int Id { get; set; }
 
