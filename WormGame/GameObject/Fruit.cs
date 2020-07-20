@@ -10,7 +10,6 @@ namespace WormGame.GameObject
     /// <summary>
     /// Fruit class. Spawns automatically to a free position.
     /// </summary>
-    /// TODO: What if there's no free positions?
     public class Fruit : PoolableEntity
     {
         private readonly Collision field;
@@ -27,12 +26,11 @@ namespace WormGame.GameObject
             field = config.field;
             width = config.width;
             height = config.height;
-            Image image = Image.CreateRectangle(config.size / 4, config.size / 2, Color.White);
-            Image image2 = Image.CreateRectangle(config.size / 2, config.size / 4, Color.White);
+            Image image = Image.CreateCircle(config.size / 3, Color.Black);
+            image.OutlineColor = Color.White;
+            image.OutlineThickness = config.size / 8;
             image.CenterOrigin();
-            image2.CenterOrigin();
             AddGraphic(image);
-            AddGraphic(image2);
         }
 
 
