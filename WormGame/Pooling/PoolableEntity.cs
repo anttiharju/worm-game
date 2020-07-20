@@ -34,7 +34,7 @@ namespace WormGame.Pooling
         /// <summary>
         /// Sets entity visibility and various other Otter2d entity properties.
         /// </summary>
-        public bool Enabled { get { return Visible; } set { AutoUpdate = value; AutoRender = value; Visible = value; } }
+        public virtual bool Enabled { get { return Visible; } set { AutoUpdate = value; AutoRender = value; Visible = value; } }
 
 
         /// <summary>

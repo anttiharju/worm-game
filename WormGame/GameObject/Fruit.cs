@@ -26,8 +26,8 @@ namespace WormGame.GameObject
             field = config.field;
             width = config.width;
             height = config.height;
-            Image image = Image.CreateCircle(config.size / 3, Color.Black);
-            image.OutlineColor = Color.White;
+            Image image = Image.CreateCircle(config.size / 3, Color.White);
+            image.OutlineColor = Color.Black;
             image.OutlineThickness = config.size / 8;
             image.CenterOrigin();
             AddGraphic(image);

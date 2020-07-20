@@ -13,10 +13,8 @@ namespace WormGame.GameObject
     /// </summary>
     public class WormModule : PoolableObject
     {
-        private readonly Collision field;
-
         /// <summary>
-        /// Get and set next WormBody in worm.
+        /// Get or set next WormBody in worm.
         /// </summary>
         public WormModule Next { get; set; }
 
@@ -28,7 +26,7 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Get and set target position.
+        /// Get or set target position.
         /// Implemented this way because we need to be able to return it by reference to avoid creating a new Vector2 every wormUpdate per worm.
         /// </summary>
         public Vector2 Target { get { return target; } set { target = value; } }
@@ -36,7 +34,7 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Get and set worm direction.
+        /// Get or set worm direction.
         /// </summary>
         public Vector2 Direction { get { return direction; } set { direction = value; } }
         private Vector2 direction;
@@ -50,27 +48,14 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Constructor. Initializes graphic.
+        /// Constructor.
         /// </summary>
-        /// <param name="config">Configuration class</param>
+        /// <param name="config">Config</param>
         public WormModule(Config config)
         {
-            field = config.field;
             Graphic = Image.CreateCircle(config.imageSize / 2);
             Graphic.Scale = (float)config.size / config.imageSize;
             Graphic.CenterOrigin();
-        }
-
-
-        public void Reset()
-        {
-            Next = null;
-            Graphic.X = 0;
-            Graphic.Y = 0;
-            target.X = 0;
-            target.Y = 0;
-            direction.X = 0;
-            direction.Y = 0;
         }
 
 
@@ -156,8 +141,6 @@ namespace WormGame.GameObject
         {
             if (Next != null)
                 Next.Disable();
-            if (field.Check(target) == 1)
-                field.Set(null, target);
             Graphic.Visible = false;
             Enabled = false;
             Next = null;
