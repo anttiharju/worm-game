@@ -19,7 +19,7 @@ namespace WormGame.Core
         private readonly int size;
         private readonly int width;
         private readonly int height;
-
+        private readonly string exceptionText = "Unrecognized poolable entity on collision field.";
 
         /// <summary>
         /// Initializes the collision field which is a 2d array of poolable entities.
@@ -93,7 +93,7 @@ namespace WormGame.Core
                     fruit.Spawn();
                 return 3;
             }
-            return 4;
+            throw new Exception(exceptionText);
         }
 
 
@@ -146,7 +146,7 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Translates horizontal entity position to a field position.
+        /// Translates horizontal entity position to a field one.
         /// </summary>
         /// <param name="x">Horizontal entity position</param>
         /// <returns>Horizontal field position</returns>
@@ -157,7 +157,7 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Translates vertical entity position to a field position.
+        /// Translates vertical entity position to a field one.
         /// </summary>
         /// <param name="y">Vertical entity position</param>
         /// <returns>Vertical field position</returns>
@@ -168,7 +168,7 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Translates horizontal field position to an entity position.
+        /// Translates horizontal field position to an entity one.
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <returns>Horizontal entity position</returns>
@@ -179,7 +179,7 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Translates vertical field position to an entity position.
+        /// Translates vertical field position to an entity one.
         /// </summary>
         /// <param name="y">Vertical field position</param>
         /// <returns>Vertical entity position</returns>
@@ -220,7 +220,7 @@ namespace WormGame.Core
                         line.Append('+');
                         continue;
                     }
-                    throw new Exception("Unrecognized poolable on collision field.");
+                    throw new Exception(exceptionText);
                 }
                 Console.WriteLine(line.ToString());
             }
