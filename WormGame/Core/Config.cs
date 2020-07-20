@@ -11,7 +11,7 @@ namespace WormGame.Core
     public class Config
     {
 #if DEBUG
-        public bool visualizeCollision = false;
+        public bool visualizeCollision = true;
 #endif
         public readonly bool fullscreen = false;
         public readonly int windowWidth = 1280;
