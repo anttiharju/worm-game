@@ -159,7 +159,6 @@ namespace WormGame
                     if (worm.Enabled)
                         worm.Move();
                 wormCounter = 0;
-                field.Scan();
                 if (wormCount < maxWormCount)
                 {
                     Vector2 random = Random.ValidPosition(field, config.width, config.height, 4);
@@ -173,7 +172,7 @@ namespace WormGame
                 }
 #if DEBUG
                 if (config.visualizeCollision)
-                    field.Visualize(config);
+                    field.Visualize();
 #endif
             }
         }

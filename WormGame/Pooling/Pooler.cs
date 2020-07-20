@@ -5,7 +5,7 @@ using WormGame.Core;
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 18.07.2020
+    /// @version 20.07.2020
     /// <summary>
     /// Object pooler.
     /// </summary>
@@ -93,11 +93,11 @@ namespace WormGame.Pooling
         /// Defragments (sorts) the pool in a way that disabled poolables are at the end of the pool array, readily available to enable.
         /// </summary>
         /// <example>
-        /// - = available, [number] = in use, ^ = enablingIndex
-        /// Before: -2-45
+        /// Before: [.2.45]
+        ///              ^
+        /// After:  [524..]
         ///             ^
-        /// After:  524--
-        ///            ^
+        /// . = available, [number] = in use, ^ = enablingIndex
         /// <pre name="test">
         ///  #if DEBUG
         ///  Config testConfig = new Config();
