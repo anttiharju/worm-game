@@ -24,7 +24,7 @@ namespace WormGame.GameObject
 
         public Block Spawn(Worm worm, Pooler<BlockModule> brickModules)
         {
-            if (!brickModules.Ask(worm.Length))
+            if (!brickModules.Check(worm.Length))
             {
                 Enabled = false;
                 return null;
