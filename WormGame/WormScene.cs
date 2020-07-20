@@ -20,7 +20,7 @@ namespace WormGame
         private readonly Collision field;
         private readonly Pooler<Worm> worms;
         private readonly Pooler<Fruit> fruits;
-        private readonly Pooler<Block> bricks;
+        private readonly Pooler<Block> blocks;
         private readonly Pooler<WormModule> wormModules;
         private readonly Pooler<BlockModule> blockModules;
 
@@ -39,20 +39,19 @@ namespace WormGame
             this.config = config;
             field = config.field;
 
-            CreateBackground(config.size / 3, Color.Gray);
-            CreateBackground(0, Color.Black);
+            CreateBackground();
 
             // Entity pools
-            bricks = new Pooler<Block>(config, config.entityAmount);
+            blocks = new Pooler<Block>(config, config.entityAmount * 2);
             fruits = new Pooler<Fruit>(config, config.fruitAmount);
             worms = new Pooler<Worm>(config, config.entityAmount);
-            AddMultiple(bricks.Pool);
+            AddMultiple(blocks.Pool);
             AddMultiple(fruits.Pool);
             AddMultiple(worms.Pool);
 
             // Object pools
             wormModules = new Pooler<WormModule>(config, config.moduleAmount);
-            blockModules = new Pooler<BlockModule>(config, config.moduleAmount);
+            blockModules = new Pooler<BlockModule>(config, config.moduleAmount * 2);
 
             // Entity setup
             /*
@@ -66,7 +65,7 @@ namespace WormGame
                     }
             */
             if (config.fruits)
-                for (int i = 0; i < fruits.Count; i++)
+                for (int i = 0; i < fruits.Length; i++)
                     fruits.Enable().Spawn();
 
             for (int i = 0; i < 3; i++)
@@ -124,11 +123,14 @@ namespace WormGame
         /// <returns>Brick</returns>
         public Block SpawnBrick(Worm worm)
         {
+            Block block = blocks.Enable();
+            if (block == null) return null;
+            block = block.Spawn(worm, blockModules);
+            if (block == null)
+                block.Disable();
             wormCount--;
-            Block brick = bricks.Enable();
-            if (brick == null) return null;
-            brick.Spawn(worm, blockModules);
-            return brick;
+            worm.Disable();
+            return block;
         }
 
 
@@ -161,7 +163,7 @@ namespace WormGame
                 if (wormCount < maxWormCount)
                 {
                     Vector2 random = Random.ValidPosition(field, config.width, config.height, 4);
-                    if (field.Get(random) == null)
+                    if (random.X != -1 && field.Get(random) == null)
                     {
                         SpawnWorm(field.X(random.X), field.Y(random.Y));
                         wormCount++;
@@ -178,14 +180,14 @@ namespace WormGame
 
 
         /// <summary>
-        /// Creates a rectangular entity at on the middle of the field.
+        /// Creates visible borders for the field.
         /// </summary>
-        /// <param name="offset">Size offset</param>
-        /// <param name="color">Rectangle color</param>
-        private void CreateBackground(int offset, Color color)
+        private void CreateBackground()
         {
-            Image backgroundGraphic = Image.CreateRectangle(config.width * config.size + offset, config.height * config.size + offset, color);
+            Image backgroundGraphic = Image.CreateRectangle(config.width * config.size, config.height * config.size, Color.Black);
             backgroundGraphic.CenterOrigin();
+            backgroundGraphic.OutlineColor = Color.Gray;
+            backgroundGraphic.OutlineThickness = config.size / 6;
             Entity background = new Entity(config.windowWidth / 2, config.windowHeight / 2, backgroundGraphic)
             {
                 Collidable = false
