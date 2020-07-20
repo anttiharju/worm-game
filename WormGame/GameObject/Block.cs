@@ -17,9 +17,6 @@ namespace WormGame.GameObject
 
         public override Color Color { get { return firstModule.Graphic.Color ?? null; } set { SetColor(value); } }
 
-        public Block(Config config) : base() { }
-
-
         public void SetColor(Color color)
         {
             firstModule.SetColor(color);
