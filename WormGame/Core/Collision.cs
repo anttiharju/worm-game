@@ -7,22 +7,22 @@ using WormGame.GameObject;
 namespace WormGame.Core
 {
     /// @author Antti Harju
-    /// @version 08.07.2020
+    /// @version 20.07.2020
     /// <summary>
-    /// Collision field.
+    /// Collision field. Stays performant with large fields.
     /// </summary>
     public class Collision
     {
-        private readonly WormScene scene;
         private readonly PoolableEntity[,] field;
         private readonly int leftBorder;
         private readonly int topBorder;
+        private readonly int size;
         private readonly int width;
         private readonly int height;
-        private readonly int size;
+
 
         /// <summary>
-        /// Initializes the collision field which is a 2d array of poolables used for collision.
+        /// Initializes the collision field which is a 2d array of poolable entities.
         /// </summary>
         /// <param name="game">Required so we know the window dimensions</param>
         /// <param name="width">Field width</param>
@@ -30,7 +30,6 @@ namespace WormGame.Core
         /// <param name="margin">Field margin</param>
         public Collision(Config config)
         {
-            scene = config.scene;
             width = config.width;
             height = config.height;
             size = config.size;
@@ -45,18 +44,7 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Get a cells value from the field at an entity position.
-        /// </summary>
-        /// <param name="position">Entity position</param>
-        /// <returns>Field cell value</returns>
-        public ref PoolableEntity Get(Vector2 position)
-        {
-            return ref Get(X(position.X), Y(position.Y));
-        }
-
-
-        /// <summary>
-        /// Get a cells value from the field.
+        /// Get entity from field.
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
@@ -68,25 +56,24 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Checks wheter a cell on the field is occupied.
+        /// Get entity from field.
         /// </summary>
-        /// <param name="target">Entity position</param>
-        /// <param name="eatFruit">Wheter or not check should activate fruits</param>
-        /// <returns>0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 free</returns>
-        public int Check(Vector2 target, bool eatFruit = false)
+        /// <param name="position">Entity position</param>
+        /// <returns>Field cell value</returns>
+        public ref PoolableEntity Get(Vector2 position)
         {
-            return Check(X(target.X), Y(target.Y), eatFruit);
+            return ref Get(X(position.X), Y(position.Y));
         }
 
 
         /// <summary>
-        /// Checks wheter a cell on the field is occupied.
+        /// Check entity from field.
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
-        /// <param name="eatFruit">Wheter or not check should activate fruits</param>
+        /// <param name="consume">Consume fruits</param>
         /// <returns>0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 free</returns>
-        public int Check(int x, int y, bool eatFruit = false)
+        public int Check(int x, int y, bool consume = false)
         {
             if (x < 0 ||
                 y < 0 ||
@@ -102,7 +89,7 @@ namespace WormGame.Core
                 return 2;
             if (cell is Fruit fruit)
             {
-                if (eatFruit)
+                if (consume)
                     fruit.Spawn();
                 return 3;
             }
@@ -111,33 +98,21 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Occupy a cell from the field for an entity.
+        /// Check entity from field.
         /// </summary>
-        /// <param name="entity">Entity</param>
-        /// <param name="position">Entity position</param>
-        public void Set(PoolableEntity entity, Vector2 position)
+        /// <param name="target">Entity position</param>
+        /// <param name="consume">Consume fruits</param>
+        /// <returns>0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 free</returns>
+        public int Check(Vector2 target, bool consume = false)
         {
-            Get(position) = entity;
-        }
-
-
-
-        /// <summary>
-        /// Occupy a cell from the field.
-        /// </summary>
-        /// <param name="entity">Entity</param>
-        /// <param name="x">Horizontal entity position</param>
-        /// <param name="y">Vertical entity position</param>
-        public void Set(PoolableEntity entity, float x, float y)
-        {
-            Get(X(x), Y(y)) = entity;
+            return Check(X(target.X), Y(target.Y), consume);
         }
 
 
         /// <summary>
-        /// Occupy a cell from the field.
+        /// Set entity to field.
         /// </summary>
-        /// <param name="wormEntity">Worm</param>
+        /// <param name="entity">Worm</param>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
         public void Set(PoolableEntity entity, int x, int y)
@@ -146,8 +121,32 @@ namespace WormGame.Core
         }
 
 
+
         /// <summary>
-        /// Get horizontal field position from an entity one.
+        /// Set entity to field.
+        /// </summary>
+        /// <param name="entity">Entity</param>
+        /// <param name="x">Horizontal entity position</param>
+        /// <param name="y">Vertical entity position</param>
+        public void Set(PoolableEntity entity, float x, float y)
+        {
+            Set(entity, X(x), Y(y));
+        }
+
+
+        /// <summary>
+        /// Set entity to field.
+        /// </summary>
+        /// <param name="entity">Entity</param>
+        /// <param name="position">Entity position</param>
+        public void Set(PoolableEntity entity, Vector2 position)
+        {
+            Set(entity, X(position.X), Y(position.Y));
+        }
+
+
+        /// <summary>
+        /// Translates horizontal entity position to a field position.
         /// </summary>
         /// <param name="x">Horizontal entity position</param>
         /// <returns>Horizontal field position</returns>
@@ -158,7 +157,7 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Get vertical field position from an entity one.
+        /// Translates vertical entity position to a field position.
         /// </summary>
         /// <param name="y">Vertical entity position</param>
         /// <returns>Vertical field position</returns>
@@ -169,7 +168,7 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Get horizontal entity position from a field one.
+        /// Translates horizontal field position to an entity position.
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <returns>Horizontal entity position</returns>
@@ -180,7 +179,7 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Get vertical entity position from a field one.
+        /// Translates vertical field position to an entity position.
         /// </summary>
         /// <param name="y">Vertical field position</param>
         /// <returns>Vertical entity position</returns>
@@ -188,77 +187,42 @@ namespace WormGame.Core
         {
             return topBorder - size * y;
         }
-
-
-        /// <summary>
-        /// Scan for full brick rows to destroy.
-        /// </summary>
-        public void Scan()
-        {
-            for (int y = 0; y < height; y++)
-            {
-                bool full = true;
-                for (int x = 0; x < width; x++)
-                {
-                    if (!(field[x, y] is Block))
-                        full = false;
-                }
-                if (full)
-                {
-                    // TODO: Remove full brick rows.
-                }
-            }
-        }
-
-
 #if DEBUG
         /// <summary>
-        /// Visualises collision field in console as text.
+        /// Visualizes collision field in debug console as ASCII art.
         /// </summary>
-        public void Visualize(Config config)
+        public void Visualize()
         {
             for (int y = 0; y < height; y++)
             {
                 Console.CursorTop = height - y;
+                System.Text.StringBuilder line = new System.Text.StringBuilder(width);
                 for (int x = 0; x < width; x++)
                 {
-                    try
-                    {
-                        Console.CursorLeft = x;
-                    }
-                    catch (ArgumentOutOfRangeException)
-                    {
-                        config.visualizeCollision = false;
-                        Console.CursorLeft = 0;
-                        Console.CursorTop = height - y;
-                        Console.WriteLine(new string(' ', Console.BufferWidth));
-                        Console.CursorLeft = 0;
-                        Console.CursorTop = 1;
-                        Console.WriteLine("[COLLISION] Can't visualize a field wider than " + Console.BufferWidth + ".");
-                        return;
-                    }
                     PoolableEntity current = field[x, y];
                     if (current == null)
                     {
-                        Console.Write(".");
-                        continue;
-                    }
-                    if (current is Worm)
-                    {
-                        Console.Write("o");
+                        line.Append('.');
                         continue;
                     }
                     if (current is Block)
                     {
-                        Console.Write("x");
+                        line.Append('x');
+                        continue;
+                    }
+                    if (current is Worm)
+                    {
+                        line.Append('o');
                         continue;
                     }
                     if (current is Fruit)
                     {
-                        Console.Write("+");
+                        line.Append('+');
                         continue;
                     }
+                    throw new Exception("Unrecognized poolable on collision field.");
                 }
+                Console.WriteLine(line.ToString());
             }
             Console.CursorLeft = 0;
             Console.CursorTop = height + 1;
