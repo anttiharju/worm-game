@@ -13,6 +13,8 @@ namespace WormGame.GameObject
     /// </summary>
     public class WormModule : PoolableObject
     {
+        private readonly Collision field;
+
         /// <summary>
         /// Get and set next WormBody in worm.
         /// </summary>
@@ -53,6 +55,7 @@ namespace WormGame.GameObject
         /// <param name="config">Configuration class</param>
         public WormModule(Config config)
         {
+            field = config.field;
             Graphic = Image.CreateCircle(config.imageSize / 2);
             Graphic.Scale = (float)config.size / config.imageSize;
             Graphic.CenterOrigin();
@@ -153,6 +156,8 @@ namespace WormGame.GameObject
         {
             if (Next != null)
                 Next.Disable();
+            if (field.Check(target) == 1)
+                field.Set(null, target);
             Graphic.Visible = false;
             Enabled = false;
             Next = null;

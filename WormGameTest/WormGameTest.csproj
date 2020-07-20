@@ -12,4 +12,4 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0"/>
   </ItemGroup>
 
-<ItemGroup><ProjectReference Include="C:\Users\antti\omat\worm-bricks\WormGame\WormGame.csproj"/></ItemGroup></Project>
+<ItemGroup><ProjectReference Include="C:\Users\antti\omat\worm-bricks\WormGame\WormGame.csproj"/><ProjectReference Include="C:\Users\antti\omat\worm-bricks\WormGame\WormGame.csproj"/></ItemGroup></Project>

@@ -43,8 +43,11 @@ namespace WormGame.GameObject
         public Fruit Spawn()
         {
             Vector2 random = Random.ValidPosition(field, width, height, 4);
-            if (field.Get(random) != null)
+            if (random.X == -1 || field.Get(random) != null)
+            {
                 Disable();
+                return null;
+            }
             X = random.X;
             Y = random.Y;
             field.Set(this, Position);

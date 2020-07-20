@@ -1,4 +1,5 @@
 ﻿using Otter.Graphics;
+using System.Net;
 using WormGame.Core;
 using WormGame.Pooling;
 
@@ -27,19 +28,19 @@ namespace WormGame.GameObject
 
         public Block Spawn(Worm worm, Pooler<BlockModule> brickModules)
         {
-            Count = worm.Length;
+            if (!brickModules.Ask(worm.Length))
+            {
+                Enabled = false;
+                return null;
+            }
 
+            Count = worm.Length;
             X = worm.X;
             Y = worm.Y;
 
             firstModule = brickModules.Enable();
-            if (firstModule == null) return null;
-            firstModule.Graphic.X = 0;
-            firstModule.Graphic.Y = 0;
-            bool neighbours = firstModule.CopyWorm(worm, worm.firstModule, this, brickModules);
-            Color = worm.Color;
-            if (neighbours)
-                Disable();
+            firstModule.Graphic.Color = worm.Color;
+            firstModule.CopyWorm(worm, worm.firstModule, this, brickModules);
 
             return this;
         }

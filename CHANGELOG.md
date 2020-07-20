@@ -18,6 +18,7 @@
             - This shouldn't be the root cause anymore as I applied some dumb safeguards.
         - Sometimes blocks spawn outside of the play area. I suspect worms turning into blocks before they have fully ramped up (they have overlapping parts)
             - BlockModule pooler keeps going empty before it should, probably due to overlapping BlockModules due to the thing explained in the line above
+            
 
 # 18.07.2020
 - Fix worm entity model

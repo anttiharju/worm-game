@@ -27,22 +27,33 @@ namespace WormGame.GameObject
             Graphic.CenterOrigin();
         }
 
-        public bool CopyWorm(Worm worm, WormModule wormModule, Block brick, Pooler<BlockModule> brickModules, bool disable = false)
+        public void CopyWorm(Worm worm, WormModule wormModule, Block brick, Pooler<BlockModule> brickModules, int count = 0)
         {
             Next = brickModules.Enable();
-            if (Next == null) return false;
-            Next.Next = null;
             Next.Graphic.X = wormModule.Target.X - worm.Position.X;
             Next.Graphic.Y = wormModule.Target.Y - worm.Position.Y;
+
+            if (Next.Graphic.X == Graphic.X && Next.Graphic.Y == Graphic.Y)
+            {
+                int delta = worm.Length - count;
+                if (delta != 0)
+                    System.Console.WriteLine(delta);
+                Next.Disable();
+                return;
+            }
+
+            Next.Graphic.Color = Graphic.Color;
             brick.AddGraphic(Next.Graphic);
             field.Set(brick, wormModule.Target);
+            if (wormModule.Next != null)
+                Next.CopyWorm(worm, wormModule.Next, brick, brickModules, ++count);
+        }
+        /*
             if (!disable)
                 disable = NeighbourCheck(brick, worm.Color, field.X(wormModule.Target.X), field.Y(wormModule.Target.Y));
             if (wormModule.Next != null)
                 return Next.CopyWorm(worm, wormModule.Next, brick, brickModules, disable);
             return disable;
-        }
-
         private bool NeighbourCheck(Block parent, Color color, int positionX, int positionY)
         {
             int[] x = { 1, -1, 0, 0 };
@@ -69,7 +80,7 @@ namespace WormGame.GameObject
                 }
             }
             return false;
-        }
+        }*/
 
         public void SetColor(Color color)
         {
@@ -85,6 +96,8 @@ namespace WormGame.GameObject
                 Next.Disable(parentPosition);
             Enabled = false;
             Next = null;
+            Graphic.X = 0;
+            Graphic.Y = 0;
         }
     }
 }

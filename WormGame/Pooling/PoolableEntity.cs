@@ -20,7 +20,7 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Entity identifier.
+        /// Entity identifier. Unique within the same pool.
         /// </summary>
         public int Id { get; set; }
 
@@ -32,7 +32,7 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Sets graphic visibility and various other Otter2d entity properties.
+        /// Sets entity visibility and various other Otter2d entity properties.
         /// </summary>
         public bool Enabled { get { return Visible; } set { AutoUpdate = value; AutoRender = value; Visible = value; } }
 
