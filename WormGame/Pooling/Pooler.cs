@@ -84,11 +84,11 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Ask if the pool has required amount of poolables available.
+        /// Check if the pool has required amount of poolables available.
         /// </summary>
         /// <param name="amount">How many poolables are needed</param>
         /// <returns>Is asked amount of poolables available</returns>
-        public bool Ask(int amount)
+        public bool Check(int amount)
         {
             if (enablingIndex <= Size - amount)
                 return true;
@@ -102,36 +102,35 @@ namespace WormGame.Pooling
         /// </summary>
         /// <returns>did sorting make more poolables available to enable</returns>
         /// <example>
-        /// Before: [.2.45]
+        /// Before: [1b3de]
         ///              ^
-        /// After:  [524..]
+        /// After:  [ebd31]
         ///             ^
-        /// . = available, [number] = in use, ^ = enablingIndex
+        /// [number] = available, [letter] = in use, ^ = enablingIndex
         /// <pre name="test">
         ///  #if DEBUG
         ///  Config testConfig = new Config();
         ///  Pooler<PoolableObject> testPool = new Pooler<PoolableObject>(testConfig, 5);
-        ///  PoolableObject one = testPool.Enable();
-        ///  PoolableObject two = testPool.Enable();
-        ///  PoolableObject thr = testPool.Enable();
-        ///  PoolableObject fou = testPool.Enable();
-        ///  PoolableObject fiv = testPool.Enable();
-        ///  one.Disable();
-        ///  thr.Disable();
-        ///  testPool[0] === one;
-        ///  testPool[1] === two;
-        ///  testPool[2] === thr;
-        ///  testPool[3] === fou;
-        ///  testPool[4] === fiv;
-        ///  testPool[5] = fiv; #THROWS IndexOutOfRangeException
-        ///  testPool[0] === one;
+        ///  PoolableObject a = testPool.Enable();
+        ///  PoolableObject b = testPool.Enable();
+        ///  PoolableObject c = testPool.Enable();
+        ///  PoolableObject d = testPool.Enable();
+        ///  PoolableObject e = testPool.Enable();
+        ///  a.Disable();
+        ///  c.Disable();
+        ///  testPool[0] === a;
+        ///  testPool[1] === b;
+        ///  testPool[2] === c;
+        ///  testPool[3] === d;
+        ///  testPool[4] === e;
+        ///  testPool[5] = d; #THROWS IndexOutOfRangeException
         ///  testPool.GetEnablingIndex() === 4;
-        ///  testPool.Ask(2) === true; // Triggers Defragment()
-        ///  testPool.Ask(3) === false;
+        ///  testPool.Check(2) === true; // Triggers Sort()
+        ///  testPool.Check(3) === false;
         ///  testPool.GetEnablingIndex() === 3;
-        ///  testPool[0] === fiv;
-        ///  testPool[1] === two;
-        ///  testPool[2] === fou;
+        ///  testPool[0] === e;
+        ///  testPool[1] === b;
+        ///  testPool[2] === d;
         ///  #else
         ///  throw new Exception("Run tests in Debug mode.");
         ///  #endif
@@ -197,7 +196,6 @@ namespace WormGame.Pooling
         {
             return Pool.GetEnumerator();
         }
-
 #if DEBUG
         /// <summary>
         /// Don't use! Only for testing.
