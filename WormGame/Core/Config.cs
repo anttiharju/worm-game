@@ -16,7 +16,7 @@ namespace WormGame.Core
         public readonly bool fullscreen = false;
         public readonly int windowWidth = 1280;
         public readonly int windowHeight = 720;
-        public readonly int refreshRate = 144;
+        public readonly int refreshRate = 144; // See wormSpeed before changing this
         public readonly int imageSize = 32;
 
         public readonly WormScene scene;
@@ -25,7 +25,7 @@ namespace WormGame.Core
         public readonly int height = 10;
         public readonly int margin = 2;
 
-        // Refresh rate has to be evenly divisible by wormSpeed (6 supports 144, 120, 60 and 30). If not, this will be subtracted by one until it is.
+        // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30). If not, this will be subtracted by one until it is.
         public readonly int wormSpeed = 6;
         public readonly int minWormLength = 5;
 
