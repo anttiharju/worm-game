@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections;
-#if DEBUG
-using System.Text.RegularExpressions;
-#endif
 using WormGame.Core;
 
 namespace WormGame.Pooling
@@ -17,7 +14,6 @@ namespace WormGame.Pooling
     {
 #if DEBUG
         private readonly string type;
-        private readonly int length;
 #endif
         private readonly int endIndex;
 
@@ -31,34 +27,33 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Returns pools capacity.
+        /// Returns pools length.
         /// </summary>
-        public int Count { get { return Pool.Length; } }
+        public int Length { get { return Pool.Length; } }
 
 
         /// <summary>
         /// Initializes the object pool. PoolableEntities have to be manually added to the scene through Pool property.
         /// </summary>
         /// <param name="config">Configuration object</param>
-        /// <param name="capacity">Pool size</param>
-        public Pooler(Config config, int capacity)
+        /// <param name="length">Pool size</param>
+        public Pooler(Config config, int length)
         {
-            endIndex = capacity - 1;
-            Pool = new T[capacity];
-            for (int i = 0; i < capacity; i++)
+            endIndex = length - 1;
+            Pool = new T[length];
+            for (int i = 0; i < length; i++)
             {
                 T tmp = (T)Activator.CreateInstance(typeof(T), new object[] { config });
                 tmp.Enabled = false;
                 tmp.Id = i;
                 Pool[i] = tmp;
             }
-
 #if DEBUG
-            length = capacity.ToString().Length;
-            var pattern = @"\.([^\.]*)$";
-            var matches = Regex.Matches("" + Pool[0].GetType(), pattern);
+            System.Text.RegularExpressions.MatchCollection matches = System.Text.RegularExpressions.Regex.Matches("" + Pool[0].GetType(), @"\.([^\.]*)$");
             if (matches.Count > 0 && matches[0].Groups.Count > 1)
                 type = matches[0].Groups[1].Value;
+            else
+                throw new Exception("Couldn't solve poolable type.");
 #endif
         }
 
@@ -70,52 +65,89 @@ namespace WormGame.Pooling
         public T Enable()
         {
             if (enablingIndex == endIndex && Pool[enablingIndex].Enabled)
-            {
-                Defrag(); // Moves enablingIndex
-                if (enablingIndex == endIndex)
-                {
-#if DEBUG
-                    Console.Write("[POOLER] ");
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write("Empty        ");
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.WriteLine($"{type}");
-                    Console.ForegroundColor = ConsoleColor.Gray;
-#endif
+                if (Defragment())
                     return null;
-                }
-            }
-            int current = enablingIndex;
-            Pool[current].Enabled = true;
+            int newEntity = enablingIndex;
+            Pool[newEntity].Enabled = true;
             if (enablingIndex != endIndex)
                 enablingIndex++;
-            return Pool[current];
+            return Pool[newEntity];
         }
 
 
         /// <summary>
-        /// Sorts the pools so that objects in use are at the beginning.
+        /// Ask if the pool has required amount of poolables available.
         /// </summary>
-        private void Defrag()
+        /// <param name="amount">How many poolables are needed</param>
+        /// <returns>If asked amount of poolables are available</returns>
+        public bool Ask(int amount)
+        {
+            if (enablingIndex <= Length - amount)
+                return true;
+            Defragment();
+            return enablingIndex <= Length - amount;
+        }
+
+
+        /// <summary>
+        /// Defragments (sorts) the pool in a way that disabled poolables are at the end of the pool array, readily available to enable.
+        /// </summary>
+        /// <example>
+        /// - = available, [number] = in use, ^ = enablingIndex
+        /// Before: -2-45
+        ///             ^
+        /// After:  524--
+        ///            ^
+        /// <pre name="test">
+        ///  #if DEBUG
+        ///  Config testConfig = new Config();
+        ///  Pooler<PoolableObject> testPool = new Pooler<PoolableObject>(testConfig, 5);
+        ///  PoolableObject one = testPool.Enable();
+        ///  PoolableObject two = testPool.Enable();
+        ///  PoolableObject thr = testPool.Enable();
+        ///  PoolableObject fou = testPool.Enable();
+        ///  PoolableObject fiv = testPool.Enable();
+        ///  one.Disable();
+        ///  thr.Disable();
+        ///  testPool[0] === one;
+        ///  testPool[1] === two;
+        ///  testPool[2] === thr;
+        ///  testPool[3] === fou;
+        ///  testPool[4] === fiv;
+        ///  testPool[5] = fiv; #THROWS IndexOutOfRangeException
+        ///  testPool[0] === one;
+        ///  testPool.GetEnablingIndex() === 4;
+        ///  testPool.Ask(2) === true; // Triggers Defragment()
+        ///  testPool.Ask(3) === false;
+        ///  testPool.GetEnablingIndex() === 3;
+        ///  testPool[0] === fiv;
+        ///  testPool[1] === two;
+        ///  testPool[2] === fou;
+        ///  #else
+        ///  throw new Exception("Run tests in Debug mode.");
+        ///  #endif
+        /// </pre>
+        /// </example>
+        private bool Defragment()
         {
 #if DEBUG
-            int delta = enablingIndex;
+            int freedAmount = enablingIndex;
 #endif
-            int i = 0;
-            while (i < enablingIndex)
+            int current = 0;
+            while (current < enablingIndex)
             {
-                if (Pool[i].Enabled)
-                    i++;
+                if (Pool[current].Enabled)
+                    current++;
                 else
                 {
-                    for (int j = enablingIndex; j > i; j--)
+                    for (int enabled = enablingIndex; enabled > current; enabled--)
                     {
-                        if (Pool[j].Enabled)
+                        if (Pool[enabled].Enabled)
                         {
-                            T tmp = Pool[j];
-                            Pool[j] = Pool[i];
-                            Pool[i] = tmp;
-                            i++;
+                            T swap = Pool[enabled];
+                            Pool[enabled] = Pool[current];
+                            Pool[current] = swap;
+                            current++;
                             break;
                         }
                         else
@@ -124,28 +156,60 @@ namespace WormGame.Pooling
                 }
             }
 #if DEBUG
-            delta -= enablingIndex;
-            if (delta == 0) return;
-            Console.Write($"[POOLER] ");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("Defrag ");
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.Write($"{delta,5} ");
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write($"{type}");
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.WriteLine();
+            freedAmount -= enablingIndex;
+            ConsoleColor defaultColor = Console.ForegroundColor;
+            if (freedAmount == 0)
+            {   // Defragmentation didn't free any poolables: pool is fully utilized. This shouldn't happen.
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write("[POOLER] ");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"{type,-11}");
+                Console.ForegroundColor = defaultColor;
+            }
+            else
+            {   // Defragmentation freed {freedAmount} poolables back to use.
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write($"[POOLER] ");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write($"{type,-11}");
+                Console.ForegroundColor = defaultColor;
+                Console.WriteLine($" {freedAmount} ");
+            }
 #endif
+            return enablingIndex == endIndex;
         }
 
 
         /// <summary>
-        /// So we can foreach through the objects in the pool. Used in wormScene.
+        /// So we can loop through the poolables, e.g. to move them.
         /// </summary>
         /// <returns>Pool enumerator</returns>
         public IEnumerator GetEnumerator()
         {
             return Pool.GetEnumerator();
         }
+
+#if DEBUG
+        /// <summary>
+        /// Don't use! Only for testing.
+        /// </summary>
+        /// <returns>enablingIndex</returns>
+        public int GetEnablingIndex()
+        {
+            return enablingIndex;
+        }
+
+
+        /// <summary>
+        /// Don't use! Only for testing.
+        /// </summary>
+        /// <param name="i">Index</param>
+        /// <returns>Poolable at index</returns>
+        public T this[int i]
+        {
+            get { return Pool[i]; }
+            set { Pool[i] = value; }
+        }
+#endif
     }
 }

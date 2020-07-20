@@ -83,6 +83,7 @@ namespace WormGame.GameObject
             modules = wormModules;
             X = field.EntityX(x);
             Y = field.EntityY(y);
+            target = Position;
             Length = length;
 
             lastModule = null;
@@ -135,11 +136,7 @@ namespace WormGame.GameObject
             else
             {
                 if (!tryAgain)
-                {
-                    Length = rampUp + 1;
                     scene.SpawnBrick(this);
-                    Disable();
-                }
                 else if (Player == null)
                 {
                     direction = Random.ValidDirection(field, firstModule.Target, size);
@@ -209,8 +206,6 @@ namespace WormGame.GameObject
         /// </summary>
         public override void Disable()
         {
-            firstModule.Disable();
-            firstModule = null;
             newGraphic = null;
             lastModule = null;
             newModule = null;
@@ -220,6 +215,8 @@ namespace WormGame.GameObject
             target.X = 0;
             target.Y = 0;
             rampUp = 0;
+            firstModule.Disable();
+            firstModule = null;
         }
     }
 }

@@ -82,6 +82,7 @@ namespace WormGame.Static
                             randomY = y;
                             goto End;
                         }
+                return -Vector2.One;
             }
         End:
             return new Vector2(field.EntityX(randomX), field.EntityY(randomY));

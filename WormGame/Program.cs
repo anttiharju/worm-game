@@ -1,4 +1,6 @@
 ﻿using Otter.Core;
+using Otter.Graphics.Drawables;
+using Otter.Utility;
 using WormGame.Core;
 
 namespace WormGame
@@ -10,9 +12,10 @@ namespace WormGame
     /// </summary>
     public class Program
     {
+        public static Config config = new Config();
         static void Main()
         {
-            Config config = new Config();
+            Image.CirclePointCount = (int)(config.size * 0.6f);
             Game game = new Game("Worm Blocks", config.windowWidth, config.windowHeight, config.refreshRate, config.fullscreen)
             {
                 WindowResize = false,
@@ -21,5 +24,12 @@ namespace WormGame
             };
             game.Start(config.scene);
         }
+#if DEBUG
+        [OtterCommand(helpText: "Toggle collision visualizer.", group: "game")]
+        static void Visualize()
+        {
+            config.visualizeCollision = !config.visualizeCollision;
+        }
+#endif
     }
 }
