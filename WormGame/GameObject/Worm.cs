@@ -91,7 +91,6 @@ namespace WormGame.GameObject
             newModule = firstModule;
             for (int i = 0; i < Length; i++)
             {
-                newModule.Reset();
                 newGraphic = newModule.Graphic;
                 newModule.Target = Position;
 
@@ -148,7 +147,6 @@ namespace WormGame.GameObject
             if (grow && moving)
             {
                 newModule = modules.Enable();
-                newModule.Reset();
                 if (newModule == null) return;
                 newGraphic = newModule.Graphic;
                 newGraphic.X = lastModule.Graphic.X;

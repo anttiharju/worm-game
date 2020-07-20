@@ -43,10 +43,18 @@ namespace WormGame.Pooling
             Pool = new T[size];
             for (int i = 0; i < size; i++)
             {
-                T tmp = (T)Activator.CreateInstance(typeof(T), new object[] { config });
-                tmp.Enabled = false;
-                tmp.Id = i;
-                Pool[i] = tmp;
+                T currentPoolable;
+                try
+                {
+                    currentPoolable = (T)Activator.CreateInstance(typeof(T), new object[] { config });
+                }
+                catch (MissingMethodException)
+                {
+                    currentPoolable = (T)Activator.CreateInstance(typeof(T), new object[] { });
+                }
+                currentPoolable.Enabled = false;
+                currentPoolable.Id = i;
+                Pool[i] = currentPoolable;
             }
 #if DEBUG
             System.Text.RegularExpressions.MatchCollection matches = System.Text.RegularExpressions.Regex.Matches("" + Pool[0].GetType(), @"\.([^\.]*)$");
