@@ -17,7 +17,7 @@ namespace WormGame.Pooling
 #endif
         private readonly int endIndex;
 
-        private int enablingIndex = 0;
+        public int EnableIndex { get; private set; }
 
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace WormGame.Pooling
         /// <summary>
         /// Returns pools length.
         /// </summary>
-        public int Size { get { return Pool.Length; } }
+        public int Count { get { return Pool.Length; } }
 
 
         /// <summary>
@@ -72,13 +72,13 @@ namespace WormGame.Pooling
         /// <returns>Enabled object</returns>
         public T Enable()
         {
-            if (enablingIndex == endIndex && Pool[enablingIndex].Enabled)
-                if (Sort())
+            if (EnableIndex == endIndex && Pool[EnableIndex].Enabled)
+                if (Defrag())
                     return null;
-            int newEntity = enablingIndex;
+            int newEntity = EnableIndex;
             Pool[newEntity].Enabled = true;
-            if (enablingIndex != endIndex)
-                enablingIndex++;
+            if (EnableIndex != endIndex)
+                EnableIndex++;
             return Pool[newEntity];
         }
 
@@ -90,65 +90,61 @@ namespace WormGame.Pooling
         /// <returns>Is asked amount of poolables available</returns>
         public bool Check(int amount)
         {
-            if (enablingIndex <= Size - amount)
+            if (EnableIndex <= Count - amount)
                 return true;
-            Sort();
-            return enablingIndex <= Size - amount;
+            Defrag();
+            return EnableIndex <= Count - amount;
         }
 
 
         /// <summary>
-        /// Sorts the pool in a way that disabled poolables are at the end of the pool array, readily available to be enabled.
+        /// Defragments the pool in a way that disabled poolables are at the end of the array, readily available to be enabled.
         /// </summary>
-        /// <returns>did sorting make more poolables available to enable</returns>
+        /// <returns>Are all poolables enabled</returns>
         /// <example>
-        /// Before: [1b3de]
+        /// Before: [.2.45]
         ///              ^
-        /// After:  [ebd31]
+        /// After:  [524..]
         ///             ^
-        /// [number] = available, [letter] = in use, ^ = enablingIndex
+        /// . = disabled, [number] = enabled, ^ = EnableIndex
         /// <pre name="test">
-        ///  #if DEBUG
         ///  Config testConfig = new Config();
         ///  Pooler<PoolableObject> testPool = new Pooler<PoolableObject>(testConfig, 5);
-        ///  PoolableObject a = testPool.Enable();
-        ///  PoolableObject b = testPool.Enable();
-        ///  PoolableObject c = testPool.Enable();
-        ///  PoolableObject d = testPool.Enable();
-        ///  PoolableObject e = testPool.Enable();
-        ///  a.Disable();
-        ///  c.Disable();
-        ///  testPool[0] === a;
-        ///  testPool[1] === b;
-        ///  testPool[2] === c;
-        ///  testPool[3] === d;
-        ///  testPool[4] === e;
-        ///  testPool[5] = d; #THROWS IndexOutOfRangeException
-        ///  testPool.GetEnablingIndex() === 4;
-        ///  testPool.Check(2) === true; // Triggers Sort()
+        ///  PoolableObject p1 = testPool.Enable();
+        ///  PoolableObject p2 = testPool.Enable();
+        ///  PoolableObject p3 = testPool.Enable();
+        ///  PoolableObject p4 = testPool.Enable();
+        ///  PoolableObject p5 = testPool.Enable();
+        ///  p1.Disable();
+        ///  p3.Disable();
+        ///  testPool[0] === p1;
+        ///  testPool[1] === p2;
+        ///  testPool[2] === p3;
+        ///  testPool[3] === p4;
+        ///  testPool[4] === p5;
+        ///  testPool[5] === p5; #THROWS IndexOutOfRangeException
+        ///  testPool.EnableIndex === 4;
+        ///  testPool.Check(2) === true; // Triggers Defrag()
         ///  testPool.Check(3) === false;
-        ///  testPool.GetEnablingIndex() === 3;
-        ///  testPool[0] === e;
-        ///  testPool[1] === b;
-        ///  testPool[2] === d;
-        ///  #else
-        ///  throw new Exception("Run tests in Debug mode.");
-        ///  #endif
+        ///  testPool.EnableIndex === 3;
+        ///  testPool[0] === p5;
+        ///  testPool[1] === p2;
+        ///  testPool[2] === p4;
+        ///  testPool[3] === p3;
+        ///  testPool[4] === p1;
         /// </pre>
         /// </example>
-        private bool Sort()
+        private bool Defrag()
         {
-#if DEBUG
-            int freedAmount = enablingIndex;
-#endif
+            int defragAmount = EnableIndex;
             int current = 0;
-            while (current < enablingIndex)
+            while (current < EnableIndex)
             {
                 if (Pool[current].Enabled)
                     current++;
                 else
                 {
-                    for (int enabled = enablingIndex; enabled > current; enabled--)
+                    for (int enabled = EnableIndex; enabled > current; enabled--)
                     {
                         if (Pool[enabled].Enabled)
                         {
@@ -159,14 +155,14 @@ namespace WormGame.Pooling
                             break;
                         }
                         else
-                            enablingIndex--;
+                            EnableIndex--;
                     }
                 }
             }
+            defragAmount -= EnableIndex;
 #if DEBUG
-            freedAmount -= enablingIndex;
             ConsoleColor defaultColor = Console.ForegroundColor;
-            if (freedAmount == 0)
+            if (defragAmount == 0)
             {   // Defragmentation didn't free any poolables: pool is fully utilized. This shouldn't happen with correct pool size.
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.Write("[POOLER] ");
@@ -175,48 +171,37 @@ namespace WormGame.Pooling
                 Console.ForegroundColor = defaultColor;
             }
             else
-            {   // Defragmentation freed {freedAmount} poolables back to use.
+            {   // Defragmentation freed {defragAmount} of poolables back to use.
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.Write($"[POOLER] ");
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.Write($"{type,-11}");
                 Console.ForegroundColor = defaultColor;
-                Console.WriteLine($" {freedAmount} ");
+                Console.WriteLine($" {defragAmount} ");
             }
 #endif
-            return enablingIndex == endIndex;
+            return EnableIndex == endIndex;
         }
 
 
         /// <summary>
-        /// Enables us to loop through the pool, e.g. to move the poolables in it.
+        /// Enables us to foreach through the pool.
         /// </summary>
         /// <returns>Pool enumerator</returns>
         public IEnumerator GetEnumerator()
         {
             return Pool.GetEnumerator();
         }
-#if DEBUG
-        /// <summary>
-        /// Don't use! Only for testing.
-        /// </summary>
-        /// <returns>enablingIndex</returns>
-        public int GetEnablingIndex()
-        {
-            return enablingIndex;
-        }
 
 
         /// <summary>
-        /// Don't use! Only for testing.
+        /// Enables us to for loop through the pool and test it properly.
         /// </summary>
         /// <param name="i">Index</param>
         /// <returns>Poolable at index</returns>
         public T this[int i]
         {
             get { return Pool[i]; }
-            set { Pool[i] = value; }
         }
-#endif
     }
 }

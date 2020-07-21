@@ -65,7 +65,7 @@ namespace WormGame
                     }
             */
             if (config.fruits)
-                for (int i = 0; i < fruits.Size; i++)
+                for (int i = 0; i < fruits.Count; i++)
                     fruits.Enable().Spawn();
 
             for (int i = 0; i < 3; i++)
