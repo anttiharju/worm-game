@@ -38,38 +38,26 @@ namespace WormGame
         {
             this.config = config;
             field = config.field;
-            maxWormCount = config.wormAmount;
-
+            maxWormCount = config.maxWormAmount;
             CreateBackground();
 
             // Entity pools
-            blocks = new Pooler<Block>(config, config.entityAmount * 2);
+            blocks = new Pooler<Block>(config, config.moduleAmount);
             fruits = new Pooler<Fruit>(config, config.fruitAmount);
-            worms = new Pooler<Worm>(config, config.entityAmount);
+            worms = new Pooler<Worm>(config, config.wormAmount);
             AddMultiple(blocks.Pool);
             AddMultiple(fruits.Pool);
             AddMultiple(worms.Pool);
 
             // Object pools
             wormModules = new Pooler<WormModule>(config, config.moduleAmount);
-            blockModules = new Pooler<BlockModule>(config, config.moduleAmount * 2);
+            blockModules = new Pooler<BlockModule>(config, config.moduleAmount);
 
             // Entity setup
-            /*
-            int density = config.density;
-            if (density > 0)
-                for (int x = 0; x < config.width; x += density)
-                    for (int y = 0; y < config.height; y += density)
-                    {
-                        SpawnWorm(x, y);
-                        wormCount++;
-                    }
-            */
             if (config.fruits)
                 for (int i = 0; i < fruits.Count; i++)
                     fruits.Enable().Spawn();
 
-            SpawnWorm(0, 0);
             for (int i = 0; i < 3; i++)
                 SpawnPlayer(i);
         }
@@ -119,11 +107,11 @@ namespace WormGame
 
 
         /// <summary>
-        /// Turn a worm into a brick.
+        /// Turn a worm into a block.
         /// </summary>
         /// <param name="worm">Worm to transform</param>
-        /// <returns>Brick</returns>
-        public Block SpawnBrick(Worm worm, int currentLength)
+        /// <returns>Block</returns>
+        public Block SpawnBlock(Worm worm, int currentLength)
         {
             Block block = blocks.Enable();
             if (block == null || blockModules.Check(currentLength) == false)
@@ -159,7 +147,7 @@ namespace WormGame
                     if (worm.Enabled)
                         worm.Move();
                 wormCounter = 0;
-                /*if (wormCount < maxWormCount)
+                if (wormCount < maxWormCount)
                 {
                     Vector2 random = Random.ValidPosition(field, config.width, config.height, 4);
                     if (random.X != -1 && field.Get(random) == null)
@@ -169,7 +157,7 @@ namespace WormGame
                     }
                     else
                         wormCount--;
-                }*/
+                }
 #if DEBUG
                 if (config.visualizeCollision)
                     field.Visualize();

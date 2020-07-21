@@ -21,22 +21,23 @@ namespace WormGame.GameObject
         public BlockModule(Config config)
         {
             field = config.field;
-            Graphic = Image.CreateRectangle(config.imageSize);
-            Graphic.Scale = (float)config.size / config.imageSize;
+            Graphic = Image.CreateRectangle(config.size);
             Graphic.CenterOrigin();
         }
 
-        public void CopyWorm(Worm worm, WormModule wormModule, Block brick, Pooler<BlockModule> brickModules, int currentLength, int i = 1)
+        public void CopyWormModule(Worm worm, WormModule wormModule, Block brick, Pooler<BlockModule> brickModules, int currentLength, int i = 1)
         {
-            Next = brickModules.Enable();
-            Next.Graphic.X = wormModule.Target.X - worm.Position.X;
-            Next.Graphic.Y = wormModule.Target.Y - worm.Position.Y;
+            Graphic.X = wormModule.Target.X - worm.Position.X;
+            Graphic.Y = wormModule.Target.Y - worm.Position.Y;
+            Graphic.Color = worm.Color;
 
-            Next.Graphic.Color = Graphic.Color;
-            brick.AddGraphic(Next.Graphic);
+            brick.AddGraphic(Graphic);
             field.Set(brick, wormModule.Target);
             if (i < currentLength)
-                Next.CopyWorm(worm, wormModule.Next, brick, brickModules, currentLength, ++i);
+            {
+                Next = brickModules.Enable();
+                Next.CopyWormModule(worm, wormModule.Next, brick, brickModules, currentLength, ++i);
+            }
         }
 
         public void SetColor(Color color)

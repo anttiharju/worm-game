@@ -13,11 +13,10 @@ namespace WormGame.Core
 #if DEBUG
         public bool visualizeCollision = false; // 119x29 fits in debug console
 #endif
-        public readonly bool fullscreen = true;
-        public readonly int windowWidth = 1920;
-        public readonly int windowHeight = 1080;
+        public readonly bool fullscreen = false;
+        public readonly int windowWidth = 1280;
+        public readonly int windowHeight = 720;
         public readonly int refreshRate = 144; // See wormSpeed before changing this
-        public readonly int imageSize = 32;
 
         public readonly WormScene scene;
         public readonly Collision field;
@@ -26,17 +25,18 @@ namespace WormGame.Core
         public readonly int margin = 2;
 
         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30). If not, this will be subtracted by one until it is.
-        public readonly int wormSpeed = 24;
-        public readonly int minWormLength = 200;
+        public readonly int wormSpeed = 144;
+        public readonly int minWormLength = 5;
 
         // Not loaded from settings.cfg (yet?)
         public readonly bool fruits = false;
         public readonly float fruitPercentage = 0.015f;
-        public readonly int wormAmount = 1;
+        public readonly int maxWormAmount = 5;
         public readonly int density = 5;
 
         // Dynamic values
         public readonly int fruitAmount;
+        public readonly int wormAmount;
         public readonly int entityAmount;
         public readonly int moduleAmount;
         public readonly float step;
@@ -119,10 +119,11 @@ namespace WormGame.Core
             fruitAmount = (int)(width * height * fruitPercentage);
             if (fruitAmount < 1)
                 fruitAmount = 1;
+            wormAmount = maxWormAmount * 2 + 4; // with bad luck every worm can transition at the same time, that's why * 2 and +1 for each player (4)
             moduleAmount = width * height;
             entityAmount = moduleAmount / minWormLength;
             size = CalculateSize(windowWidth, windowHeight);
-            step = (float)wormSpeed / refreshRate * (float)size;
+            step = (float)wormSpeed / refreshRate * size;
             field = new Collision(this);
             scene = new WormScene(this);
         }

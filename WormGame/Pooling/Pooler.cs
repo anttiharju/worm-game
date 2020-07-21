@@ -5,7 +5,7 @@ using WormGame.Core;
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 20.07.2020
+    /// @version 21.07.2020
     /// <summary>
     /// Object pooler.
     /// </summary>

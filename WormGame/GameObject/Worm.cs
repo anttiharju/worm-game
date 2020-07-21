@@ -79,7 +79,6 @@ namespace WormGame.GameObject
         /// <returns>Worm</returns>
         public Worm Spawn(Pooler<WormModule> wormModules, int x, int y, int length, Color color)
         {
-            ClearGraphics();
             scene = (WormScene)Scene;
             modules = wormModules;
             X = field.EntityX(x);
@@ -139,7 +138,7 @@ namespace WormGame.GameObject
             {
                 if (!tryAgain)
                 {
-                    scene.SpawnBrick(this, currentLength);
+                    scene.SpawnBlock(this, currentLength);
                     Disable();
                 }
                 else if (Player == null)
@@ -210,8 +209,9 @@ namespace WormGame.GameObject
         /// </summary>
         public override void Disable()
         {
-            Enabled = false;
             firstModule.Disable();
+            ClearGraphics();
+            Enabled = false;
         }
     }
 }
