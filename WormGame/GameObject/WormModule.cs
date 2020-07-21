@@ -142,12 +142,11 @@ namespace WormGame.GameObject
         /// </summary>
         public override void Disable()
         {
+            Enabled = false;
             if (Next != null)
                 Next.Disable();
             if (field.Check(target) == 1)
                 field.Set(null, target);
-            Graphic.Visible = false;
-            Enabled = false;
             Next = null;
             target.X = 0;
             target.Y = 0;

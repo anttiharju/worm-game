@@ -9,41 +9,39 @@ namespace TestWormGame.Pooling
 	public  class TestPooler
 	{
 		[Test]
-		public  void TestSort110()
+		public  void TestDefrag110()
 		{
-			#if DEBUG
 			Config testConfig = new Config();
 			Pooler<PoolableObject> testPool = new Pooler<PoolableObject>(testConfig, 5);
-			PoolableObject a = testPool.Enable();
-			PoolableObject b = testPool.Enable();
-			PoolableObject c = testPool.Enable();
-			PoolableObject d = testPool.Enable();
-			PoolableObject e = testPool.Enable();
-			a.Disable();
-			c.Disable();
-			Assert.AreEqual( a, testPool[0] , "in method Sort, line 121");
-			Assert.AreEqual( b, testPool[1] , "in method Sort, line 122");
-			Assert.AreEqual( c, testPool[2] , "in method Sort, line 123");
-			Assert.AreEqual( d, testPool[3] , "in method Sort, line 124");
-			Assert.AreEqual( e, testPool[4] , "in method Sort, line 125");
+			PoolableObject p1 = testPool.Enable();
+			PoolableObject p2 = testPool.Enable();
+			PoolableObject p3 = testPool.Enable();
+			PoolableObject p4 = testPool.Enable();
+			PoolableObject p5 = testPool.Enable();
+			p1.Disable();
+			p3.Disable();
+			Assert.AreEqual( p1, testPool[0] , "in method Defrag, line 120");
+			Assert.AreEqual( p2, testPool[1] , "in method Defrag, line 121");
+			Assert.AreEqual( p3, testPool[2] , "in method Defrag, line 122");
+			Assert.AreEqual( p4, testPool[3] , "in method Defrag, line 123");
+			Assert.AreEqual( p5, testPool[4] , "in method Defrag, line 124");
 			try
 			{
-			testPool[5] = d;
-			Assert.Fail("Did not throw IndexOutOfRangeException in method Sort on line 125");
+			Assert.AreEqual( p5, testPool[5] , "in method Defrag, line 125");
+			Assert.Fail("Did not throw IndexOutOfRangeException in method Defrag on line 124");
 			}
 			catch (IndexOutOfRangeException)
 			{
 			}
-			Assert.AreEqual( 4, testPool.GetEnablingIndex() , "in method Sort, line 127");
-			Assert.AreEqual( true, testPool.Check(2) , "in method Sort, line 128");
-			Assert.AreEqual( false, testPool.Check(3) , "in method Sort, line 129");
-			Assert.AreEqual( 3, testPool.GetEnablingIndex() , "in method Sort, line 130");
-			Assert.AreEqual( e, testPool[0] , "in method Sort, line 131");
-			Assert.AreEqual( b, testPool[1] , "in method Sort, line 132");
-			Assert.AreEqual( d, testPool[2] , "in method Sort, line 133");
-			#else
-			throw new Exception("Run tests in Debug mode.");
-			#endif
+			Assert.AreEqual( 4, testPool.EnableIndex , "in method Defrag, line 126");
+			Assert.AreEqual( true, testPool.Check(2) , "in method Defrag, line 127");
+			Assert.AreEqual( false, testPool.Check(3) , "in method Defrag, line 128");
+			Assert.AreEqual( 3, testPool.EnableIndex , "in method Defrag, line 129");
+			Assert.AreEqual( p5, testPool[0] , "in method Defrag, line 130");
+			Assert.AreEqual( p2, testPool[1] , "in method Defrag, line 131");
+			Assert.AreEqual( p4, testPool[2] , "in method Defrag, line 132");
+			Assert.AreEqual( p3, testPool[3] , "in method Defrag, line 133");
+			Assert.AreEqual( p1, testPool[4] , "in method Defrag, line 134");
 		}
 	}
 }
