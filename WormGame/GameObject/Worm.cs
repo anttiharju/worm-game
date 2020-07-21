@@ -19,7 +19,7 @@ namespace WormGame.GameObject
         private readonly float step;
         private readonly int size;
 
-        private int currentLength = 1;
+        private int currentLength;
         private bool moving;
         private WormScene scene;
         private Vector2 target;
@@ -79,12 +79,15 @@ namespace WormGame.GameObject
         /// <returns>Worm</returns>
         public Worm Spawn(Pooler<WormModule> wormModules, int x, int y, int length, Color color)
         {
+            ClearGraphics();
             scene = (WormScene)Scene;
             modules = wormModules;
             X = field.EntityX(x);
             Y = field.EntityY(y);
             target = Position;
             Length = length;
+            currentLength = 1;
+            moving = true;
 
             lastModule = null;
             firstModule = wormModules.Enable();
@@ -136,8 +139,8 @@ namespace WormGame.GameObject
             {
                 if (!tryAgain)
                 {
-                    if (scene.SpawnBrick(this, currentLength, Length) != null)
-                        Disable();
+                    scene.SpawnBrick(this, currentLength);
+                    Disable();
                 }
                 else if (Player == null)
                 {
@@ -207,17 +210,8 @@ namespace WormGame.GameObject
         /// </summary>
         public override void Disable()
         {
-            newGraphic = null;
-            lastModule = null;
-            newModule = null;
-            modules = null;
             Enabled = false;
-            moving = false;
-            target.X = 0;
-            target.Y = 0;
-            currentLength = 1;
             firstModule.Disable();
-            firstModule = null;
         }
     }
 }

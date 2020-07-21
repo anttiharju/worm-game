@@ -24,6 +24,7 @@ namespace WormGame.GameObject
 
         public Block Spawn(Worm worm, Pooler<BlockModule> brickModules, int currentLength)
         {
+            ClearGraphics();
             Count = worm.Length;
             X = worm.X;
             Y = worm.Y;
@@ -37,9 +38,8 @@ namespace WormGame.GameObject
 
         public override void Disable()
         {
-            firstModule.Disable(Position);
-            firstModule = null;
             Enabled = false;
+            firstModule.Disable(Position);
         }
     }
 }
