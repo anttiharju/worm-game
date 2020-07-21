@@ -22,21 +22,15 @@ namespace WormGame.GameObject
             firstModule.SetColor(color);
         }
 
-        public Block Spawn(Worm worm, Pooler<BlockModule> brickModules)
+        public Block Spawn(Worm worm, Pooler<BlockModule> brickModules, int currentLength)
         {
-            if (!brickModules.Check(worm.Length))
-            {
-                Enabled = false;
-                return null;
-            }
-
             Count = worm.Length;
             X = worm.X;
             Y = worm.Y;
 
             firstModule = brickModules.Enable();
             firstModule.Graphic.Color = worm.Color;
-            firstModule.CopyWorm(worm, worm.firstModule, this, brickModules);
+            firstModule.CopyWorm(worm, worm.firstModule, this, brickModules, currentLength);
 
             return this;
         }

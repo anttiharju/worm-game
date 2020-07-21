@@ -19,7 +19,7 @@ namespace WormGame.GameObject
         private readonly float step;
         private readonly int size;
 
-        private int rampUp;
+        private int currentLength = 1;
         private bool moving;
         private WormScene scene;
         private Vector2 target;
@@ -124,8 +124,8 @@ namespace WormGame.GameObject
             {
                 if (check == 3)
                     grow = true;
-                if (rampUp < Length - 1)
-                    rampUp++;
+                if (currentLength < Length)
+                    currentLength++;
                 else if (!grow)
                     field.Set(null, lastModule.Target);
                 firstModule.DirectionFollow(direction);
@@ -135,7 +135,10 @@ namespace WormGame.GameObject
             else
             {
                 if (!tryAgain)
-                    scene.SpawnBrick(this);
+                {
+                    if (scene.SpawnBrick(this, currentLength, Length) != null)
+                        Disable();
+                }
                 else if (Player == null)
                 {
                     direction = Random.ValidDirection(field, firstModule.Target, size);
@@ -155,7 +158,7 @@ namespace WormGame.GameObject
                 newModule.GetTarget().Y = Position.Y + newGraphic.Y;
                 newGraphic.Color = Color;
                 Length++;
-                rampUp++;
+                currentLength++;
                 AddGraphic(newGraphic);
                 lastModule.Next = newModule;
                 lastModule = newModule;
@@ -212,7 +215,7 @@ namespace WormGame.GameObject
             moving = false;
             target.X = 0;
             target.Y = 0;
-            rampUp = 0;
+            currentLength = 1;
             firstModule.Disable();
             firstModule = null;
         }
