@@ -27,7 +27,7 @@ namespace WormGame
         private float wormCounter;
 
         public int wormCount;
-        public int maxWormCount = 5;
+        public int maxWormCount;
 
 
         /// <summary>
@@ -38,6 +38,7 @@ namespace WormGame
         {
             this.config = config;
             field = config.field;
+            maxWormCount = config.wormAmount;
 
             CreateBackground();
 
@@ -68,6 +69,7 @@ namespace WormGame
                 for (int i = 0; i < fruits.Count; i++)
                     fruits.Enable().Spawn();
 
+            SpawnWorm(0, 0);
             for (int i = 0; i < 3; i++)
                 SpawnPlayer(i);
         }
@@ -121,9 +123,8 @@ namespace WormGame
         /// </summary>
         /// <param name="worm">Worm to transform</param>
         /// <returns>Brick</returns>
-        public Block SpawnBrick(Worm worm, int currentLength, int length)
+        public Block SpawnBrick(Worm worm, int currentLength)
         {
-            System.Console.WriteLine(currentLength + " " + length);
             Block block = blocks.Enable();
             if (block == null || blockModules.Check(currentLength) == false)
                 return null;
@@ -158,7 +159,7 @@ namespace WormGame
                     if (worm.Enabled)
                         worm.Move();
                 wormCounter = 0;
-                if (wormCount < maxWormCount)
+                /*if (wormCount < maxWormCount)
                 {
                     Vector2 random = Random.ValidPosition(field, config.width, config.height, 4);
                     if (random.X != -1 && field.Get(random) == null)
@@ -168,7 +169,7 @@ namespace WormGame
                     }
                     else
                         wormCount--;
-                }
+                }*/
 #if DEBUG
                 if (config.visualizeCollision)
                     field.Visualize();
