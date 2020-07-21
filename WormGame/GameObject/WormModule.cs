@@ -56,8 +56,7 @@ namespace WormGame.GameObject
         public WormModule(Config config)
         {
             field = config.field;
-            Graphic = Image.CreateCircle(config.imageSize / 2);
-            Graphic.Scale = (float)config.size / config.imageSize;
+            Graphic = Image.CreateCircle(config.size / 2);
             Graphic.CenterOrigin();
         }
 

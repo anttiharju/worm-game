@@ -13,8 +13,6 @@ namespace WormGame.GameObject
     {
         private BlockModule firstModule;
 
-        public int Count { get; private set; }
-
         public override Color Color { get { return firstModule.Graphic.Color ?? null; } set { SetColor(value); } }
 
         public void SetColor(Color color)
@@ -22,24 +20,27 @@ namespace WormGame.GameObject
             firstModule.SetColor(color);
         }
 
-        public Block Spawn(Worm worm, Pooler<BlockModule> brickModules, int currentLength)
+        public Block Spawn(Worm worm, Pooler<BlockModule> blockModules, int currentLength)
         {
-            ClearGraphics();
-            Count = worm.Length;
             X = worm.X;
             Y = worm.Y;
 
-            firstModule = brickModules.Enable();
-            firstModule.Graphic.Color = worm.Color;
-            firstModule.CopyWorm(worm, worm.firstModule, this, brickModules, currentLength);
+            firstModule = blockModules.Enable();
+            if(firstModule == null)
+            {
+                Disable();
+                return null;
+            }
+            firstModule.CopyWormModule(worm, worm.firstModule, this, blockModules, currentLength);
 
             return this;
         }
 
         public override void Disable()
         {
-            Enabled = false;
             firstModule.Disable(Position);
+            ClearGraphics();
+            Enabled = false;
         }
     }
 }
