@@ -148,6 +148,8 @@ namespace WormGame.GameObject
             if (field.Check(target) == 1)
                 field.Set(null, target);
             Next = null;
+            Graphic.X = 0;
+            Graphic.Y = 0;
             target.X = 0;
             target.Y = 0;
             direction.X = 0;
