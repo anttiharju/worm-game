@@ -121,15 +121,14 @@ namespace WormGame
         /// </summary>
         /// <param name="worm">Worm to transform</param>
         /// <returns>Brick</returns>
-        public Block SpawnBrick(Worm worm)
+        public Block SpawnBrick(Worm worm, int currentLength, int length)
         {
+            System.Console.WriteLine(currentLength + " " + length);
             Block block = blocks.Enable();
-            if (block == null) return null;
-            block = block.Spawn(worm, blockModules);
-            if (block == null)
-                block.Disable();
+            if (block == null || blockModules.Check(currentLength) == false)
+                return null;
+            block = block.Spawn(worm, blockModules, currentLength);
             wormCount--;
-            worm.Disable();
             return block;
         }
 
