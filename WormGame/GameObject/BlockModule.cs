@@ -26,28 +26,17 @@ namespace WormGame.GameObject
             Graphic.CenterOrigin();
         }
 
-        public void CopyWorm(Worm worm, WormModule wormModule, Block brick, Pooler<BlockModule> brickModules, int count = 0)
+        public void CopyWorm(Worm worm, WormModule wormModule, Block brick, Pooler<BlockModule> brickModules, int currentLength, int i = 1)
         {
             Next = brickModules.Enable();
             Next.Graphic.X = wormModule.Target.X - worm.Position.X;
             Next.Graphic.Y = wormModule.Target.Y - worm.Position.Y;
 
-            if (Next.Graphic.X == Graphic.X && Next.Graphic.Y == Graphic.Y)
-            {
-                int delta = worm.Length - count;
-                if (delta != 0)
-                {
-                    System.Console.WriteLine(delta);
-                    Next.Disable();
-                    return;
-                }
-            }
-
             Next.Graphic.Color = Graphic.Color;
             brick.AddGraphic(Next.Graphic);
             field.Set(brick, wormModule.Target);
-            if (wormModule.Next != null)
-                Next.CopyWorm(worm, wormModule.Next, brick, brickModules, ++count);
+            if (i < currentLength)
+                Next.CopyWorm(worm, wormModule.Next, brick, brickModules, currentLength, ++i);
         }
 
         public void SetColor(Color color)
