@@ -40,6 +40,7 @@ namespace WormGame.GameObject
         /// <returns>Fruit</returns>
         public Fruit Spawn()
         {
+            System.Console.WriteLine(Id);
             Vector2 random = Random.ValidPosition(field, width, height, 4);
             if (random.X == -1 || field.Check(random) != 4)
             {
