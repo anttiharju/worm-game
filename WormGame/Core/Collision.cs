@@ -19,7 +19,8 @@ namespace WormGame.Core
         private readonly int size;
         private readonly int width;
         private readonly int height;
-        private readonly string exceptionText = "Unrecognized poolable entity on collision field.";
+        private readonly Exception unknownPoolableException = new Exception("Unknown poolable entity on collision field.");
+
 
         /// <summary>
         /// Initializes the collision field which is a 2d array of poolable entities.
@@ -44,29 +45,6 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Get entity from field.
-        /// </summary>
-        /// <param name="x">Horizontal field position</param>
-        /// <param name="y">Vertical field position</param>
-        /// <returns>Field cell value</returns>
-        public ref PoolableEntity Get(int x, int y)
-        {
-            return ref field[x, y];
-        }
-
-
-        /// <summary>
-        /// Get entity from field.
-        /// </summary>
-        /// <param name="position">Entity position</param>
-        /// <returns>Field cell value</returns>
-        public ref PoolableEntity Get(Vector2 position)
-        {
-            return ref Get(X(position.X), Y(position.Y));
-        }
-
-
-        /// <summary>
         /// Check entity from field.
         /// </summary>
         /// <param name="x">Horizontal field position</param>
@@ -80,7 +58,7 @@ namespace WormGame.Core
                 x >= width ||
                 y >= height)
                 return 0;
-            PoolableEntity cell = Get(x, y);
+            PoolableEntity cell = field[x, y];
             if (cell == null)
                 return 4;
             if (cell is Worm)
@@ -93,7 +71,7 @@ namespace WormGame.Core
                     fruit.Spawn();
                 return 3;
             }
-            throw new Exception(exceptionText);
+            throw unknownPoolableException;
         }
 
 
@@ -117,20 +95,7 @@ namespace WormGame.Core
         /// <param name="y">Vertical field position</param>
         public void Set(PoolableEntity entity, int x, int y)
         {
-            Get(x, y) = entity;
-        }
-
-
-
-        /// <summary>
-        /// Set entity to field.
-        /// </summary>
-        /// <param name="entity">Entity</param>
-        /// <param name="x">Horizontal entity position</param>
-        /// <param name="y">Vertical entity position</param>
-        public void Set(PoolableEntity entity, float x, float y)
-        {
-            Set(entity, X(x), Y(y));
+            field[x, y] = entity;
         }
 
 
@@ -142,6 +107,18 @@ namespace WormGame.Core
         public void Set(PoolableEntity entity, Vector2 position)
         {
             Set(entity, X(position.X), Y(position.Y));
+        }
+
+
+        /// <summary>
+        /// Set entity to field.
+        /// </summary>
+        /// <param name="entity">Entity</param>
+        /// <param name="x">Horizontal entity position</param>
+        /// <param name="y">Vertical entity position</param>
+        public void Set(PoolableEntity entity, float x, float y)
+        {
+            Set(entity, X(x), Y(y));
         }
 
 
@@ -220,7 +197,7 @@ namespace WormGame.Core
                         line.Append('+');
                         continue;
                     }
-                    throw new Exception(exceptionText);
+                    throw unknownPoolableException;
                 }
                 Console.WriteLine(line.ToString());
             }
