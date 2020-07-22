@@ -21,6 +21,7 @@ namespace WormGame.GameObject
 
         private int currentLength;
         private bool moving;
+        private bool grow;
         private WormScene scene;
         private Vector2 target;
         private WormModule newModule;
@@ -116,15 +117,15 @@ namespace WormGame.GameObject
         /// </summary>
         public void Move()
         {
+            grow = false;
             moving = true;
-            bool grow = false;
-            bool tryAgain = true;
+            bool retry = true;
         Retry:
             target = firstModule.Target + Direction * size;
-            int check = field.Check(target, true);
-            if (check >= 3)
+            int nextPos = field.Check(target, true);
+            if (nextPos >= 3) // If fruit (3) or free (4)
             {
-                if (check == 3)
+                if (nextPos == 3) // If fruit
                     grow = true;
                 if (currentLength < Length)
                     currentLength++;
@@ -136,38 +137,37 @@ namespace WormGame.GameObject
             }
             else
             {
-                if (!tryAgain)
+                if (!retry)
                 {
-                    if (grow)
-                        scene.SpawnBlock(this, currentLength - 1);
-                    else
-                        scene.SpawnBlock(this, currentLength);
+                    scene.SpawnBlock(this, currentLength);
                     Disable();
                 }
                 else if (Player == null)
                 {
                     direction = Random.ValidDirection(field, firstModule.Target, size);
-                    tryAgain = false;
+                    retry = false;
                     goto Retry;
                 }
                 moving = false;
             }
             if (grow && moving)
-            {
-                newModule = modules.Enable();
-                if (newModule == null) return;
-                newGraphic = newModule.Graphic;
-                newGraphic.X = lastModule.Graphic.X;
-                newGraphic.Y = lastModule.Graphic.Y;
-                newModule.GetTarget().X = Position.X + newGraphic.X;
-                newModule.GetTarget().Y = Position.Y + newGraphic.Y;
-                newGraphic.Color = Color;
-                Length++;
-                currentLength++;
-                AddGraphic(newGraphic);
-                lastModule.Next = newModule;
-                lastModule = newModule;
-            }
+                Grow();
+        }
+
+        private void Grow()
+        {
+            newModule = modules.Enable();
+            if (newModule == null) return;
+            newGraphic = newModule.Graphic;
+            newGraphic.X = lastModule.Graphic.X;
+            newGraphic.Y = lastModule.Graphic.Y;
+            newModule.GetTarget().X = Position.X + newGraphic.X;
+            newModule.GetTarget().Y = Position.Y + newGraphic.Y;
+            newGraphic.Color = Color;
+            AddGraphic(newGraphic);
+            lastModule.Next = newModule;
+            lastModule = newModule;
+            currentLength++;
         }
 
 
