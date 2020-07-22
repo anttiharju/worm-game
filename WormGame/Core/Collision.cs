@@ -7,7 +7,7 @@ using WormGame.GameObject;
 namespace WormGame.Core
 {
     /// @author Antti Harju
-    /// @version 20.07.2020
+    /// @version 23.07.2020
     /// <summary>
     /// Collision field. Stays performant with large fields.
     /// </summary>
@@ -45,13 +45,13 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Check entity from field.
+        /// Check a cell from field. Returns numbers instead of strings so we can use > < operators.
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
         /// <param name="consume">Consume fruits</param>
         /// <returns>0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 free</returns>
-        public int Check(int x, int y, bool consume = false)
+        public int Get(int x, int y, bool consume = false)
         {
             if (x < 0 ||
                 y < 0 ||
@@ -76,14 +76,14 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Check entity from field.
+        /// Check a cell from field. Returns numbers instead of strings so we can use > < operators.
         /// </summary>
         /// <param name="target">Entity position</param>
         /// <param name="consume">Consume fruits</param>
         /// <returns>0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 free</returns>
         public int Check(Vector2 target, bool consume = false)
         {
-            return Check(X(target.X), Y(target.Y), consume);
+            return Get(X(target.X), Y(target.Y), consume);
         }
 
 
