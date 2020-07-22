@@ -26,7 +26,7 @@ namespace WormGame.GameObject
             Y = worm.Y;
 
             firstModule = blockModules.Enable();
-            if(firstModule == null)
+            if (firstModule == null)
             {
                 Disable();
                 return null;
@@ -38,7 +38,8 @@ namespace WormGame.GameObject
 
         public override void Disable()
         {
-            firstModule.Disable(Position);
+            if (firstModule != null)
+                firstModule.Disable(Position);
             ClearGraphics();
             Enabled = false;
         }
