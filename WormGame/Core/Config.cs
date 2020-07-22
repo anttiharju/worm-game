@@ -20,8 +20,8 @@ namespace WormGame.Core
 
         public readonly WormScene scene;
         public readonly Collision field;
-        public readonly int width = 20;
-        public readonly int height = 10;
+        public readonly int width = 6;
+        public readonly int height = 6;
         public readonly int margin = 2;
 
         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30). If not, this will be subtracted by one until it is.
@@ -119,7 +119,7 @@ namespace WormGame.Core
             fruitAmount = (int)(width * height * fruitPercentage);
             if (fruitAmount < 1)
                 fruitAmount = 1;
-            wormAmount = maxWormAmount * 2 + 4; // with bad luck every worm can transition at the same time, that's why * 2 and +1 for each player (4)
+            wormAmount = maxWormAmount * 2; // with bad luck every worm can turn into a block simultaneously, that's why * 2.
             moduleAmount = width * height;
             entityAmount = moduleAmount / minWormLength;
             size = CalculateSize(windowWidth, windowHeight);

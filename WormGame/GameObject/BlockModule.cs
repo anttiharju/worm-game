@@ -12,6 +12,8 @@ namespace WormGame.GameObject
 
         public BlockModule Next { get; set; }
 
+        public Vector2 Target { get; private set; }
+
         public Image Graphic { get; private set; }
 
         public override bool Enabled { get { return enabled; } set { enabled = value; Graphic.Visible = value; } }
@@ -25,18 +27,19 @@ namespace WormGame.GameObject
             Graphic.CenterOrigin();
         }
 
-        public void CopyWormModule(Worm worm, WormModule wormModule, Block brick, Pooler<BlockModule> brickModules, int currentLength, int i = 1)
+        public void CopyWormModule(Worm worm, WormModule wormModule, Block parent, Pooler<BlockModule> brickModules, int currentLength, int i = 1)
         {
+            Target = wormModule.Target;
             Graphic.X = wormModule.Target.X - worm.Position.X;
             Graphic.Y = wormModule.Target.Y - worm.Position.Y;
             Graphic.Color = worm.Color;
 
-            brick.AddGraphic(Graphic);
-            field.Set(brick, wormModule.Target);
+            parent.AddGraphic(Graphic);
+            field.Set(parent, wormModule.Target);
             if (i < currentLength)
             {
                 Next = brickModules.Enable();
-                Next.CopyWormModule(worm, wormModule.Next, brick, brickModules, currentLength, ++i);
+                Next.CopyWormModule(worm, wormModule.Next, parent, brickModules, currentLength, ++i);
             }
         }
 
@@ -52,6 +55,11 @@ namespace WormGame.GameObject
             field.Set(null, parentPosition.X + Graphic.X, parentPosition.Y + Graphic.Y);
             if (Next != null)
                 Next.Disable(parentPosition);
+            Disable();
+        }
+
+        public override void Disable()
+        {
             Enabled = false;
             Next = null;
             Graphic.X = 0;

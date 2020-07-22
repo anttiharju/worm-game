@@ -18,6 +18,7 @@ namespace WormGame
     {
         private readonly Config config;
         private readonly Collision field;
+        private readonly Pooler<DebugEntity> debugEntities;
         private readonly Pooler<Worm> worms;
         private readonly Pooler<Fruit> fruits;
         private readonly Pooler<Block> blocks;
@@ -39,15 +40,17 @@ namespace WormGame
             this.config = config;
             field = config.field;
             maxWormCount = config.maxWormAmount;
-            CreateBackground();
+            CreateBorders();
 
             // Entity pools
+            debugEntities = new Pooler<DebugEntity>(config, config.moduleAmount);
             blocks = new Pooler<Block>(config, config.moduleAmount);
             fruits = new Pooler<Fruit>(config, config.fruitAmount);
             worms = new Pooler<Worm>(config, config.wormAmount);
             AddMultiple(blocks.Pool);
             AddMultiple(fruits.Pool);
             AddMultiple(worms.Pool);
+            AddMultiple(debugEntities.Pool);
 
             // Object pools
             wormModules = new Pooler<WormModule>(config, config.moduleAmount);
@@ -116,6 +119,9 @@ namespace WormGame
             Block block = blocks.Enable();
             if (block == null || blockModules.Check(currentLength) == false)
                 return null;
+            int delta = blockModules.Count - blockModules.EnableIndex;
+            if (delta < 5)
+                System.Console.WriteLine(delta);
             block = block.Spawn(worm, blockModules, currentLength);
             wormCount--;
             return block;
@@ -163,17 +169,41 @@ namespace WormGame
                     field.Visualize();
 #endif
             }
+            if (Input.KeyPressed('C'))
+            {
+                System.Console.WriteLine("Find block duplicates");
+                for (int i = 0; i < blockModules.Count; i++)
+                {
+                    BlockModule current = blockModules[i];
+                    if (current.Enabled == false) continue;
+                    for (int j = 0; j < blockModules.Count; j++)
+                    {
+                        if (j == i)
+                            continue;
+                        BlockModule other = blockModules[j];
+                        if (current.Target == other.Target)
+                        {
+                            System.Console.WriteLine(current.Target);
+                            debugEntities.Enable().Spawn(current.Target);
+                        }
+                    }
+                }
+            }
+            if (Input.KeyPressed('V'))
+            {
+                System.Console.WriteLine(blockModules.Count - blockModules.EnableIndex);
+            }
         }
 
 
         /// <summary>
         /// Creates visible borders for the field.
         /// </summary>
-        private void CreateBackground()
+        private void CreateBorders()
         {
             Image backgroundGraphic = Image.CreateRectangle(config.width * config.size, config.height * config.size, Color.Black);
             backgroundGraphic.CenterOrigin();
-            backgroundGraphic.OutlineColor = Color.Gray;
+            backgroundGraphic.OutlineColor = Color.White;
             backgroundGraphic.OutlineThickness = config.size / 6;
             Entity background = new Entity(config.windowWidth / 2, config.windowHeight / 2, backgroundGraphic)
             {
