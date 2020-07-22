@@ -25,13 +25,13 @@ namespace WormGame.Core
         public readonly int margin = 2;
 
         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30). If not, this will be subtracted by one until it is.
-        public readonly int wormSpeed = 144;
+        public readonly int wormSpeed = 6;
         public readonly int minWormLength = 5;
 
         // Not loaded from settings.cfg (yet?)
-        public readonly bool fruits = false;
+        public readonly bool fruits = true;
         public readonly float fruitPercentage = 0.015f;
-        public readonly int maxWormAmount = 5;
+        public readonly int maxWormAmount = 1;
         public readonly int density = 5;
 
         // Dynamic values

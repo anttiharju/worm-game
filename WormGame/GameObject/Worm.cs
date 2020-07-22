@@ -138,7 +138,10 @@ namespace WormGame.GameObject
             {
                 if (!tryAgain)
                 {
-                    scene.SpawnBlock(this, currentLength);
+                    if (grow)
+                        scene.SpawnBlock(this, currentLength - 1);
+                    else
+                        scene.SpawnBlock(this, currentLength);
                     Disable();
                 }
                 else if (Player == null)

@@ -150,7 +150,7 @@ namespace WormGame
                 if (wormCount < maxWormCount)
                 {
                     Vector2 random = Random.ValidPosition(field, config.width, config.height, 4);
-                    if (random.X != -1 && field.Get(random) == null)
+                    if (random.X != -1 && field.Check(random) == 4)
                     {
                         SpawnWorm(field.X(random.X), field.Y(random.Y));
                         wormCount++;
