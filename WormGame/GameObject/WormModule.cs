@@ -7,32 +7,22 @@ using WormGame.Pooling;
 namespace WormGame.GameObject
 {
     /// @author Antti Harju
-    /// @version 18.07.2020
+    /// @version 23.07.2020
     /// <summary>
-    /// Class for worm bodies. Worm is still a single entity, but a modular one thanks to this class.
+    /// Class for worm modules.
     /// </summary>
     public class WormModule : PoolableObject
     {
-        private readonly Collision field;
-
         /// <summary>
-        /// Get or set next WormBody in worm.
+        /// Get or set next module.
         /// </summary>
         public WormModule Next { get; set; }
 
 
         /// <summary>
-        /// Get WormBody graphic.
+        /// Get module graphic.
         /// </summary>
         public Image Graphic { get; private set; }
-
-
-        /// <summary>
-        /// Get or set target position.
-        /// Implemented this way because we need to be able to return it by reference to avoid creating a new Vector2 every wormUpdate per worm.
-        /// </summary>
-        public Vector2 Target { get { return target; } set { target = value; } }
-        private Vector2 target;
 
 
         /// <summary>
@@ -43,43 +33,46 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Set or get wheter or not object is in use.
+        /// Get or set target position.
+        /// </summary>
+        public Vector2 Target { get { return target; } set { target = value; } }
+        private Vector2 target;
+
+
+        /// <summary>
+        /// Get or set wheter or not module is in use.
         /// </summary>
         public override bool Enabled { get { return enabled; } set { enabled = value; Graphic.Visible = value; } }
         private bool enabled;
 
 
         /// <summary>
-        /// Constructor.
+        /// Constructor. Initializes graphic.
         /// </summary>
-        /// <param name="config">Config</param>
+        /// <param name="config">Configuration</param>
         public WormModule(Config config)
         {
-            field = config.field;
             Graphic = Image.CreateCircle(config.size / 2);
             Graphic.CenterOrigin();
         }
 
 
         /// <summary>
-        /// Returns target. With this we can directly set target.X instead of creating a new Vector every time we want to modify it.
+        /// Recursively update every worm module direction.
         /// </summary>
-        /// <returns>Target (reference)</returns>
-        public ref Vector2 GetTarget()
+        /// <param name="newDirection"></param>
+        public void DirectionFollow(Vector2 newDirection)
         {
-            return ref target;
+            if (Next != null)
+                Next.DirectionFollow(Direction);
+            Direction = newDirection;
         }
 
-
-        public ref Vector2 GetDirection()
-        {
-            return ref direction;
-        }
 
         /// <summary>
-        /// Updates WormBodies graphic positions
+        /// Recursively update every worm module graphic position.
         /// </summary>
-        /// <param name="positionDelta">Worm entitys position delta</param>
+        /// <param name="positionDelta">Worm entity position delta</param>
         /// <param name="step">Worm step</param>
         public void GraphicFollow(Vector2 positionDelta, float step)
         {
@@ -92,7 +85,7 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Updates worms target positions recursively.
+        /// Recursively update every worm module target.
         /// </summary>
         /// <param name="newTarget">New target for worm body</param>
         public void TargetFollow(Vector2 newTarget)
@@ -104,19 +97,17 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Updates worms directions recursively.
+        /// Reset module direction.
         /// </summary>
-        /// <param name="newDirection"></param>
-        public void DirectionFollow(Vector2 newDirection)
+        public void ResetDirection()
         {
-            if (Next != null)
-                Next.DirectionFollow(Direction);
-            Direction = newDirection;
+            direction.X = 0;
+            direction.Y = 0;
         }
 
 
         /// <summary>
-        /// Recursively sets the whole worms color.
+        /// Recursively set worm color.
         /// </summary>
         /// <param name="color"></param>
         public void SetColor(Color color)
@@ -128,22 +119,31 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Disables all of worms WormBodies.
+        /// Set module target.
+        /// </summary>
+        /// <param name="x">Target.X</param>
+        /// <param name="y">Target.Y</param>
+        public void SetTarget(float x, float y)
+        {
+            target.X = x;
+            target.Y = y;
+        }
+
+
+        /// <summary>
+        /// Recursively disable every one of worms modules.
         /// </summary>
         public override void Disable()
         {
             Enabled = false;
             if (Next != null)
                 Next.Disable();
-            if (field.Check(target) == 1)
-                field.Set(null, target);
             Next = null;
+            ResetDirection();
             Graphic.X = 0;
             Graphic.Y = 0;
             target.X = 0;
             target.Y = 0;
-            direction.X = 0;
-            direction.Y = 0;
         }
     }
 }

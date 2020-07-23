@@ -11,7 +11,7 @@ namespace WormGame.Core
     public class Config
     {
 #if DEBUG
-        public bool visualizeCollision = false; // 119x29 fits in debug console
+        public bool visualizeCollision = true; // 119x29 fits in debug console
 #endif
         public readonly bool fullscreen = false;
         public readonly int windowWidth = 1280;
@@ -20,8 +20,8 @@ namespace WormGame.Core
 
         public readonly WormScene scene;
         public readonly Collision field;
-        public readonly int width = 64;
-        public readonly int height = 36;
+        public readonly int width = 20;
+        public readonly int height = 10;
         public readonly int margin = 2;
 
         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30). If not, this will be subtracted by one until it is.
@@ -29,9 +29,9 @@ namespace WormGame.Core
         public readonly int minWormLength = 5;
 
         // Not loaded from settings.cfg (yet?)
-        public readonly bool fruits = true;
+        public readonly bool fruits = false;
         public readonly float fruitPercentage = 0.05f;
-        public readonly int maxWormAmount = 6;
+        public readonly int maxWormAmount = 5;
         public readonly int density = 5;
 
         // Dynamic values
