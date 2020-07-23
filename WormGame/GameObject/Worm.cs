@@ -1,6 +1,5 @@
 ﻿using Otter.Graphics;
 using Otter.Utility.MonoGame;
-using Otter.Graphics.Drawables;
 using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
@@ -8,64 +7,62 @@ using WormGame.Pooling;
 namespace WormGame.GameObject
 {
     /// @author Antti Harju
-    /// @version 18.07.2020
+    /// @version 23.07.2020
     /// <summary>
-    /// Worm entity. Worms are modular entities; it consists of one Otter2d entity and several normal objects so it can grow and be any length.
+    /// Worm entity. Worms are modular entities; it consists of one Otter2d entity and several normal objects so it can grow infinitely.
     /// </summary>
-    /// TODO: Weird behaviour if turn into a brick in a tight space.
     public class Worm : PoolableEntity
     {
-        private readonly Collision field;
+        public WormModule firstModule;
+
+        private readonly Collision collision;
         private readonly float step;
         private readonly int size;
 
+        private WormScene scene;
+        private Pooler<WormModule> modules;
+        private WormModule lastModule;
+        private WormModule newModule;
+        private Vector2 target;
         private int currentLength;
         private bool moving;
         private bool grow;
-        private WormScene scene;
-        private Vector2 target;
-        private WormModule newModule;
-        private WormModule lastModule;
-        private Graphic newGraphic;
-        private Pooler<WormModule> modules;
-
-        public WormModule firstModule;
 
 
         /// <summary>
-        /// We can access scene through player.
+        /// Get or set player. Wheter or not this is null tells us wheter or not worm is posessed.
         /// </summary>
         public Player Player { get; set; }
 
 
         /// <summary>
-        /// Get worm length.
+        /// Return worm length.
         /// </summary>
         public int Length { get; private set; }
 
 
         /// <summary>
-        /// Get and set worm color.
+        /// Get or set worm color.
         /// </summary>
-        public override Color Color { get { return firstModule.Graphic.Color ?? null; } set { SetColor(value); } }
+        public override Color Color { get { return firstModule.Graphic.Color ?? null; } set { firstModule.SetColor(value); } }
 
 
         /// <summary>
-        /// Get and set the worm direction.
+        /// Get or set worm direction.
         /// </summary>
-        public Vector2 Direction { get { return direction; } set { if (Help.ValidateDirection(field, firstModule.Target, size, value)) direction = value; } }
+        public Vector2 Direction { get { return direction; } set { if (Help.ValidateDirection(collision, firstModule.Target, size, value)) direction = value; } }
         private Vector2 direction;
 
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="config"></param>
+        /// <param name="config">Configuration</param>
         public Worm(Config config) : base()
         {
             size = config.size;
             step = config.step;
-            field = config.field;
+            collision = config.field;
         }
 
 
@@ -82,50 +79,49 @@ namespace WormGame.GameObject
         {
             scene = (WormScene)Scene;
             modules = wormModules;
-            X = field.EntityX(x);
-            Y = field.EntityY(y);
+            X = collision.EntityX(x);
+            Y = collision.EntityY(y);
             target = Position;
-            Length = length;
             currentLength = 1;
+            Length = 1;
             moving = true;
 
             firstModule = wormModules.Enable();
             firstModule.Target = Position;
             AddGraphic(firstModule.Graphic);
 
-
             lastModule = firstModule;
-            for (int i = 1; i < Length; i++)
-                Grow(true);
+            for (int i = 1; i < length; i++)
+                Grow();
 
-            direction = Random.ValidDirection(field, Position, size);
-            field.Set(this, x, y);
+            direction = Random.ValidDirection(collision, Position, size);
+            collision.Set(this, x, y);
             Color = color;
             return this;
         }
 
 
-        private void Grow(bool spawning = false)
+        /// <summary>
+        /// Grow worm by one module.
+        /// </summary>
+        private void Grow()
         {
             newModule = modules.Enable();
             if (newModule == null) return;
             newModule.Graphic.X = lastModule.Graphic.X;
             newModule.Graphic.Y = lastModule.Graphic.Y;
-            newModule.GetTarget().X = X + lastModule.Graphic.X;
-            newModule.GetTarget().Y = Y + lastModule.Graphic.Y;
+            newModule.SetTarget(X + lastModule.Graphic.X, Y + lastModule.Graphic.Y);
             newModule.Graphic.Color = Color;
             AddGraphic(newModule.Graphic);
+            lastModule.ResetDirection();
             lastModule.Next = newModule;
-            lastModule.GetDirection().X = 0;
-            lastModule.GetDirection().Y = 0;
             lastModule = newModule;
-            if (!spawning)
-                Length++;
+            Length++;
         }
 
 
         /// <summary>
-        /// Updates worms directions, targets and updates its position on the collision field.
+        /// Update worm directions, targets and collision.
         /// </summary>
         public void Move()
         {
@@ -133,33 +129,33 @@ namespace WormGame.GameObject
                 Grow();
             grow = false;
             moving = true;
-            bool retry = true;
+            bool retry = false;
         Retry:
             target = firstModule.Target + Direction * size;
-            int nextPos = field.Check(target, true);
-            if (nextPos >= 3) // If fruit (3) or free (4)
+            int nextPosition = collision.Get(target, true);
+            if (nextPosition >= 3) // Move if next position is empty (4) or fruit (3).
             {
-                if (nextPos == 3) // If fruit
+                if (nextPosition == 3)
                     grow = true;
                 if (currentLength < Length)
                     currentLength++;
                 else
-                    field.Set(null, lastModule.Target);
+                    collision.Set(null, lastModule.Target);
                 firstModule.DirectionFollow(direction);
                 firstModule.TargetFollow(target);
-                field.Set(this, target);
+                collision.Set(this, target);
             }
             else
             {
-                if (!retry)
+                if (retry) // If stuck, turn into a block.
                 {
                     scene.SpawnBlock(this, currentLength);
                     Disable();
                 }
-                else if (Player == null)
+                else if (Player == null) // Find a new direction if not posessed by player.
                 {
-                    direction = Random.ValidDirection(field, firstModule.Target, size);
-                    retry = false;
+                    direction = Random.ValidDirection(collision, firstModule.Target, size);
+                    retry = true;
                     goto Retry;
                 }
                 moving = false;
@@ -168,11 +164,10 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Moves worms graphics.
+        /// Update position and modules.
         /// </summary>
         public override void Update()
         {
-            base.Update();
             if (moving)
             {
                 Vector2 positionDelta = firstModule.Direction * step;
@@ -183,24 +178,13 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Sets worms color.
-        /// </summary>
-        /// <param name="color"></param>
-        public void SetColor(Color color)
-        {
-            firstModule.SetColor(color);
-        }
-
-
-        /// <summary>
-        /// Disables the worm.
+        /// Disable worm.
         /// </summary>
         public override void Disable()
         {
             firstModule.Disable();
             ClearGraphics();
             Enabled = false;
-            lastModule = null;
         }
     }
 }

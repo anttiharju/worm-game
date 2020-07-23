@@ -136,7 +136,9 @@ namespace WormGame.Pooling
         /// </example>
         private bool Defrag()
         {
+#if DEBUG
             int defragAmount = EnableIndex;
+#endif
             int current = 0;
             while (current < EnableIndex)
             {
@@ -159,8 +161,8 @@ namespace WormGame.Pooling
                     }
                 }
             }
-            defragAmount -= EnableIndex;
 #if DEBUG
+            defragAmount -= EnableIndex;
             ConsoleColor defaultColor = Console.ForegroundColor;
             if (defragAmount == 0)
             {   // Defragmentation didn't free any poolables: pool is fully utilized. This shouldn't happen with correct pool size.

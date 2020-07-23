@@ -18,7 +18,6 @@ namespace WormGame
     {
         private readonly Config config;
         private readonly Collision field;
-        private readonly Pooler<DebugEntity> debugEntities;
         private readonly Pooler<Worm> worms;
         private readonly Pooler<Fruit> fruits;
         private readonly Pooler<Block> blocks;
@@ -43,14 +42,12 @@ namespace WormGame
             CreateBorders();
 
             // Entity pools
-            debugEntities = new Pooler<DebugEntity>(config, config.moduleAmount);
             blocks = new Pooler<Block>(config, config.moduleAmount);
             fruits = new Pooler<Fruit>(config, config.fruitAmount);
             worms = new Pooler<Worm>(config, config.wormAmount);
             AddMultiple(blocks.Pool);
             AddMultiple(fruits.Pool);
             AddMultiple(worms.Pool);
-            AddMultiple(debugEntities.Pool);
 
             // Object pools
             wormModules = new Pooler<WormModule>(config, config.moduleAmount);
@@ -60,11 +57,6 @@ namespace WormGame
             if (config.fruits)
                 for (int i = 0; i < fruits.Count; i++)
                     fruits.Enable().Spawn();
-
-            field.Set(null, fruits[0].Position);
-            fruits[0].X = field.EntityX(0);
-            fruits[0].Y = field.EntityY(0);
-            field.Set(fruits[0], fruits[0].Position);
 
             for (int i = 0; i < 3; i++)
                 SpawnPlayer(i);
@@ -84,7 +76,7 @@ namespace WormGame
             foreach (Worm worm in worms)
                 if (worm.Enabled)
                 {
-                    float distance = Vector2.Distance(position, worm.firstModule.GetTarget());
+                    float distance = Vector2.Distance(position, worm.firstModule.Target);
                     if (distance < nearestDistance)
                     {
                         nearestWorm = worm;
@@ -161,7 +153,7 @@ namespace WormGame
                 if (wormCount < maxWormCount)
                 {
                     Vector2 random = Random.ValidPosition(field, config.width, config.height, 4);
-                    if (random.X != -1 && field.Check(random) == 4)
+                    if (random.X != -1 && field.Get(random) == 4)
                     {
                         SpawnWorm(field.X(random.X), field.Y(random.Y));
                         wormCount++;
@@ -173,30 +165,6 @@ namespace WormGame
                 if (config.visualizeCollision)
                     field.Visualize();
 #endif
-            }
-            if (Input.KeyPressed('C'))
-            {
-                System.Console.WriteLine("Find block duplicates");
-                for (int i = 0; i < blockModules.Count; i++)
-                {
-                    BlockModule current = blockModules[i];
-                    if (current.Enabled == false) continue;
-                    for (int j = 0; j < blockModules.Count; j++)
-                    {
-                        if (j == i)
-                            continue;
-                        BlockModule other = blockModules[j];
-                        if (current.Target == other.Target)
-                        {
-                            System.Console.WriteLine(current.Target);
-                            debugEntities.Enable().Spawn(current.Target);
-                        }
-                    }
-                }
-            }
-            if (Input.KeyPressed('V'))
-            {
-                System.Console.WriteLine(blockModules.Count - blockModules.EnableIndex);
             }
         }
 

@@ -12,14 +12,12 @@ namespace WormGame
     /// </summary>
     public class Program
     {
-        public static Config config = new Config();
-        
-        
         /// <summary>
         /// Program entry point.
         /// </summary>
         public static void Main()
         {
+            Config config = new Config();
             int circleAccuracy = (int)(config.size * 0.6f);
             if (circleAccuracy > 6)
                 Image.CirclePointCount = circleAccuracy;
@@ -32,16 +30,5 @@ namespace WormGame
             };
             game.Start(config.scene);
         }
-#if DEBUG
-        /// <summary>
-        /// Toggle collision visualization in-game.
-        /// </summary>
-        [OtterCommand(helpText: "Toggle collision visualizer.", group: "game")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Used by Otter2d in-game debug console.")]
-        public static void Visualize()
-        {
-            config.visualizeCollision = !config.visualizeCollision;
-        }
-#endif
     }
 }

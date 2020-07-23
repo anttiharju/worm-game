@@ -50,7 +50,7 @@ namespace WormGame.Core
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
         /// <param name="consume">Consume fruits</param>
-        /// <returns>0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 free</returns>
+        /// <returns>0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 empty</returns>
         public int Get(int x, int y, bool consume = false)
         {
             if (x < 0 ||
@@ -80,8 +80,8 @@ namespace WormGame.Core
         /// </summary>
         /// <param name="target">Entity position</param>
         /// <param name="consume">Consume fruits</param>
-        /// <returns>0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 free</returns>
-        public int Check(Vector2 target, bool consume = false)
+        /// <returns>0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 empty</returns>
+        public int Get(Vector2 target, bool consume = false)
         {
             return Get(X(target.X), Y(target.Y), consume);
         }
