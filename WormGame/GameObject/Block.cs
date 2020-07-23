@@ -15,6 +15,8 @@ namespace WormGame.GameObject
 
         public override Color Color { get { return firstModule.Graphic.Color ?? null; } set { firstModule.SetColor(value); } }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Required by Pooler")]
+        public Block(Config config) { }
 
         public Block Spawn(Worm worm, Pooler<BlockModule> blockModules, int currentLength)
         {
