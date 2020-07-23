@@ -10,6 +10,20 @@ namespace WormGame.Pooling
     public class PoolableObject : IPoolable
     {
         /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="config">Configuration</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Required by Pooler")]
+        public PoolableObject(Config config) { }
+
+
+        /// <summary>
+        /// Constructor so inheritors don't need base(config).
+        /// </summary>
+        public PoolableObject() { }
+
+
+        /// <summary>
         /// Entity identifier. Unique within the same pool.
         /// </summary>
         public int Id { get; set; }
