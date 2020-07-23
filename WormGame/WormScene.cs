@@ -114,11 +114,8 @@ namespace WormGame
         public Block SpawnBlock(Worm worm, int currentLength)
         {
             Block block = blocks.Enable();
-            if (block == null || blockModules.Check(currentLength) == false)
+            if (block == null || blockModules.HasAvailable(currentLength) == false)
                 return null;
-            int delta = blockModules.Count - blockModules.EnableIndex;
-            if (delta < 5)
-                System.Console.WriteLine(delta);
             block = block.Spawn(worm, blockModules, currentLength);
             wormCount--;
             return block;

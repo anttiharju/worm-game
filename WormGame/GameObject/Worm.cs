@@ -42,9 +42,9 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Get or set worm color.
+        /// Get worm color.
         /// </summary>
-        public override Color Color { get { return firstModule.Graphic.Color ?? null; } set { firstModule.SetColor(value); } }
+        public override Color Color { get { return firstModule.Graphic.Color ?? null; } }
 
 
         /// <summary>
@@ -88,6 +88,7 @@ namespace WormGame.GameObject
 
             firstModule = wormModules.Enable();
             firstModule.Target = Position;
+            firstModule.Graphic.Color = color;
             AddGraphic(firstModule.Graphic);
 
             lastModule = firstModule;
@@ -96,7 +97,6 @@ namespace WormGame.GameObject
 
             direction = Random.ValidDirection(collision, Position, size);
             collision.Set(this, x, y);
-            Color = color;
             return this;
         }
 
