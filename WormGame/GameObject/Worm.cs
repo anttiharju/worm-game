@@ -89,21 +89,14 @@ namespace WormGame.GameObject
             currentLength = 1;
             moving = true;
 
-            lastModule = null;
             firstModule = wormModules.Enable();
-            newModule = firstModule;
-            for (int i = 0; i < Length; i++)
-            {
-                newGraphic = newModule.Graphic;
-                newModule.Target = Position;
+            firstModule.Target = Position;
+            AddGraphic(firstModule.Graphic);
 
-                if (lastModule != null)
-                    lastModule.Next = newModule;
-                AddGraphic(newGraphic);
-                lastModule = newModule;
-                if (i != Length - 1)
-                    newModule = wormModules.Enable();
-            }
+
+            lastModule = firstModule;
+            for (int i = 1; i < Length; i++)
+                Grow(true);
 
             direction = Random.ValidDirection(field, Position, size);
             field.Set(this, x, y);
@@ -112,11 +105,32 @@ namespace WormGame.GameObject
         }
 
 
+        private void Grow(bool spawning = false)
+        {
+            newModule = modules.Enable();
+            if (newModule == null) return;
+            newModule.Graphic.X = lastModule.Graphic.X;
+            newModule.Graphic.Y = lastModule.Graphic.Y;
+            newModule.GetTarget().X = X + lastModule.Graphic.X;
+            newModule.GetTarget().Y = Y + lastModule.Graphic.Y;
+            newModule.Graphic.Color = Color;
+            AddGraphic(newModule.Graphic);
+            lastModule.Next = newModule;
+            lastModule.GetDirection().X = 0;
+            lastModule.GetDirection().Y = 0;
+            lastModule = newModule;
+            if (!spawning)
+                Length++;
+        }
+
+
         /// <summary>
         /// Updates worms directions, targets and updates its position on the collision field.
         /// </summary>
         public void Move()
         {
+            if (grow)
+                Grow();
             grow = false;
             moving = true;
             bool retry = true;
@@ -129,7 +143,7 @@ namespace WormGame.GameObject
                     grow = true;
                 if (currentLength < Length)
                     currentLength++;
-                else if (!grow)
+                else
                     field.Set(null, lastModule.Target);
                 firstModule.DirectionFollow(direction);
                 firstModule.TargetFollow(target);
@@ -150,24 +164,6 @@ namespace WormGame.GameObject
                 }
                 moving = false;
             }
-            if (grow && moving)
-                Grow();
-        }
-
-        private void Grow()
-        {
-            newModule = modules.Enable();
-            if (newModule == null) return;
-            newGraphic = newModule.Graphic;
-            newGraphic.X = lastModule.Graphic.X;
-            newGraphic.Y = lastModule.Graphic.Y;
-            newModule.GetTarget().X = Position.X + newGraphic.X;
-            newModule.GetTarget().Y = Position.Y + newGraphic.Y;
-            newGraphic.Color = Color;
-            AddGraphic(newGraphic);
-            lastModule.Next = newModule;
-            lastModule = newModule;
-            currentLength++;
         }
 
 
@@ -183,17 +179,6 @@ namespace WormGame.GameObject
                 Position += positionDelta;
                 firstModule.Next.GraphicFollow(positionDelta, step);
             }
-        }
-
-
-        /// <summary>
-        /// Gets worms nth WormBodies target position. Kind of like an indexer, but not.
-        /// </summary>
-        /// <param name="n">WormBody index</param>
-        /// <returns>Worms nth WormBodies target position</returns>
-        public Vector2 GetTarget(int n)
-        {
-            return firstModule.GetTarget(n);
         }
 
 
@@ -215,6 +200,7 @@ namespace WormGame.GameObject
             firstModule.Disable();
             ClearGraphics();
             Enabled = false;
+            lastModule = null;
         }
     }
 }

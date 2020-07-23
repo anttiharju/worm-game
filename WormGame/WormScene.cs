@@ -61,6 +61,11 @@ namespace WormGame
                 for (int i = 0; i < fruits.Count; i++)
                     fruits.Enable().Spawn();
 
+            field.Set(null, fruits[0].Position);
+            fruits[0].X = field.EntityX(0);
+            fruits[0].Y = field.EntityY(0);
+            field.Set(fruits[0], fruits[0].Position);
+
             for (int i = 0; i < 3; i++)
                 SpawnPlayer(i);
         }
@@ -79,7 +84,7 @@ namespace WormGame
             foreach (Worm worm in worms)
                 if (worm.Enabled)
                 {
-                    float distance = Vector2.Distance(position, worm.GetTarget(worm.Length / 2));
+                    float distance = Vector2.Distance(position, worm.firstModule.GetTarget());
                     if (distance < nearestDistance)
                     {
                         nearestWorm = worm;

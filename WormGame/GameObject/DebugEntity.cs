@@ -10,9 +10,9 @@ namespace WormGame.GameObject
     {
         public DebugEntity(Config config)
         {
-            Image image = Image.CreateCircle(config.size / 4, Color.Black);
+            Image image = Image.CreateCircle(config.size / 4, Color.White);
             image.OutlineThickness = config.size / 8;
-            image.OutlineColor = Color.White;
+            image.OutlineColor = Color.Black;
             image.CenterOrigin();
             AddGraphic(image);
         }
