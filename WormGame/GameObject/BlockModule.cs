@@ -27,7 +27,7 @@ namespace WormGame.GameObject
             Graphic.CenterOrigin();
         }
 
-        public void CopyWormModule(Worm worm, WormModule wormModule, Block parent, Pooler<BlockModule> brickModules, int currentLength, int i = 1)
+        public void CloneWorm(Worm worm, WormModule wormModule, Block parent, Pooler<BlockModule> brickModules, int currentLength, int i = 1)
         {
             Target = wormModule.Target;
             Graphic.X = wormModule.Target.X - worm.Position.X;
@@ -39,7 +39,7 @@ namespace WormGame.GameObject
             if (i < currentLength)
             {
                 Next = brickModules.Enable();
-                Next.CopyWormModule(worm, wormModule.Next, parent, brickModules, currentLength, ++i);
+                Next.CloneWorm(worm, wormModule.Next, parent, brickModules, currentLength, ++i);
             }
         }
 

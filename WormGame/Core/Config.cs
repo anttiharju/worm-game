@@ -29,7 +29,7 @@ namespace WormGame.Core
         public readonly int minWormLength = 5;
 
         // Not loaded from settings.cfg (yet?)
-        public readonly bool fruits = false;
+        public readonly bool fruits = true;
         public readonly float fruitPercentage = 0.05f;
         public readonly int maxWormAmount = 5;
         public readonly int density = 5;

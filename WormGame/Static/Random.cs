@@ -66,8 +66,16 @@ namespace WormGame.Static
             int randomY = Range(0, height);
             if (field.Get(randomX, randomY) < validity)
             {
-                for (int y = 0; y < height; y++)
-                    for (int x = 0; x < width; x++)
+                for (int y = randomY; y < height; y++)
+                    for (int x = randomX; x < width; x++)
+                        if (field.Get(x, y) >= validity)
+                        {
+                            randomX = x;
+                            randomY = y;
+                            goto End;
+                        }
+                for (int y = randomY; y >= 0; y--)
+                    for (int x = randomX; x >= 0; x--)
                         if (field.Get(x, y) >= validity)
                         {
                             randomX = x;

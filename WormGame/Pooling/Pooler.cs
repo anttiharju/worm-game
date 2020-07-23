@@ -5,7 +5,7 @@ using WormGame.Core;
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 21.07.2020
+    /// @version 23.07.2020
     /// <summary>
     /// Object pooler.
     /// </summary>
@@ -17,23 +17,27 @@ namespace WormGame.Pooling
 #endif
         private readonly int endIndex;
 
+
+        /// <summary>
+        /// The index from where new poolables are enabled from.
+        /// </summary>
         public int EnableIndex { get; private set; }
 
 
         /// <summary>
-        /// Returns the pool.
+        /// Return pool.
         /// </summary>
         public T[] Pool { get; }
 
 
         /// <summary>
-        /// Returns pools length.
+        /// Returns pool length.
         /// </summary>
         public int Count { get { return Pool.Length; } }
 
 
         /// <summary>
-        /// Initializes the object pool. PoolableEntities have to be manually added to the scene through Pool property.
+        /// Initializes pool. If pooling entities, you have to manually add them to the scene: AddMultiple([PoolerVariableName].Pool);
         /// </summary>
         /// <param name="config">Configuration object</param>
         /// <param name="size">Pool size</param>
@@ -67,13 +71,13 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Enables a disabled object from the pool.
+        /// Enable a disabled poolable.
         /// </summary>
-        /// <returns>Enabled object</returns>
+        /// <returns>Enabled poolable</returns>
         public T Enable()
         {
             if (EnableIndex == endIndex && Pool[EnableIndex].Enabled)
-                if (Defrag())
+                if (Sort())
                     return null;
             int newEntity = EnableIndex;
             Pool[newEntity].Enabled = true;
@@ -84,21 +88,21 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Check if the pool has required amount of poolables available.
+        /// Check if the pool has enough poolables available.
         /// </summary>
-        /// <param name="amount">How many poolables are needed</param>
+        /// <param name="amount">Needed poolable amountd</param>
         /// <returns>Is asked amount of poolables available</returns>
-        public bool Check(int amount)
+        public bool HasAvailable(int amount)
         {
             if (EnableIndex <= Count - amount)
                 return true;
-            Defrag();
+            Sort();
             return EnableIndex <= Count - amount;
         }
 
 
         /// <summary>
-        /// Defragments the pool in a way that disabled poolables are at the end of the array, readily available to be enabled.
+        /// Sorts (defragments) the pool in a way that disabled poolables are at the end of the array, readily available to be enabled.
         /// </summary>
         /// <returns>Are all poolables enabled</returns>
         /// <example>
@@ -124,8 +128,8 @@ namespace WormGame.Pooling
         ///  testPool[4] === p5;
         ///  testPool[5] === p5; #THROWS IndexOutOfRangeException
         ///  testPool.EnableIndex === 4;
-        ///  testPool.Check(2) === true; // Triggers Defrag()
-        ///  testPool.Check(3) === false;
+        ///  testPool.HasAvailable(2) === true; // Triggers Sort()
+        ///  testPool.HasAvailable(3) === false;
         ///  testPool.EnableIndex === 3;
         ///  testPool[0] === p5;
         ///  testPool[1] === p2;
@@ -134,10 +138,10 @@ namespace WormGame.Pooling
         ///  testPool[4] === p1;
         /// </pre>
         /// </example>
-        private bool Defrag()
+        private bool Sort()
         {
 #if DEBUG
-            int defragAmount = EnableIndex;
+            int freedAmount = EnableIndex;
 #endif
             int current = 0;
             while (current < EnableIndex)
@@ -162,10 +166,10 @@ namespace WormGame.Pooling
                 }
             }
 #if DEBUG
-            defragAmount -= EnableIndex;
+            freedAmount -= EnableIndex;
             ConsoleColor defaultColor = Console.ForegroundColor;
-            if (defragAmount == 0)
-            {   // Defragmentation didn't free any poolables: pool is fully utilized. This shouldn't happen with correct pool size.
+            if (freedAmount == 0)
+            {   // Sorting didn't free any poolables: pool is fully utilized. This shouldn't happen with the correct pool size.
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.Write("[POOLER] ");
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -173,13 +177,13 @@ namespace WormGame.Pooling
                 Console.ForegroundColor = defaultColor;
             }
             else
-            {   // Defragmentation freed {defragAmount} of poolables back to use.
+            {   // Sorting freed {freedAmount} of poolables back to use.
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.Write($"[POOLER] ");
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.Write($"{type,-11}");
                 Console.ForegroundColor = defaultColor;
-                Console.WriteLine($" {defragAmount} ");
+                Console.WriteLine($" {freedAmount} ");
             }
 #endif
             return EnableIndex == endIndex;
@@ -187,7 +191,7 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Enables us to foreach through the pool.
+        /// Enables us to foreach the pool.
         /// </summary>
         /// <returns>Pool enumerator</returns>
         public IEnumerator GetEnumerator()
@@ -197,7 +201,7 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Enables us to for loop through the pool and test it properly.
+        /// Enables us to for-loop the pool. Also required for testing.
         /// </summary>
         /// <param name="i">Index</param>
         /// <returns>Poolable at index</returns>

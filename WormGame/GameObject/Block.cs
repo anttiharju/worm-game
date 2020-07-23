@@ -13,12 +13,8 @@ namespace WormGame.GameObject
     {
         private BlockModule firstModule;
 
-        public override Color Color { get { return firstModule.Graphic.Color ?? null; } set { SetColor(value); } }
+        public override Color Color { get { return firstModule.Graphic.Color ?? null; } set { firstModule.SetColor(value); } }
 
-        public void SetColor(Color color)
-        {
-            firstModule.SetColor(color);
-        }
 
         public Block Spawn(Worm worm, Pooler<BlockModule> blockModules, int currentLength)
         {
@@ -31,7 +27,7 @@ namespace WormGame.GameObject
                 Disable();
                 return null;
             }
-            firstModule.CopyWormModule(worm, worm.firstModule, this, blockModules, currentLength);
+            firstModule.CloneWorm(worm, worm.firstModule, this, blockModules, currentLength);
 
             return this;
         }
