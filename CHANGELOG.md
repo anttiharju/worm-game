@@ -1,3 +1,12 @@
+# 23.07.2020
+- Fix BlockModule overusage by fixing worms Grow -method
+    - The root cause was the way how worms grow when they eat fruits.
+        - The worm would kind of eat the fruit before it had really even eaten it (the fruit is consumed when the worm detects it's about to move on top of it)
+            - The worm also grew instantly (currentLength was increased) when it detected that.
+        - Now the worm has overlapping parts when it has moved onto the fruits position, but currentLength is increased naturally.
+            - Also Grow method in now used when we spawn the worm, we got rid of a nice amount of code.
+
+
 # 19.07.2020
 - New direction for game mechanics
     - When worms gets stuck, it turns into a brick
