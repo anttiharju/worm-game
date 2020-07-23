@@ -62,20 +62,6 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// So we can get specific WormBody target positions. Try to use recursive methods instead of this in loops.
-        /// </summary>
-        /// <param name="n">Target index</param>
-        /// <param name="i">Index to keep track of where we are</param>
-        /// <returns>nth WormBody target position</returns>
-        public Vector2 GetTarget(int n, int i = 0)
-        {
-            if (n == i)
-                return Target;
-            return Next.GetTarget(n, ++i);
-        }
-
-
-        /// <summary>
         /// Returns target. With this we can directly set target.X instead of creating a new Vector every time we want to modify it.
         /// </summary>
         /// <returns>Target (reference)</returns>
@@ -84,6 +70,11 @@ namespace WormGame.GameObject
             return ref target;
         }
 
+
+        public ref Vector2 GetDirection()
+        {
+            return ref direction;
+        }
 
         /// <summary>
         /// Updates WormBodies graphic positions
