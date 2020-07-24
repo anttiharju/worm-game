@@ -1,3 +1,11 @@
+# 24.07.2020
+- Add spawn animation for worms (WormWarning)
+- Update configuration file loading
+- Added settings.cfg from bin path to git, pretty sure that actual binaries won't be included.
+    - Just so there's no duplicates.
+- Bunch of smaller fixes and improvements here and there
+
+
 # 23.07.2020
 - Fix BlockModule overusage by fixing worms Grow -method
     - The root cause was the way how worms grow when they eat fruits.
