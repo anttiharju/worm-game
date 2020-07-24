@@ -185,6 +185,7 @@ namespace WormGame.GameObject
             firstModule.Disable();
             ClearGraphics();
             Enabled = false;
+            moving = false;
         }
     }
 }
