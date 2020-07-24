@@ -65,11 +65,11 @@ namespace WormGame.Static
         ///  FastRound(-2.0000000000000000000000001f) === -2;
         /// </pre>
         /// </example>
-        public static int FastRound(float number)
+        public static int FastRound(float number, float accuracy = 0.1f)
         {
             if (number < 0)
-                return (int)(number - 0.01f);
-            return (int)(number + 0.01f);
+                return (int)(number - accuracy);
+            return (int)(number + accuracy);
         }
 
 

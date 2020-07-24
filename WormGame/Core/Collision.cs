@@ -17,10 +17,10 @@ namespace WormGame.Core
         private readonly int leftBorder;
         private readonly int topBorder;
         private readonly int size;
-        private readonly int width;
-        private readonly int height;
         private readonly Exception unknownPoolableException = new Exception("Unknown poolable entity on collision field.");
 
+        public int Width { get; }
+        public int Height { get; }
 
         /// <summary>
         /// Initializes the collision field which is a 2d array of poolable entities.
@@ -31,16 +31,39 @@ namespace WormGame.Core
         /// <param name="margin">Field margin</param>
         public Collision(Config config)
         {
-            width = config.width;
-            height = config.height;
+            Width = config.width;
+            Height = config.height;
             size = config.size;
-            field = new PoolableEntity[width, height];
-            leftBorder = config.windowWidth / 2 - width / 2 * size;
-            topBorder = config.windowHeight / 2 + height / 2 * size;
-            if (width % 2 == 0)
+            field = new PoolableEntity[Width, Height];
+            leftBorder = config.windowWidth / 2 - Width / 2 * size;
+            topBorder = config.windowHeight / 2 + Height / 2 * size;
+            if (Width % 2 == 0)
                 leftBorder += size / 2;
-            if (height % 2 == 0)
+            if (Height % 2 == 0)
                 topBorder -= size / 2;
+        }
+
+
+        /// <summary>
+        /// Returns a poolable entity as reference.
+        /// </summary>
+        /// <param name="x">Horizontal field position</param>
+        /// <param name="y">Vertical field position</param>
+        /// <returns>Poolable entity as reference</returns>
+        public ref PoolableEntity Get(int x, int y)
+        {
+            return ref field[x, y];
+        }
+
+
+        /// <summary>
+        /// Returns a poolable entity as reference.
+        /// </summary>
+        /// <param name="position">Entity position</param>
+        /// <returns>Poolable entity as reference</returns>
+        public ref PoolableEntity Get(Vector2 position)
+        {
+            return ref Get(X(position.X), Y(position.Y));
         }
 
 
@@ -51,12 +74,12 @@ namespace WormGame.Core
         /// <param name="y">Vertical field position</param>
         /// <param name="consume">Consume fruits</param>
         /// <returns>0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 empty</returns>
-        public int Get(int x, int y, bool consume = false)
+        public int Check(int x, int y, bool consume = false)
         {
             if (x < 0 ||
                 y < 0 ||
-                x >= width ||
-                y >= height)
+                x >= Width ||
+                y >= Height)
                 return 0;
             PoolableEntity cell = field[x, y];
             if (cell == null)
@@ -81,9 +104,9 @@ namespace WormGame.Core
         /// <param name="target">Entity position</param>
         /// <param name="consume">Consume fruits</param>
         /// <returns>0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 empty</returns>
-        public int Get(Vector2 target, bool consume = false)
+        public int Check(Vector2 target, bool consume = false)
         {
-            return Get(X(target.X), Y(target.Y), consume);
+            return Check(X(target.X), Y(target.Y), consume);
         }
 
 
@@ -170,11 +193,11 @@ namespace WormGame.Core
         /// </summary>
         public void Visualize()
         {
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < Height; y++)
             {
-                Console.CursorTop = height - y;
-                System.Text.StringBuilder line = new System.Text.StringBuilder(width);
-                for (int x = 0; x < width; x++)
+                Console.CursorTop = Height - y;
+                System.Text.StringBuilder line = new System.Text.StringBuilder(Width);
+                for (int x = 0; x < Width; x++)
                 {
                     PoolableEntity current = field[x, y];
                     if (current == null)
@@ -194,7 +217,7 @@ namespace WormGame.Core
                     }
                     if (current is Fruit)
                     {
-                        line.Append('+');
+                        line.Append('f');
                         continue;
                     }
                     throw unknownPoolableException;
@@ -202,7 +225,7 @@ namespace WormGame.Core
                 Console.WriteLine(line.ToString());
             }
             Console.CursorLeft = 0;
-            Console.CursorTop = height + 1;
+            Console.CursorTop = Height + 1;
         }
 #endif
     }
