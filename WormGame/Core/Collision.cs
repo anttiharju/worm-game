@@ -81,14 +81,14 @@ namespace WormGame.Core
                 x >= Width ||
                 y >= Height)
                 return 0;
-            PoolableEntity cell = field[x, y];
-            if (cell == null)
+            PoolableEntity current = field[x, y];
+            if (current == null)
                 return 4;
-            if (cell is Worm)
+            if (current is Worm || current is WormWarning)
                 return 1;
-            if (cell is Block)
+            if (current is Block)
                 return 2;
-            if (cell is Fruit fruit)
+            if (current is Fruit fruit)
             {
                 if (consume)
                     fruit.Spawn();
@@ -210,7 +210,7 @@ namespace WormGame.Core
                         line.Append('x');
                         continue;
                     }
-                    if (current is Worm)
+                    if (current is Worm || current is WormWarning)
                     {
                         line.Append('o');
                         continue;

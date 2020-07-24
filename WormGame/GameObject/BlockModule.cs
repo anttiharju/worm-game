@@ -28,7 +28,7 @@ namespace WormGame.GameObject
             Graphic.CenterOrigin();
         }
 
-        public void CloneWorm(Worm worm, WormModule wormModule, Block parent, Pooler<BlockModule> brickModules, int currentLength, int i = 1)
+        public void CloneWorm(Worm worm, WormModule wormModule, Block parent, Pooler<BlockModule> brickModules, int currentLength, int i = 1, bool disable = false)
         {
             Target = wormModule.Target;
             Graphic.X = wormModule.Target.X - worm.Position.X;
@@ -36,30 +36,32 @@ namespace WormGame.GameObject
             Graphic.Color = worm.Color;
 
             if (CheckNeighbours(worm.Color, parent.Id, collision.X(wormModule.Target.X), collision.Y(wormModule.Target.Y)))
-            {
-                parent.Disable();
-                return;
-            }
+                disable = true;
 
             parent.AddGraphic(Graphic);
             collision.Set(parent, wormModule.Target);
             if (i < currentLength)
             {
                 Next = brickModules.Enable();
-                Next.CloneWorm(worm, wormModule.Next, parent, brickModules, currentLength, ++i);
+                Next.CloneWorm(worm, wormModule.Next, parent, brickModules, currentLength, ++i, disable);
+            }
+            else if (disable)
+            {
+                parent.Disable();
+                return;
             }
         }
 
         private bool CheckNeighbours(Color color, int parentId, int x, int y)
         {
-            int[] xLoop = { -1, 1, 0, 0 };
-            int[] yLoop = { 0, 0, -1, 1 };
+            int[] xPositions = { -1, 1, 0, 0 };
+            int[] yPositions = { 0, 0, -1, 1 };
 
             bool disable = false;
-            for (int i = 0; i < xLoop.Length; i++)
+            for (int i = 0; i < xPositions.Length; i++)
             {
-                int currentX = x + xLoop[i];
-                int currentY = y + yLoop[i];
+                int currentX = x + xPositions[i];
+                int currentY = y + yPositions[i];
                 if (currentX >= 0 &&
                     currentY >= 0 &&
                     currentX < collision.Width &&

@@ -1,4 +1,5 @@
-﻿using WormGame.GameObject;
+﻿using System;
+using System.Globalization;
 using WormGame.Static;
 
 namespace WormGame.Core
@@ -10,29 +11,33 @@ namespace WormGame.Core
     /// </summary>
     public class Config
     {
+        // Misc
+        public readonly WormScene scene;
+        public readonly Collision collision;
 #if DEBUG
         public bool visualizeCollision = true; // 119x29 fits in debug console
 #endif
+        // Window
         public readonly bool fullscreen = false;
         public readonly int windowWidth = 1280;
         public readonly int windowHeight = 720;
         public readonly int refreshRate = 144; // See wormSpeed before changing this
 
-        public readonly WormScene scene;
-        public readonly Collision collision;
+        // Scene
         public readonly int width = 20;
         public readonly int height = 10;
         public readonly int margin = 1;
 
-        // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30). If not, this will be subtracted by one until it is.
-        public readonly int wormSpeed = 144;
+        // Worm
+        public readonly int wormSpeed = 24; // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
         public readonly int minWormLength = 5;
+        public readonly float wormSpawnDuration = 2.2f;
+        public readonly float wormPercentage = 0.025f;
+        public readonly int wormCap = 0; // # Overrides wormPercentage if > 0.
 
-        // Not loaded from settings.cfg (yet?)
+        // Fruit
         public readonly bool fruits = true;
         public readonly float fruitPercentage = 0.025f;
-        public readonly int maxWormAmount = 5;
-        public readonly int density = 5;
 
         // Dynamic values
         public readonly int fruitAmount;
@@ -71,8 +76,9 @@ namespace WormGame.Core
                     endIndex = line.Length;
                 string name = line.Substring(0, equalIndex).Trim();
                 string value = line.Substring(endStartIndex, endIndex - endStartIndex).Trim();
-                switch (name)
+                switch (name) // 
                 {
+                    // Window
                     case "fullscreen":
                         fullscreen = bool.Parse(value);
                         break;
@@ -85,9 +91,7 @@ namespace WormGame.Core
                     case "refreshRate":
                         refreshRate = int.Parse(value);
                         break;
-                    case "imageSize":
-                        imageSize = int.Parse(value);
-                        break;
+                    // Scene
                     case "width":
                         width = int.Parse(value);
                         break;
@@ -97,14 +101,28 @@ namespace WormGame.Core
                     case "margin":
                         margin = int.Parse(value);
                         break;
-                    case "minWormLength":
-                        minWormLength = int.Parse(value);
-                        break;
+                    // Worm
                     case "wormSpeed":
                         wormSpeed = int.Parse(value);
                         break;
-                    case "brickFreq":
-                        brickFreq = int.Parse(value);
+                    case "minWormLength":
+                        minWormLength = int.Parse(value);
+                        break;
+                    case "wormSpawnDuration":
+                        wormSpawnDuration = float.Parse(value, CultureInfo.InvariantCulture);
+                        break;
+                    case "wormPercentage":
+                        wormPercentage = float.Parse(value, CultureInfo.InvariantCulture);
+                        break;
+                    case "wormCap":
+                        wormCap = int.Parse(value);
+                        break;
+                    // Fruits
+                    case "fruits":
+                        fruits = bool.Parse(value);
+                        break;
+                    case "fruitPercentage":
+                        fruitPercentage = float.Parse(value, CultureInfo.InvariantCulture);
                         break;
                 }
             }
@@ -114,12 +132,18 @@ namespace WormGame.Core
 
             if (width < 2) width = 2;
             if (height < 2) height = 2;
-            while (refreshRate % wormSpeed != 0)
-                wormSpeed--;
+            if (wormSpeed < 1) wormSpeed = 1;
+            while (refreshRate % wormSpeed != 0) wormSpeed--;
             fruitAmount = (int)(width * height * fruitPercentage);
-            if (fruitAmount < 1)
-                fruitAmount = 1;
-            wormAmount = maxWormAmount * 2; // with bad luck every worm can turn into a block simultaneously, that's why * 2.
+            if (fruitAmount < 1) fruitAmount = 1;
+            if (wormCap <= 0)
+            {
+                float tmp = width * height * wormPercentage;
+                wormCap = (int)(tmp + 1);
+                if (wormAmount < 1)
+                    wormAmount = 1;
+            }
+            wormAmount = wormCap * 2;  // Although rare, there's a chance that every worm turns into a block simultaneously, that's why * 2.
             moduleAmount = width * height;
             entityAmount = moduleAmount / minWormLength;
             size = CalculateSize(windowWidth, windowHeight);

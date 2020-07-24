@@ -16,19 +16,20 @@ namespace WormGame
     /// </summary>
     public class WormScene : Scene
     {
+        public int wormAmount;
+        public int wormCap;
+
         private readonly Config config;
         private readonly Collision collision;
         private readonly Pooler<Worm> worms;
         private readonly Pooler<Fruit> fruits;
         private readonly Pooler<Block> blocks;
+        private readonly Pooler<WormWarning> warnings;
         private readonly Pooler<WormModule> wormModules;
         private readonly Pooler<BlockModule> blockModules;
+        private readonly float stepAccuracy;
 
-        private float stepAccuracy;
-        private float wormCounter;
-
-        public int wormCount;
-        public int maxWormCount;
+        private float wormFrequency;
 
 
         /// <summary>
@@ -40,16 +41,18 @@ namespace WormGame
             this.config = config;
             collision = config.collision;
             stepAccuracy = config.step / 2;
-            maxWormCount = config.maxWormAmount;
+            wormCap = config.wormCap;
             CreateBorders();
 
             // Entity pools
             blocks = new Pooler<Block>(config, config.moduleAmount);
             fruits = new Pooler<Fruit>(config, config.fruitAmount);
             worms = new Pooler<Worm>(config, config.wormAmount);
+            warnings = new Pooler<WormWarning>(config, config.wormAmount);
             AddMultiple(blocks.Pool);
             AddMultiple(fruits.Pool);
             AddMultiple(worms.Pool);
+            AddMultiple(warnings.Pool);
 
             // Object pools
             wormModules = new Pooler<WormModule>(config, config.moduleAmount); // In theory there can be a worm that fills up the whole field.
@@ -62,6 +65,8 @@ namespace WormGame
 
             for (int i = 0; i < 3; i++)
                 SpawnPlayer(i);
+
+            wormFrequency = config.size - config.step;
         }
 
 
@@ -90,21 +95,90 @@ namespace WormGame
 
 
         /// <summary>
+        /// Makes calls to scenes entities to keep them moving.
+        /// </summary>
+        public override void Update()
+        {
+            wormFrequency += config.step;
+            if (Mathf.FastRound(wormFrequency, stepAccuracy) >= config.size)
+            {
+                foreach (Worm worm in worms)
+                    if (worm.Enabled)
+                        worm.Move();
+                wormFrequency = 0;
+                if (wormAmount < wormCap)
+                {
+                    Vector2 random = Random.ValidPosition(collision, config.width, config.height, 4);
+                    if (random.X != -1)
+                        SpawnWorm(random);
+                    else
+                    {
+                        random = Random.ValidPosition(collision, config.width, config.height, 3);
+                        if (random.X != -1 && collision.Check(random) == 3)
+                        {
+                            Fruit fruit = (Fruit)collision.Get(random);
+                            fruit.Disable();
+                            SpawnWorm(random);
+                        }
+                        else
+                        {
+                            wormAmount--;
+                        }
+                    }
+                }
+#if DEBUG
+                if (config.visualizeCollision)
+                    collision.Visualize();
+#endif
+            }
+        }
+
+
+        /// <summary>
+        /// Spawn either worm or warning depending on configuration as part of Update().
+        /// </summary>
+        /// <param name="random">Spawn position</param>
+        private void SpawnWorm(Vector2 random)
+        {
+            if (Mathf.FastRound(config.wormSpawnDuration) <= 0)
+                SpawnWorm(collision.X(random.X), collision.Y(random.Y));
+            else
+                SpawnWarning(collision.X(random.X), collision.Y(random.Y));
+            wormAmount++;
+        }
+
+
+        /// <summary>
         /// Spawns a worm.
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
         /// <param name="length">Length, default config.minWormLength</param>
         /// <param name="color">Color, default Random.Color</param>
-        /// <returns>Worm</returns>
-        public Worm SpawnWorm(int x, int y, int length = 0, Color color = null)
+        public void SpawnWorm(int x, int y, int length = 0, Color color = null)
         {
             Worm worm = worms.Enable();
-            if (worm == null) return null;
+            if (worm == null) return;
             if (color == null) color = Random.Color;
             if (length < config.minWormLength) length = config.minWormLength;
             worm.Spawn(wormModules, x, y, length, color);
-            return worm;
+        }
+
+
+        /// <summary>
+        /// Spawns a worm.
+        /// </summary>
+        /// <param name="x">Horizontal field position</param>
+        /// <param name="y">Vertical field position</param>
+        /// <param name="length">Length, default config.minWormLength</param>
+        /// <param name="color">Color, default Random.Color</param>
+        public void SpawnWarning(int x, int y, int length = 0, Color color = null)
+        {
+            WormWarning warning = warnings.Enable();
+            if (warning == null) return;
+            if (color == null) color = Random.Color;
+            if (length < config.minWormLength) length = config.minWormLength;
+            warning.Spawn(x, y, length, color);
         }
 
 
@@ -119,7 +193,7 @@ namespace WormGame
             if (block == null || blockModules.HasAvailable(currentLength) == false)
                 return null;
             block = block.Spawn(worm, blockModules, currentLength);
-            wormCount--;
+            wormAmount--;
             return block;
         }
 
@@ -134,50 +208,6 @@ namespace WormGame
             Player player = new Player(this, playerNumber, config.windowWidth / 2, config.windowHeight / 2, config.size);
             Add(player);
             return player;
-        }
-
-
-        /// <summary>
-        /// Makes calls to scenes entities to keep them moving.
-        /// </summary>
-        public override void Update()
-        {
-            wormCounter += config.step;
-            if (Mathf.FastRound(wormCounter, stepAccuracy) >= config.size)
-            {
-                foreach (Worm worm in worms)
-                    if (worm.Enabled)
-                        worm.Move();
-                wormCounter = 0;
-                if (wormCount < maxWormCount)
-                {
-                    Vector2 random = Random.ValidPosition(collision, config.width, config.height, 4);
-                    if (random.X != -1)
-                    {
-                        SpawnWorm(collision.X(random.X), collision.Y(random.Y));
-                        wormCount++;
-                    }
-                    else
-                    {
-                        random = Random.ValidPosition(collision, config.width, config.height, 3);
-                        if (random.X != -1 && collision.Check(random) == 3)
-                        {
-                            Fruit fruit = (Fruit)collision.Get(random);
-                            fruit.Disable();
-                            SpawnWorm(collision.X(random.X), collision.Y(random.Y));
-                            wormCount++;
-                        }
-                        else
-                        {
-                            wormCount--;
-                        }
-                    }
-                }
-#if DEBUG
-                if (config.visualizeCollision)
-                    collision.Visualize();
-#endif
-            }
         }
 
 
