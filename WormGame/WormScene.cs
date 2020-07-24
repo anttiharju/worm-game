@@ -17,13 +17,14 @@ namespace WormGame
     public class WormScene : Scene
     {
         private readonly Config config;
-        private readonly Collision field;
+        private readonly Collision collision;
         private readonly Pooler<Worm> worms;
         private readonly Pooler<Fruit> fruits;
         private readonly Pooler<Block> blocks;
         private readonly Pooler<WormModule> wormModules;
         private readonly Pooler<BlockModule> blockModules;
 
+        private float stepAccuracy;
         private float wormCounter;
 
         public int wormCount;
@@ -37,7 +38,8 @@ namespace WormGame
         public WormScene(Config config)
         {
             this.config = config;
-            field = config.field;
+            collision = config.collision;
+            stepAccuracy = config.step / 2;
             maxWormCount = config.maxWormAmount;
             CreateBorders();
 
@@ -50,7 +52,7 @@ namespace WormGame
             AddMultiple(worms.Pool);
 
             // Object pools
-            wormModules = new Pooler<WormModule>(config, config.moduleAmount);
+            wormModules = new Pooler<WormModule>(config, config.moduleAmount); // In theory there can be a worm that fills up the whole field.
             blockModules = new Pooler<BlockModule>(config, config.moduleAmount);
 
             // Entity setup
@@ -141,7 +143,7 @@ namespace WormGame
         public override void Update()
         {
             wormCounter += config.step;
-            if (Mathf.FastRound(wormCounter) >= config.size)
+            if (Mathf.FastRound(wormCounter, stepAccuracy) >= config.size)
             {
                 foreach (Worm worm in worms)
                     if (worm.Enabled)
@@ -149,18 +151,31 @@ namespace WormGame
                 wormCounter = 0;
                 if (wormCount < maxWormCount)
                 {
-                    Vector2 random = Random.ValidPosition(field, config.width, config.height, 4);
-                    if (random.X != -1 && field.Get(random) == 4)
+                    Vector2 random = Random.ValidPosition(collision, config.width, config.height, 4);
+                    if (random.X != -1)
                     {
-                        SpawnWorm(field.X(random.X), field.Y(random.Y));
+                        SpawnWorm(collision.X(random.X), collision.Y(random.Y));
                         wormCount++;
                     }
                     else
-                        wormCount--;
+                    {
+                        random = Random.ValidPosition(collision, config.width, config.height, 3);
+                        if (random.X != -1 && collision.Check(random) == 3)
+                        {
+                            Fruit fruit = (Fruit)collision.Get(random);
+                            fruit.Disable();
+                            SpawnWorm(collision.X(random.X), collision.Y(random.Y));
+                            wormCount++;
+                        }
+                        else
+                        {
+                            wormCount--;
+                        }
+                    }
                 }
 #if DEBUG
                 if (config.visualizeCollision)
-                    field.Visualize();
+                    collision.Visualize();
 #endif
             }
         }

@@ -6,18 +6,18 @@ Educational project. The point wasn't to make a good game, but to learn Git and 
 ## Game mechanics
 - Field
     - Fruits and worms spawn on it
+- Players
+    - Up to four
+    - Controlled with gamepads (left stick + rb)
+    - Can posess worms
 - Worms
-    - Go straight until they hit smoething
+    - Go straight until they hit something
     - Controlled like snake in the snake game
     - Grow longer by eating fruits
     - Turn into blocks when stuck
 - Blocks
     - Can't move
-    - Disappear if in contact with another block of the same color.
-- Players
-    - Controlled with gamepads
-    - Can posess worms
-    - Up to four
+    - Disappear if in next to another block of the same color.
     
 # Tools
 - Visual Studio Community 2019
