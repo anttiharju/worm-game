@@ -1,12 +1,12 @@
 ﻿using Otter.Core;
 using Otter.Graphics.Drawables;
-using Otter.Utility;
+using System;
 using WormGame.Core;
 
 namespace WormGame
 {
     /// @author Antti Harju
-    /// @version 20.07.2020
+    /// @version 24.07.2020
     /// <summary>
     /// See README.md for an explanation of game mechanics.
     /// </summary>
@@ -18,9 +18,7 @@ namespace WormGame
         public static void Main()
         {
             Config config = new Config();
-            int circleAccuracy = (int)(config.size * 0.6f);
-            if (circleAccuracy > 6)
-                Image.CirclePointCount = circleAccuracy;
+            Image.CirclePointCount = 36;
 
             Game game = new Game("Worm Blocks", config.windowWidth, config.windowHeight, config.refreshRate, config.fullscreen)
             {

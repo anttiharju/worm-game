@@ -13,6 +13,9 @@ namespace WormGame.GameObject
     /// </summary>
     public class WormModule : PoolableObject
     {
+        private readonly Collision collision;
+
+
         /// <summary>
         /// Get or set next module.
         /// </summary>
@@ -52,6 +55,7 @@ namespace WormGame.GameObject
         /// <param name="config">Configuration</param>
         public WormModule(Config config)
         {
+            collision = config.collision;
             Graphic = Image.CreateCircle(config.size / 2);
             Graphic.CenterOrigin();
         }
@@ -138,6 +142,8 @@ namespace WormGame.GameObject
             Enabled = false;
             if (Next != null)
                 Next.Disable();
+            if (collision.Check(target) == 1)
+                collision.Set(null, target);
             Next = null;
             ResetDirection();
             Graphic.X = 0;

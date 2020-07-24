@@ -62,7 +62,7 @@ namespace WormGame.GameObject
         {
             size = config.size;
             step = config.step;
-            collision = config.field;
+            collision = config.collision;
         }
 
 
@@ -132,15 +132,15 @@ namespace WormGame.GameObject
             bool retry = false;
         Retry:
             target = firstModule.Target + Direction * size;
-            int nextPosition = collision.Get(target, true);
+            int nextPosition = collision.Check(target, true);
             if (nextPosition >= 3) // Move if next position is empty (4) or fruit (3).
             {
-                if (nextPosition == 3)
-                    grow = true;
                 if (currentLength < Length)
                     currentLength++;
                 else
                     collision.Set(null, lastModule.Target);
+                if (nextPosition == 3)
+                    grow = true;
                 firstModule.DirectionFollow(direction);
                 firstModule.TargetFollow(target);
                 collision.Set(this, target);

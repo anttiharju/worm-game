@@ -36,7 +36,10 @@ namespace WormGame.GameObject
             Visible = false;
             scene = wormScene;
             this.playerNumber = playerNumber;
-            Image image = Image.CreateCircle(size / 3, Help.colors[playerNumber]);
+            int color = playerNumber;
+            if (color >= Help.colors.Length)
+                color = Help.colors.Length - 1;
+            Image image = Image.CreateCircle(size / 3, Help.colors[color]);
             image.OutlineThickness = size / 15;
             image.OutlineColor = Color.Black;
             image.CenterOrigin();

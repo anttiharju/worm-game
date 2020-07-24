@@ -19,10 +19,10 @@ namespace WormGame.Core
         public readonly int refreshRate = 144; // See wormSpeed before changing this
 
         public readonly WormScene scene;
-        public readonly Collision field;
-        public readonly int width = 119;
-        public readonly int height = 29;
-        public readonly int margin = 2;
+        public readonly Collision collision;
+        public readonly int width = 20;
+        public readonly int height = 10;
+        public readonly int margin = 1;
 
         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30). If not, this will be subtracted by one until it is.
         public readonly int wormSpeed = 144;
@@ -30,8 +30,8 @@ namespace WormGame.Core
 
         // Not loaded from settings.cfg (yet?)
         public readonly bool fruits = true;
-        public readonly float fruitPercentage = 0.05f;
-        public readonly int maxWormAmount = 30;
+        public readonly float fruitPercentage = 0.025f;
+        public readonly int maxWormAmount = 5;
         public readonly int density = 5;
 
         // Dynamic values
@@ -124,7 +124,7 @@ namespace WormGame.Core
             entityAmount = moduleAmount / minWormLength;
             size = CalculateSize(windowWidth, windowHeight);
             step = (float)wormSpeed / refreshRate * size;
-            field = new Collision(this);
+            collision = new Collision(this);
             scene = new WormScene(this);
         }
 

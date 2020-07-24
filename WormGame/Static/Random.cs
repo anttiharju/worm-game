@@ -5,7 +5,7 @@ using WormGame.Core;
 namespace WormGame.Static
 {
     /// @author Antti Harju
-    /// @version 18.07.2020
+    /// @version 24.07.2020
     /// <summary>
     /// Class for generating random stuff.
     /// </summary>
@@ -53,43 +53,6 @@ namespace WormGame.Static
 
 
         /// <summary>
-        /// Generates a random valid position.
-        /// </summary>
-        /// <param name="field">Collision</param>
-        /// <param name="width">Field width</param>
-        /// <param name="height">Field height</param>
-        /// <param name="validity">0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 free</param>
-        /// <returns>Random valid position</returns>
-        public static Vector2 ValidPosition(Collision field, int width, int height, int validity)
-        {
-            int randomX = Range(0, width);
-            int randomY = Range(0, height);
-            if (field.Get(randomX, randomY) < validity)
-            {
-                for (int y = randomY; y < height; y++)
-                    for (int x = randomX; x < width; x++)
-                        if (field.Get(x, y) >= validity)
-                        {
-                            randomX = x;
-                            randomY = y;
-                            goto End;
-                        }
-                for (int y = randomY; y >= 0; y--)
-                    for (int x = randomX; x >= 0; x--)
-                        if (field.Get(x, y) >= validity)
-                        {
-                            randomX = x;
-                            randomY = y;
-                            goto End;
-                        }
-                return -Vector2.One;
-            }
-        End:
-            return new Vector2(field.EntityX(randomX), field.EntityY(randomY));
-        }
-
-
-        /// <summary>
         /// Generates a random valid direction.
         /// </summary>
         /// <param name="field">Collision</param>
@@ -111,6 +74,43 @@ namespace WormGame.Static
                 }
             }
             return Help.directions[direction];
+        }
+
+
+        /// <summary>
+        /// Generates a random valid position.
+        /// </summary>
+        /// <param name="field">Collision</param>
+        /// <param name="width">Field width</param>
+        /// <param name="height">Field height</param>
+        /// <param name="validity">Inclusive and includes larger numbers: 0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 free</param>
+        /// <returns>Random valid position</returns>
+        public static Vector2 ValidPosition(Collision field, int width, int height, int validity)
+        {
+            int randomX = Range(0, width);
+            int randomY = Range(0, height);
+            if (field.Check(randomX, randomY) < validity)
+            {
+                for (int y = randomY; y < height; y++)
+                    for (int x = randomX; x < width; x++)
+                        if (field.Check(x, y) >= validity)
+                        {
+                            randomX = x;
+                            randomY = y;
+                            goto End;
+                        }
+                for (int y = randomY; y >= 0; y--)
+                    for (int x = randomX; x >= 0; x--)
+                        if (field.Check(x, y) >= validity)
+                        {
+                            randomX = x;
+                            randomY = y;
+                            goto End;
+                        }
+                return -Vector2.One;
+            }
+        End:
+            return new Vector2(field.EntityX(randomX), field.EntityY(randomY));
         }
     }
 }

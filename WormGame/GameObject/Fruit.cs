@@ -23,11 +23,11 @@ namespace WormGame.GameObject
         /// <param name="config"></param>
         public Fruit(Config config) : base()
         {
-            field = config.field;
+            field = config.collision;
             width = config.width;
             height = config.height;
-            Image image = Image.CreateCircle(config.size / 3, Color.Black);
-            image.OutlineThickness = config.size / 10;
+            Image image = Image.CreateCircle(config.size / 4, Color.Black);
+            image.OutlineThickness = config.size / 6;
             image.OutlineColor = Color.White;
             image.CenterOrigin();
             AddGraphic(image);
@@ -41,7 +41,7 @@ namespace WormGame.GameObject
         public Fruit Spawn()
         {
             Vector2 random = Random.ValidPosition(field, width, height, 4);
-            if (random.X == -1 || field.Get(random) != 4)
+            if (random.X == -1 || field.Check(random) != 4)
             {
                 Disable();
                 return null;

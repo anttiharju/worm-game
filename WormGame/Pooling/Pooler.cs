@@ -5,7 +5,7 @@ using WormGame.Core;
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 23.07.2020
+    /// @version 24.07.2020
     /// <summary>
     /// Object pooler.
     /// </summary>
@@ -176,7 +176,7 @@ namespace WormGame.Pooling
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.Write($"{type,-11}");
                 Console.ForegroundColor = defaultColor;
-                Console.WriteLine($" {freedAmount} ");
+                Console.WriteLine($" {freedAmount}     ");
             }
 #endif
             return EnableIndex == endIndex;
