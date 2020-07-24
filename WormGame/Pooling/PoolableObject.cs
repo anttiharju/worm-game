@@ -3,7 +3,7 @@
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 20.07.2020
+    /// @version 24.07.2020
     /// <summary>
     /// Class for poolable non-entity objects.
     /// </summary>
@@ -18,7 +18,7 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Constructor so inheritors don't need base(config).
+        /// Constructor without parameters so inheritors don't need base(config).
         /// </summary>
         public PoolableObject() { }
 
