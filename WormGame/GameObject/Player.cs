@@ -109,7 +109,11 @@ namespace WormGame.GameObject
                 worm.Direction = Help.directions[2]; // DOWN
             if (leftX > deadZone)
                 worm.Direction = Help.directions[3]; // RIGHT
-            Wormskip:;
+            if (Input.ButtonPressed(0, 0))
+            {
+                worm.Blockify();
+            }
+        Wormskip:;
             #endregion;
         }
     }

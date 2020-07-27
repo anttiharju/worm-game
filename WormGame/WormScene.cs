@@ -22,10 +22,10 @@ namespace WormGame
         private readonly Config config;
         private readonly Collision collision;
         private readonly Pooler<Worm> worms;
+        private readonly Pooler<WormSpawn> wormSpawns;
+        private readonly Pooler<WormModule> wormModules;
         private readonly Pooler<Fruit> fruits;
         private readonly Pooler<Block> blocks;
-        private readonly Pooler<WormWarning> warnings;
-        private readonly Pooler<WormModule> wormModules;
         private readonly Pooler<BlockModule> blockModules;
         private readonly float stepAccuracy;
 
@@ -44,17 +44,11 @@ namespace WormGame
             wormCap = config.wormCap;
             CreateBorders();
 
-            // Entity pools
-            blocks = new Pooler<Block>(config, config.moduleAmount);
-            fruits = new Pooler<Fruit>(config, config.fruitAmount);
-            worms = new Pooler<Worm>(config, config.wormAmount);
-            warnings = new Pooler<WormWarning>(config, config.wormAmount);
-            AddMultiple(blocks.Pool);
-            AddMultiple(fruits.Pool);
-            AddMultiple(worms.Pool);
-            AddMultiple(warnings.Pool);
-
-            // Object pools
+            // Poolers
+            fruits = new Pooler<Fruit>(config, config.fruitAmount, this);
+            worms = new Pooler<Worm>(config, config.wormAmount, this);
+            blocks = new Pooler<Block>(config, config.moduleAmount, this);
+            if (config.wormSpawnDuration > 0) wormSpawns = new Pooler<WormSpawn>(config, config.wormAmount, this);
             wormModules = new Pooler<WormModule>(config, config.moduleAmount); // In theory there can be a worm that fills up the whole field.
             blockModules = new Pooler<BlockModule>(config, config.moduleAmount);
 
@@ -174,7 +168,7 @@ namespace WormGame
         /// <param name="color">Color, default Random.Color</param>
         public void SpawnWarning(int x, int y, int length = 0, Color color = null)
         {
-            WormWarning warning = warnings.Enable();
+            WormSpawn warning = wormSpawns.Enable();
             if (warning == null) return;
             if (color == null) color = Random.Color;
             if (length < config.minWormLength) length = config.minWormLength;
@@ -187,12 +181,12 @@ namespace WormGame
         /// </summary>
         /// <param name="worm">Worm to transform</param>
         /// <returns>Block</returns>
-        public Block SpawnBlock(Worm worm, int currentLength)
+        public Block SpawnBlock(Worm worm)
         {
             Block block = blocks.Enable();
-            if (block == null || blockModules.HasAvailable(currentLength) == false)
+            if (block == null || blockModules.HasAvailable(worm.Length) == false)
                 return null;
-            block = block.Spawn(worm, blockModules, currentLength);
+            block = block.Spawn(worm, blockModules);
             wormAmount--;
             return block;
         }
@@ -212,7 +206,7 @@ namespace WormGame
 
 
         /// <summary>
-        /// Creates visible borders for the field.
+        /// Creates a visible border for the field.
         /// </summary>
         private void CreateBorders()
         {

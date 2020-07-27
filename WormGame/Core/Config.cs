@@ -1,11 +1,9 @@
-﻿using System;
-using System.Globalization;
-using WormGame.Static;
+﻿using WormGame.Static;
 
 namespace WormGame.Core
 {
     /// @author Antti Harju
-    /// @version 18.07.2020
+    /// @version 24.07.2020
     /// <summary>
     /// Configuration.
     /// </summary>
@@ -15,13 +13,14 @@ namespace WormGame.Core
         public readonly WormScene scene;
         public readonly Collision collision;
 #if DEBUG
-        public bool visualizeCollision = true; // 119x29 fits in debug console
+        public bool visualizeCollision = false; // 119x29 fits in debug console
 #endif
+
         // Window
         public readonly bool fullscreen = false;
         public readonly int windowWidth = 1280;
         public readonly int windowHeight = 720;
-        public readonly int refreshRate = 144; // See wormSpeed before changing this
+        public readonly int refreshRate = 144;  // See wormSpeed before changing this
 
         // Scene
         public readonly int width = 20;
@@ -29,19 +28,20 @@ namespace WormGame.Core
         public readonly int margin = 1;
 
         // Worm
-        public readonly int wormSpeed = 24; // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
-        public readonly int minWormLength = 5;
-        public readonly float wormSpawnDuration = 2.2f;
-        public readonly float wormPercentage = 0.025f;
-        public readonly int wormCap = 0; // # Overrides wormPercentage if > 0.
+        public readonly int wormCap = 5;        // Overrides wormPercentage if > 0.
+        public readonly int wormSpeed = 6;      // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
+        public readonly int minWormLength = 6;
+        public readonly float wormSpawnDuration = 0;
+        public readonly float wormPercentage = 1;
 
         // Fruit
-        public readonly bool fruits = true;
+        public readonly bool fruits = false;
         public readonly float fruitPercentage = 0.025f;
 
         // Dynamic values
         public readonly int fruitAmount;
         public readonly int wormAmount;
+        public readonly int warningAmount;
         public readonly int entityAmount;
         public readonly int moduleAmount;
         public readonly float step;
@@ -109,10 +109,10 @@ namespace WormGame.Core
                         minWormLength = int.Parse(value);
                         break;
                     case "wormSpawnDuration":
-                        wormSpawnDuration = float.Parse(value, CultureInfo.InvariantCulture);
+                        wormSpawnDuration = float.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
                         break;
                     case "wormPercentage":
-                        wormPercentage = float.Parse(value, CultureInfo.InvariantCulture);
+                        wormPercentage = float.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
                         break;
                     case "wormCap":
                         wormCap = int.Parse(value);
@@ -122,7 +122,7 @@ namespace WormGame.Core
                         fruits = bool.Parse(value);
                         break;
                     case "fruitPercentage":
-                        fruitPercentage = float.Parse(value, CultureInfo.InvariantCulture);
+                        fruitPercentage = float.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
                         break;
                 }
             }
@@ -133,17 +133,18 @@ namespace WormGame.Core
             if (width < 2) width = 2;
             if (height < 2) height = 2;
             if (wormSpeed < 1) wormSpeed = 1;
-            while (refreshRate % wormSpeed != 0) wormSpeed--;
+            while (refreshRate % wormSpeed != 0)
+                wormSpeed--;
             fruitAmount = (int)(width * height * fruitPercentage);
             if (fruitAmount < 1) fruitAmount = 1;
             if (wormCap <= 0)
             {
                 float tmp = width * height * wormPercentage;
                 wormCap = (int)(tmp + 1);
-                if (wormAmount < 1)
-                    wormAmount = 1;
             }
             wormAmount = wormCap * 2;  // Although rare, there's a chance that every worm turns into a block simultaneously, that's why * 2.
+            if (wormAmount < 1)
+                wormAmount = 1;
             moduleAmount = width * height;
             entityAmount = moduleAmount / minWormLength;
             size = CalculateSize(windowWidth, windowHeight);

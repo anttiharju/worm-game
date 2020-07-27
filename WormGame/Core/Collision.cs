@@ -13,14 +13,24 @@ namespace WormGame.Core
     /// </summary>
     public class Collision
     {
+        private readonly Exception unknownPoolableException = new Exception("Unknown poolable entity on collision field.");
         private readonly PoolableEntity[,] field;
         private readonly int leftBorder;
         private readonly int topBorder;
         private readonly int size;
-        private readonly Exception unknownPoolableException = new Exception("Unknown poolable entity on collision field.");
 
+
+        /// <summary>
+        /// Collision field width.
+        /// </summary>
         public int Width { get; }
+
+
+        /// <summary>
+        /// Collision field height.
+        /// </summary>
         public int Height { get; }
+
 
         /// <summary>
         /// Initializes the collision field which is a 2d array of poolable entities.
@@ -84,7 +94,7 @@ namespace WormGame.Core
             PoolableEntity current = field[x, y];
             if (current == null)
                 return 4;
-            if (current is Worm || current is WormWarning)
+            if (current is Worm || current is WormSpawn)
                 return 1;
             if (current is Block)
                 return 2;
@@ -210,7 +220,7 @@ namespace WormGame.Core
                         line.Append('x');
                         continue;
                     }
-                    if (current is Worm || current is WormWarning)
+                    if (current is Worm || current is WormSpawn)
                     {
                         line.Append('o');
                         continue;

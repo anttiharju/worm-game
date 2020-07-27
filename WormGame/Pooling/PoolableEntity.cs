@@ -38,6 +38,16 @@ namespace WormGame.Pooling
 
 
         /// <summary>
+        /// Add entity to scene.
+        /// </summary>
+        /// <param name="scene"></param>
+        public virtual void Add(WormScene scene)
+        {
+            scene.Add(this);
+        }
+
+
+        /// <summary>
         /// Frees the entity back to the pool.
         /// </summary>
         public virtual void Disable()

@@ -9,7 +9,7 @@ namespace WormGame.GameObject
     /// @author Antti Harju
     /// @version 23.07.2020
     /// <summary>
-    /// Worm entity. Worms are modular entities; it consists of one Otter2d entity and several normal objects so it can grow infinitely.
+    /// Worm entity. Worms are modular entities; it consists of one Otter2d entity and several regular objects (modules). This way the worm can grow infinitely.
     /// </summary>
     public class Worm : PoolableEntity
     {
@@ -23,10 +23,9 @@ namespace WormGame.GameObject
         private Pooler<WormModule> modules;
         private WormModule lastModule;
         private WormModule newModule;
-        private Vector2 target;
-        private int currentLength;
         private bool moving;
         private bool grow;
+        private int LengthCap;
 
 
         /// <summary>
@@ -36,7 +35,7 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Return worm length.
+        /// Get worm length.
         /// </summary>
         public int Length { get; private set; }
 
@@ -52,6 +51,12 @@ namespace WormGame.GameObject
         /// </summary>
         public Vector2 Direction { get { return direction; } set { if (Help.ValidateDirection(collision, firstModule.Target, size, value)) direction = value; } }
         private Vector2 direction;
+
+
+        /// <summary>
+        /// Get worm target.
+        /// </summary>
+        public Vector2 Target { get; private set; }
 
 
         /// <summary>
@@ -79,10 +84,9 @@ namespace WormGame.GameObject
         {
             scene = (WormScene)Scene;
             modules = wormModules;
-            X = collision.EntityX(x);
-            Y = collision.EntityY(y);
-            target = Position;
-            currentLength = 1;
+            SetPosition(collision.EntityX(x), collision.EntityY(y));
+            Target = Position;
+            LengthCap = 1;
             Length = 1;
             moving = true;
 
@@ -108,15 +112,21 @@ namespace WormGame.GameObject
         {
             newModule = modules.Enable();
             if (newModule == null) return;
-            newModule.Graphic.X = lastModule.Graphic.X;
-            newModule.Graphic.Y = lastModule.Graphic.Y;
+            newModule.Graphic.SetPosition(lastModule.Graphic.X, lastModule.Graphic.Y);
             newModule.SetTarget(X + lastModule.Graphic.X, Y + lastModule.Graphic.Y);
             newModule.Graphic.Color = Color;
             AddGraphic(newModule.Graphic);
             lastModule.ResetDirection();
             lastModule.Next = newModule;
             lastModule = newModule;
-            Length++;
+            LengthCap++;
+        }
+
+
+        public void Blockify()
+        {
+            scene.SpawnBlock(this);
+            Disable();
         }
 
 
@@ -131,26 +141,25 @@ namespace WormGame.GameObject
             moving = true;
             bool retry = false;
         Retry:
-            target = firstModule.Target + Direction * size;
-            int nextPosition = collision.Check(target, true);
+            Target = firstModule.Target + Direction * size;
+            int nextPosition = collision.Check(Target, true);
             if (nextPosition >= 3) // Move if next position is empty (4) or fruit (3).
             {
-                if (currentLength < Length)
-                    currentLength++;
+                if (Length < LengthCap)
+                    Length++;
                 else
                     collision.Set(null, lastModule.Target);
                 if (nextPosition == 3)
                     grow = true;
                 firstModule.DirectionFollow(direction);
-                firstModule.TargetFollow(target);
-                collision.Set(this, target);
+                firstModule.TargetFollow(Target);
+                collision.Set(this, Target);
             }
             else
             {
                 if (retry) // If stuck, turn into a block.
                 {
-                    scene.SpawnBlock(this, currentLength);
-                    Disable();
+                    Blockify();
                 }
                 else if (Player == null) // Find a new direction if not posessed by player.
                 {
