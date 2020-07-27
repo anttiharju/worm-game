@@ -9,7 +9,7 @@ using WormGame.Pooling;
 
 namespace WormGame.GameObject
 {
-    public class WormWarning : PoolableEntity
+    public class WormSpawn : PoolableEntity
     {
         private readonly Collision collision;
         private readonly float size;
@@ -24,7 +24,7 @@ namespace WormGame.GameObject
         private int length;
         private bool spawnWorm;
 
-        public WormWarning(Config config)
+        public WormSpawn(Config config)
         {
             spawnDuration = config.wormSpawnDuration;
             step = 1 / spawnDuration;

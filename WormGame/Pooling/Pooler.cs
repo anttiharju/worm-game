@@ -15,6 +15,7 @@ namespace WormGame.Pooling
 #if DEBUG
         private readonly string type;
 #endif
+        private readonly T[] pool;
         private readonly int endIndex;
 
 
@@ -25,36 +26,36 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Return pool.
+        /// Get pool length.
         /// </summary>
-        public T[] Pool { get; }
+        public int Count { get { return pool.Length; } }
 
 
         /// <summary>
-        /// Returns pool length.
-        /// </summary>
-        public int Count { get { return Pool.Length; } }
-
-
-        /// <summary>
-        /// Initializes pool. If pooling entities, you have to manually add them to the scene: AddMultiple([PoolerVariableName].Pool);
+        /// Initializes pool.
         /// </summary>
         /// <param name="config">Configuration object</param>
         /// <param name="size">Pool size</param>
-        public Pooler(Config config, int size)
+        public Pooler(Config config, int size, WormScene scene = null)
         {
             endIndex = size - 1;
-            Pool = new T[size];
+            pool = new T[size];
             for (int i = 0; i < size; i++)
             {
                 T currentPoolable;
                 currentPoolable = (T)Activator.CreateInstance(typeof(T), new object[] { config });
                 currentPoolable.Enabled = false;
                 currentPoolable.Id = i;
-                Pool[i] = currentPoolable;
+                pool[i] = currentPoolable;
+                if (currentPoolable is PoolableEntity entity)
+                {
+                    if (scene == null)
+                        throw new Exception("You can't pool entities without giving the scene as parameter."); ;
+                    entity.Add(scene);
+                }
             }
 #if DEBUG
-            System.Text.RegularExpressions.MatchCollection matches = System.Text.RegularExpressions.Regex.Matches("" + Pool[0].GetType(), @"\.([^\.]*)$");
+            System.Text.RegularExpressions.MatchCollection matches = System.Text.RegularExpressions.Regex.Matches("" + pool[0].GetType(), @"\.([^\.]*)$");
             if (matches.Count > 0 && matches[0].Groups.Count > 1)
                 type = matches[0].Groups[1].Value;
             else
@@ -69,14 +70,14 @@ namespace WormGame.Pooling
         /// <returns>Enabled poolable</returns>
         public T Enable()
         {
-            if (EnableIndex == endIndex && Pool[EnableIndex].Enabled)
+            if (EnableIndex == endIndex && pool[EnableIndex].Enabled)
                 if (Sort())
                     return null;
             int newEntity = EnableIndex;
-            Pool[newEntity].Enabled = true;
+            pool[newEntity].Enabled = true;
             if (EnableIndex != endIndex)
                 EnableIndex++;
-            return Pool[newEntity];
+            return pool[newEntity];
         }
 
 
@@ -139,17 +140,17 @@ namespace WormGame.Pooling
             int current = 0;
             while (current < EnableIndex)
             {
-                if (Pool[current].Enabled)
+                if (pool[current].Enabled)
                     current++;
                 else
                 {
                     for (int enabled = EnableIndex; enabled > current; enabled--)
                     {
-                        if (Pool[enabled].Enabled)
+                        if (pool[enabled].Enabled)
                         {
-                            T swap = Pool[enabled];
-                            Pool[enabled] = Pool[current];
-                            Pool[current] = swap;
+                            T swap = pool[enabled];
+                            pool[enabled] = pool[current];
+                            pool[current] = swap;
                             current++;
                             break;
                         }
@@ -189,7 +190,7 @@ namespace WormGame.Pooling
         /// <returns>Pool enumerator</returns>
         public IEnumerator GetEnumerator()
         {
-            return Pool.GetEnumerator();
+            return pool.GetEnumerator();
         }
 
 
@@ -200,7 +201,7 @@ namespace WormGame.Pooling
         /// <returns>Poolable at index</returns>
         public T this[int i]
         {
-            get { return Pool[i]; }
+            get { return pool[i]; }
         }
     }
 }
