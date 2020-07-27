@@ -17,12 +17,12 @@ namespace WormGame.Static
         /// <returns>Bigger value</returns>
         /// <example>
         /// <pre name="test">
-        ///  Bigger(1, 2) === 2;
-        ///  Bigger(2, 1) === 2;
-        ///  Bigger(-1, 1) === 1;
-        ///  Bigger(0, 0) === 0;
-        ///  Bigger(-1, -2) === -1;
-        ///  Bigger(-2, -1) === -1;
+        ///  Bigger(1, 2)   ~~~ 2;
+        ///  Bigger(2, 1)   ~~~ 2;
+        ///  Bigger(-1, 1)  ~~~ 1;
+        ///  Bigger(0, 0)   ~~~ 0;
+        ///  Bigger(-1, -2) ~~~ -1;
+        ///  Bigger(-2, -1) ~~~ -1;
         /// </pre>
         /// </example>
         public static float Bigger(float a, float b)
@@ -39,8 +39,8 @@ namespace WormGame.Static
         /// <returns>Absolute value of number</returns>
         /// <example>
         /// <pre name="test">
-        ///  FastAbs(1) ~~~ 1;
-        ///  FastAbs(0) ~~~ 0;
+        ///  FastAbs(1)  ~~~ 1;
+        ///  FastAbs(0)  ~~~ 0;
         ///  FastAbs(-1) ~~~ 1;
         /// </pre>
         /// </example>
@@ -58,9 +58,9 @@ namespace WormGame.Static
         /// <returns>int</returns>
         /// <example>
         /// <pre name="test">
-        ///  FastRound(2.0000000000000000000000001f) === 2;
-        ///  FastRound(0.9999999999999999999999999f) === 1;
-        ///  FastRound(0.0000000000000000000000001f) === 0;
+        ///  FastRound(2.0000000000000000000000001f)  === 2;
+        ///  FastRound(0.9999999999999999999999999f)  === 1;
+        ///  FastRound(0.0000000000000000000000001f)  === 0;
         ///  FastRound(-0.9999999999999999999999999f) === -1;
         ///  FastRound(-2.0000000000000000000000001f) === -2;
         /// </pre>
@@ -70,6 +70,26 @@ namespace WormGame.Static
             if (number < 0)
                 return (int)(number - accuracy);
             return (int)(number + accuracy);
+        }
+
+
+        /// <summary>
+        /// Function to normalize floats.
+        /// </summary>
+        /// <param name="number">Number to normalize</param>
+        /// <returns>-1, 0 or 1</returns>
+        /// <example>
+        /// <pre name="test">
+        ///  Normalize(0.01f) ~~~ 1;
+        ///  Normalize(-0.1f) ~~~ -1;
+        ///  Normalize(0)     ~~~ 0;
+        /// </pre>
+        /// </example>
+        public static int Normalize(float number)
+        {
+            if (number > 0) return 1;
+            if (number < 0) return -1;
+            return 0;
         }
 
 
@@ -148,10 +168,10 @@ namespace WormGame.Static
         /// <returns>Smaller value</returns>
         /// <example>
         /// <pre name="test">
-        ///  Smaller(1, 2)  ===  1;
-        ///  Smaller(2, 1)  ===  1;
-        ///  Smaller(-1, 1) === -1;
-        ///  Smaller(0, 0)  ===  0;
+        ///  Smaller(1, 2)  ~~~  1;
+        ///  Smaller(2, 1)  ~~~  1;
+        ///  Smaller(-1, 1) ~~~ -1;
+        ///  Smaller(0, 0)  ~~~  0;
         /// </pre>
         /// </example>
         public static float Smaller(float a, float b)

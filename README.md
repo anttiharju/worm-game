@@ -1,6 +1,6 @@
 # Worm Blocks (2d game)
 Educational project. The point wasn't to make a good game, but to learn Git and practise C#.
-- One of the development goals was to make the game scalable: on a i7-4790k the game can handle a few thousand worms on-screen.
+- One of the development goals was to make the game scalable: on a i7-4790k the game can handle a few thousand worms simultaneously.
 - Pooling system should be relatively easy to modify for use with Unity3d.
 
 ## Game mechanics
