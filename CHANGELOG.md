@@ -1,9 +1,39 @@
+# 27.7.2020
+- First (broken) version of blockModule merging system! (optimized block rendering)
+    - Example of where it fails to do what I'd like it to do:
+
+    Worm:           Blocks (broken)    Blocks (correct)
+    -------         -------             -------
+    -oxo-o-         -4x4-1-             -3x3-1-
+    -x---x-         -x---x-             -x---x-
+    -oxoxo-         -3x2x2-             -2x2x1-
+    -------         -------             -------
+
+    o = wormModule, - = cell border, x = connection to next module, [number] = blockModule
+
+    - As you can see, current module merging uses four modules in this situation where only three are needed.
+    - The system also can't produce 1x1 blocks.
+
+    Benchmark comparison (just to see if it makes any sense to continue working on it):
+    broken: 27,0 AVG, Update 11ms, Render 11ms.
+    old:    15,4 AVG, Update 18ms, Render 27ms.
+
+    - That's a 75% improvement! (15,4 * 1,75 = 26,95).
+
+    Work continues!
+
+
 # 24.07.2020
 - Add spawn animation for worms (WormWarning)
 - Update configuration file loading
 - Added settings.cfg from bin path to git, pretty sure that actual binaries won't be included.
     - Just so there's no duplicates.
 - Bunch of smaller fixes and improvements here and there
+- When pooling entities they no longer have to be manually added later on
+- Began work on optimizing block rendering:
+    - Currently block consists of multiple 1x1 modules: this can be optimized by scaling the modules so they can be 3x1, 1x5 etc.
+        - Benchmark with the old system: 200x100 field filled with blocks: 15,4 AVG, Update 18ms, Render 27ms.
+- Found a possible bug: wormPercentage doesn't work properly? Although might be limited by pool. Anyway not critical.
 
 
 # 23.07.2020

@@ -10,12 +10,11 @@ namespace WormGame.GameObject
     public class BlockModule : PoolableObject
     {
         private readonly Collision collision;
-
-        public BlockModule Next { get; set; }
-
-        public Vector2 Target { get; private set; }
+        private readonly int size;
 
         public Image Graphic { get; private set; }
+
+        public BlockModule Next { get; set; }
 
         public override bool Enabled { get { return enabled; } set { enabled = value; Graphic.Visible = value; } }
         private bool enabled;
@@ -24,66 +23,42 @@ namespace WormGame.GameObject
         public BlockModule(Config config)
         {
             collision = config.collision;
+            size = config.size;
             Graphic = Image.CreateRectangle(config.size);
-            Graphic.CenterOrigin();
         }
 
-        public void CloneWorm(Worm worm, WormModule wormModule, Block parent, Pooler<BlockModule> brickModules, int currentLength, int i = 1, bool disable = false)
+
+        public BlockModule Spawn(Vector2 position, Vector2 direction, int first = 1)
         {
-            Target = wormModule.Target;
-            Graphic.X = wormModule.Target.X - worm.Position.X;
-            Graphic.Y = wormModule.Target.Y - worm.Position.Y;
-            Graphic.Color = worm.Color;
-
-            if (CheckNeighbours(worm.Color, parent.Id, collision.X(wormModule.Target.X), collision.Y(wormModule.Target.Y)))
-                disable = true;
-
-            parent.AddGraphic(Graphic);
-            collision.Set(parent, wormModule.Target);
-            if (i < currentLength)
+            Graphic.SetPosition(position);
+            if (direction.Y == 0)
             {
-                Next = brickModules.Enable();
-                Next.CloneWorm(worm, wormModule.Next, parent, brickModules, currentLength, ++i, disable);
+                Graphic.OriginX = 0;
+                Graphic.OriginY = size / 2 * Mathf.Normalize(direction.Y) + size / 2;
+                Graphic.X += size / 2 * Mathf.Normalize(direction.X) * first;
+                Graphic.Y += 0;
+                Graphic.ScaleX = Mathf.Normalize(direction.X);
+                Graphic.ScaleY = 1;
             }
-            else if (disable)
+            else
             {
-                parent.Disable();
-                return;
+                Graphic.OriginX = size / 2 * Mathf.Normalize(direction.X) + size / 2;
+                Graphic.OriginY = 0;
+                Graphic.X += 0;
+                Graphic.Y += size / 2 * Mathf.Normalize(direction.Y) * first;
+                Graphic.ScaleX = 1;
+                Graphic.ScaleY = Mathf.Normalize(direction.Y);
             }
+            return this;
         }
 
-        private bool CheckNeighbours(Color color, int parentId, int x, int y)
+
+        public void SetOrigin(int originX, int originY, int offsetX, int offsetY)
         {
-            int[] xPositions = { -1, 1, 0, 0 };
-            int[] yPositions = { 0, 0, -1, 1 };
-
-            bool disable = false;
-            for (int i = 0; i < xPositions.Length; i++)
-            {
-                int currentX = x + xPositions[i];
-                int currentY = y + yPositions[i];
-                if (currentX >= 0 &&
-                    currentY >= 0 &&
-                    currentX < collision.Width &&
-                    currentY < collision.Height)
-                    if (CheckNeighbour(color, parentId, currentX, currentY))
-                        disable = true;
-            }
-            return disable;
+            Graphic.SetOrigin(originX, originY);
+            Graphic.SetPosition(offsetX, offsetY);
         }
 
-        private bool CheckNeighbour(Color color, int parentId, int x, int y)
-        {
-            PoolableEntity cell = collision.Get(x, y);
-            if (cell is Block block)
-                if (parentId != block.Id)
-                    if (Help.Equal(block.Color, color))
-                    {
-                        block.Disable();
-                        return true;
-                    }
-            return false;
-        }
 
         public void SetColor(Color color)
         {
@@ -103,9 +78,9 @@ namespace WormGame.GameObject
         public override void Disable()
         {
             Enabled = false;
-            Next = null;
             Graphic.X = 0;
             Graphic.Y = 0;
+            //Graphic.Scale = 0;
         }
     }
 }
