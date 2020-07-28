@@ -1,37 +1,48 @@
 ﻿using Otter.Graphics;
-using Otter.Utility.MonoGame;
-using Otter.Graphics.Drawables;
 using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
-using System;
 
 namespace WormGame.GameObject
 {
     /// @author Antti Harju
-    /// @version 27.07.2020
+    /// @version 28.07.2020
     /// <summary>
-    /// Brick class. Work in progress.
+    /// Block class.
     /// </summary>
     public class Block : PoolableEntity
     {
         private readonly Collision collision;
+
         private BlockModule lastModule;
         private int top;
         private int left;
         private int bottom;
         private int right;
 
-        public new Image Graphic { get { return lastModule.Graphic ?? null; } }
+
+        /// <summary>
+        /// Block color.
+        /// </summary>
         public new Color Color { get; private set; }
 
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="config">Configuration</param>
         public Block(Config config)
         {
             collision = config.collision;
         }
 
 
+        /// <summary>
+        /// Spawns the block and optimizes module usage.
+        /// </summary>
+        /// <param name="worm">Worm</param>
+        /// <param name="blockModules">Module pooler</param>
+        /// <returns>Block</returns>
         public Block Spawn(Worm worm, Pooler<BlockModule> blockModules)
         {
             SetPosition(worm.firstModule.Target);
@@ -60,30 +71,61 @@ namespace WormGame.GameObject
             return this;
         }
 
+
+        /// <summary>
+        /// Scales module recursively in both directions (horizontal part).
+        /// </summary>
+        /// <param name="x">Horizontal field position</param>
+        /// <param name="y">Vertical field position</param>
         private void ExpandBothX(int x, int y)
         {
             if (ScaleX(x, y))
                 ExpandBothY(x, y);
         }
 
+
+        /// <summary>
+        /// Scales module recursively in both directions (vertical part).
+        /// </summary>
+        /// <param name="x">Horizontal field position</param>
+        /// <param name="y">Vertical field position</param>
         private void ExpandBothY(int x, int y)
         {
             if (ScaleY(x, y))
                 ExpandBothX(x, y);
         }
 
+
+        /// <summary>
+        /// Scales module recursively in the horizontal direction.
+        /// </summary>
+        /// <param name="x">Horizontal field position</param>
+        /// <param name="y">Vertical field position</param>
         private void ExpandX(int x, int y)
         {
             if (ScaleX(x, y))
                 ExpandX(x, y);
         }
 
+
+        /// <summary>
+        /// Scales module recursively in the vertical direction.
+        /// </summary>
+        /// <param name="x">Horizontal field position</param>
+        /// <param name="y">Vertical field position</param>
         private void ExpandY(int x, int y)
         {
             if (ScaleY(x, y))
                 ExpandY(x, y);
         }
 
+
+        /// <summary>
+        /// Scales module horizontally.
+        /// </summary>
+        /// <param name="x">Horizontal field position</param>
+        /// <param name="y">Vertical field position</param>
+        /// <returns>Was the module scaled or not</returns>
         private bool ScaleX(int x, int y)
         {
             int yScale = Mathf.FastRound(lastModule.Graphic.ScaleY);
@@ -98,6 +140,13 @@ namespace WormGame.GameObject
             return true;
         }
 
+
+        /// <summary>
+        /// Scales module vertically.
+        /// </summary>
+        /// <param name="x">Horizontal field position</param>
+        /// <param name="y">Vertical field position</param>
+        /// <returns>Was the module scaled or not</returns>
         private bool ScaleY(int x, int y)
         {
             int xScale = Mathf.FastRound(lastModule.Graphic.ScaleX);
@@ -113,7 +162,12 @@ namespace WormGame.GameObject
         }
 
 
-
+        /// <summary>
+        /// Copies worm position data to a buffer which is used to optimize blockModule usage.
+        /// </summary>
+        /// <param name="worm">Worm</param>
+        /// <param name="n">1, used to keep track wheter or not that part of worm has been handled</param>
+        /// <param name="getBorders">Get the borders for the area which we loop through</param>
         private void SetBlockfield(Worm worm, int n, bool getBorders)
         {
             WormModule wormModule = worm.firstModule;
@@ -135,7 +189,7 @@ namespace WormGame.GameObject
         }
 
 
-        private bool CheckNeighbours(Color color, int x, int y)
+        /*private bool CheckNeighbours(Color color, int x, int y)
         {
             int[] xPositions = { -1, 1, 0, 0 };
             int[] yPositions = { 0, 0, -1, 1 };
@@ -166,8 +220,12 @@ namespace WormGame.GameObject
                         return true;
                     }
             return false;
-        }
+        }*/
 
+
+        /// <summary>
+        /// Disable entity.
+        /// </summary>
         public override void Disable()
         {
             if (lastModule != null)

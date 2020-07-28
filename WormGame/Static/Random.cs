@@ -55,16 +55,16 @@ namespace WormGame.Static
         /// <summary>
         /// Generates a random valid direction.
         /// </summary>
-        /// <param name="field">Collision</param>
+        /// <param name="collision">Collision</param>
         /// <param name="position">Worm target</param>
         /// <param name="size">Entity size</param>
         /// <returns>Random valid direction</returns>
-        public static Vector2 ValidDirection(Collision field, Vector2 position, int size)
+        public static Vector2 ValidDirection(Collision collision, Vector2 position, int size)
         {
             int direction = Range(0, Help.directions.Length);
             for (int i = 0; i < Help.directions.Length; i++)
             {
-                if (Help.ValidateDirection(field, position, size, Help.directions[direction]))
+                if (Help.ValidateDirection(collision, position, size, Help.directions[direction]))
                     break;
                 else
                 {
@@ -80,20 +80,20 @@ namespace WormGame.Static
         /// <summary>
         /// Generates a random valid position.
         /// </summary>
-        /// <param name="field">Collision</param>
+        /// <param name="collision">Collision</param>
         /// <param name="width">Field width</param>
         /// <param name="height">Field height</param>
         /// <param name="validity">Inclusive and includes larger numbers: 0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 free</param>
         /// <returns>Random valid position</returns>
-        public static Vector2 ValidPosition(Collision field, int width, int height, int validity)
+        public static Vector2 ValidPosition(Collision collision, int width, int height, int validity)
         {
             int randomX = Range(0, width);
             int randomY = Range(0, height);
-            if (field.Check(randomX, randomY) < validity)
+            if (collision.Check(randomX, randomY) < validity)
             {
                 for (int y = randomY; y < height; y++)
                     for (int x = randomX; x < width; x++)
-                        if (field.Check(x, y) >= validity)
+                        if (collision.Check(x, y) >= validity)
                         {
                             randomX = x;
                             randomY = y;
@@ -101,7 +101,7 @@ namespace WormGame.Static
                         }
                 for (int y = randomY; y >= 0; y--)
                     for (int x = randomX; x >= 0; x--)
-                        if (field.Check(x, y) >= validity)
+                        if (collision.Check(x, y) >= validity)
                         {
                             randomX = x;
                             randomY = y;
@@ -110,7 +110,7 @@ namespace WormGame.Static
                 return -Vector2.One;
             }
         End:
-            return new Vector2(field.EntityX(randomX), field.EntityY(randomY));
+            return new Vector2(collision.EntityX(randomX), collision.EntityY(randomY));
         }
     }
 }

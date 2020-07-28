@@ -7,9 +7,9 @@ using WormGame.Pooling;
 namespace WormGame.GameObject
 {
     /// @author Antti Harju
-    /// @version 23.07.2020
+    /// @version 28.07.2020
     /// <summary>
-    /// Class for worm modules.
+    /// WormModule. Thanks to modularity worm length can be increased during runtime.
     /// </summary>
     public class WormModule : PoolableObject
     {
@@ -50,7 +50,7 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Constructor. Initializes graphic.
+        /// Constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
         public WormModule(Config config)
@@ -64,12 +64,12 @@ namespace WormGame.GameObject
         /// <summary>
         /// Recursively update every worm module direction.
         /// </summary>
-        /// <param name="newDirection"></param>
-        public void DirectionFollow(Vector2 newDirection)
+        /// <param name="previousDirection">Previous direction</param>
+        public void DirectionFollow(Vector2 previousDirection)
         {
             if (Next != null)
                 Next.DirectionFollow(Direction);
-            Direction = newDirection;
+            Direction = previousDirection;
         }
 
 
@@ -113,7 +113,7 @@ namespace WormGame.GameObject
         /// <summary>
         /// Recursively set worm color.
         /// </summary>
-        /// <param name="color"></param>
+        /// <param name="color">Color</param>
         public void SetColor(Color color)
         {
             Graphic.Color = color;
