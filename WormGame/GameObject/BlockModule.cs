@@ -12,8 +12,6 @@ namespace WormGame.GameObject
         private readonly Collision collision;
         private readonly int size;
 
-        private bool initialized;
-
         public Image Graphic { get; private set; }
 
         public BlockModule Next { get; set; }
@@ -31,49 +29,14 @@ namespace WormGame.GameObject
         }
 
 
-        public BlockModule Spawn(Vector2 position)
+        public BlockModule Spawn(Block parent, float x, float y)
         {
-            Graphic.SetPosition(position);
+            Graphic.Scale = 1;
+            Graphic.SetOrigin(0, size);
+            Graphic.SetPosition(x - size / 2, y + size / 2);
+            parent.AddGraphic(Graphic);
+            Graphic.Color = parent.Color;
             return this;
-        }
-
-        public void Scale(Vector2 direction, int wormLength)
-        {
-            direction.X = Mathf.Normalize(direction.X);
-            direction.Y = Mathf.Normalize(direction.Y);
-            if (!initialized)
-            {
-                if (direction.Y == 0)
-                {
-                    Graphic.OriginX = 0;
-                    Graphic.OriginY = size / 2 * direction.Y + size / 2;
-                    Graphic.X += -size / 2 * direction.X;
-                    Graphic.Y += 0;
-                    Graphic.ScaleX = direction.X;
-                    Graphic.ScaleY = 1;
-                }
-                else
-                {
-                    Graphic.OriginX = size / 2 * direction.X + size / 2;
-                    Graphic.OriginY = 0;
-                    Graphic.X += 0;
-                    Graphic.Y += -size / 2 * direction.Y;
-                    Graphic.ScaleX = 1;
-                    Graphic.ScaleY = direction.Y;
-                }
-                initialized = true;
-            }
-            if (wormLength > 1)
-            {
-                Graphic.ScaleX += direction.X;
-                Graphic.ScaleY += direction.Y;
-            }
-        }
-
-        public void SetCollision(Vector2 parentPosition)
-        {
-            int currentX = collision.X(parentPosition.X);
-            int currentY = collision.Y(parentPosition.Y);
         }
 
         public override void Disable()
@@ -81,9 +44,9 @@ namespace WormGame.GameObject
             if (Next != null)
                 Next.Disable();
             Enabled = false;
-            initialized = false;
-            Graphic.Scale = 0;
             Graphic.SetPosition(0, 0);
+            Graphic.SetOrigin(0, 0);
+            Graphic.Scale = 0;
         }
     }
 }
