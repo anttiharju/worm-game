@@ -49,8 +49,10 @@ namespace WormGame.Pooling
                 pool[i] = currentPoolable;
                 if (currentPoolable is PoolableEntity entity)
                 {
+#if DEBUG
                     if (scene == null)
                         throw new Exception("You can't pool entities without giving the scene as parameter."); ;
+#endif
                     entity.Add(scene);
                 }
             }

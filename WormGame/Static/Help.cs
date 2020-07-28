@@ -11,7 +11,7 @@ namespace WormGame.Static
     /// </summary>
     public static class Help
     {
-        public static readonly Color[] colors = { /*Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Magenta, Color.Orange,*/ Color.Cyan };
+        public static readonly Color[] colors = { Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Magenta, Color.Orange, Color.Cyan };
         public static readonly Vector2[] directions = { new Vector2(0, -1), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(1, 0) };
 
 

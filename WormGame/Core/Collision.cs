@@ -19,6 +19,7 @@ namespace WormGame.Core
         private readonly int topBorder;
         private readonly int size;
 
+        public readonly int[,] blockField;
 
         /// <summary>
         /// Collision field width.
@@ -45,6 +46,7 @@ namespace WormGame.Core
             Height = config.height;
             size = config.size;
             field = new PoolableEntity[Width, Height];
+            blockField = new int[Width, Height];
             leftBorder = config.windowWidth / 2 - Width / 2 * size;
             topBorder = config.windowHeight / 2 + Height / 2 * size;
             if (Width % 2 == 0)
@@ -201,7 +203,7 @@ namespace WormGame.Core
         /// <summary>
         /// Visualizes collision field in debug console as ASCII art.
         /// </summary>
-        public void Visualize()
+        public void VisualizeCollision()
         {
             for (int y = 0; y < Height; y++)
             {
@@ -232,6 +234,24 @@ namespace WormGame.Core
                     }
                     throw unknownPoolableException;
                 }
+                Console.WriteLine(line.ToString());
+            }
+            Console.CursorLeft = 0;
+            Console.CursorTop = Height + 1;
+        }
+
+
+        /// <summary>
+        /// Visualizes blockModule optimization buffer.
+        /// </summary>
+        public void VisualizeBlocks()
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                Console.CursorTop = Height - y;
+                System.Text.StringBuilder line = new System.Text.StringBuilder(Width);
+                for (int x = 0; x < Width; x++)
+                    line.Append(blockField[x, y]);
                 Console.WriteLine(line.ToString());
             }
             Console.CursorLeft = 0;

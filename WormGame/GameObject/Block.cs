@@ -4,6 +4,7 @@ using Otter.Graphics.Drawables;
 using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
+using System;
 
 namespace WormGame.GameObject
 {
@@ -15,91 +16,122 @@ namespace WormGame.GameObject
     public class Block : PoolableEntity
     {
         private readonly Collision collision;
-        private readonly int size;
-        private BlockModule firstModule;
-        private Vector2[] positions;
+        private BlockModule lastModule;
+        private int top;
+        private int left;
+        private int bottom;
+        private int right;
 
-        public new Image Graphic { get { return firstModule.Graphic ?? null; } }
-        public override Color Color { get { return firstModule.Graphic.Color ?? null; } }
+        public new Image Graphic { get { return lastModule.Graphic ?? null; } }
+        public new Color Color { get; private set; }
 
 
         public Block(Config config)
         {
             collision = config.collision;
-            size = config.size;
         }
 
 
-        public Block Spawn(Worm worm, Pooler<BlockModule> blockModules) // TODO: REMOVAL FROM COLLISION ON DISABLE.
+        public Block Spawn(Worm worm, Pooler<BlockModule> blockModules)
         {
             SetPosition(worm.firstModule.Target);
+            Color = worm.Color;
+            top = 0;
+            left = collision.Width;
+            bottom = collision.Height;
+            right = 0;
 
-            WormModule wormModule = worm.firstModule;
-            BlockModule blockModule = null;
-            Vector2 direction;
-            Vector2 previousDirection = Vector2.Zero;
-            collision.Set(this, wormModule.Target);
+            SetBlockfield(worm, 1, true);
+
+            for (int y = bottom; y <= top; y++)
+                for (int x = left; x <= right; x++)
+                    if (collision.blockField[x, y] == 1)
+                    {
+                        lastModule = blockModules.Enable().Spawn(this, collision.EntityX(x) - X, collision.EntityY(y) - Y);
+                        collision.blockField[x, y] = 2;
+                        ExpandBothX(x, y);
+                        ExpandX(x, y);
+                        ExpandY(x, y);
+                    }
             bool disable = false;
-            if (CheckNeighbours(worm.Color, collision.X(wormModule.Target.X), collision.Y(wormModule.Target.Y))) disable = true;
-
-            int i = 0;
-            do
-            {
-                // Get direction
-                if (i < worm.Length - 1)
-                    direction = wormModule.Next.Target - wormModule.Target;
-                else
-                {
-                    if (i == 0)
-                        direction = Vector2.UnitX * size;
-                    else
-                        direction = previousDirection;
-                }
-                // Create a new module or scale the old one
-                if (direction != previousDirection)
-                {
-                    if (i == 0)
-                    {
-                        blockModule = NewModule(worm, blockModules, wormModule);
-                        firstModule = blockModule;
-                    }
-                    else
-                    {
-                        blockModule.Next = NewModule(worm, blockModules, wormModule);
-                        blockModule = blockModule.Next;
-                    }
-                }
-                blockModule.Scale(direction, worm.Length);
-                previousDirection = direction;
-                if (wormModule.Next != null)
-                {
-                    wormModule = wormModule.Next;
-                    collision.Set(this, wormModule.Target);
-                    if (CheckNeighbours(worm.Color, collision.X(wormModule.Target.X), collision.Y(wormModule.Target.Y))) disable = true;
-                }
-                i++;
-            }
-            while (i < worm.Length - 1);
             if (disable)
                 Disable();
+            SetBlockfield(worm, 0, false);
             return this;
         }
 
-        private BlockModule NewModule(Worm worm, Pooler<BlockModule> blockModules, WormModule wormModule)
+        private void ExpandBothX(int x, int y)
         {
-            BlockModule newModule = blockModules.Enable().Spawn(wormModule.Target - worm.firstModule.Target);
-            newModule.Graphic.Color = Color.Random;
-            AddGraphic(newModule.Graphic);
-            return newModule;
+            if (ScaleX(x, y))
+                ExpandBothY(x, y);
+        }
+
+        private void ExpandBothY(int x, int y)
+        {
+            if (ScaleY(x, y))
+                ExpandBothX(x, y);
+        }
+
+        private void ExpandX(int x, int y)
+        {
+            if (ScaleX(x, y))
+                ExpandX(x, y);
+        }
+
+        private void ExpandY(int x, int y)
+        {
+            if (ScaleY(x, y))
+                ExpandY(x, y);
+        }
+
+        private bool ScaleX(int x, int y)
+        {
+            int yScale = Mathf.FastRound(lastModule.Graphic.ScaleY);
+            int xPos = x + Mathf.FastRound(lastModule.Graphic.ScaleX);
+            if (xPos >= collision.Width) return false;
+            for (int yPos = y; yPos < y + yScale; yPos++)
+                if (collision.blockField[xPos, yPos] != 1)
+                    return false;
+            for (int yPos = y; yPos < y + yScale; yPos++)
+                collision.blockField[xPos, yPos] = 2;
+            lastModule.Graphic.ScaleX++;
+            return true;
+        }
+
+        private bool ScaleY(int x, int y)
+        {
+            int xScale = Mathf.FastRound(lastModule.Graphic.ScaleX);
+            int yPos = y + Mathf.FastRound(lastModule.Graphic.ScaleY);
+            if (yPos >= collision.Height) return false;
+            for (int xPos = x; xPos < x + xScale; xPos++)
+                if (collision.blockField[xPos, yPos] != 1)
+                    return false;
+            for (int xPos = x; xPos < x + xScale; xPos++)
+                collision.blockField[xPos, yPos] = 2;
+            lastModule.Graphic.ScaleY++;
+            return true;
         }
 
 
-        public override void Disable()
+
+        private void SetBlockfield(Worm worm, int n, bool getBorders)
         {
-            if (firstModule != null)
-                firstModule.Disable();
-            ClearGraphics();
-            Enabled = false;
+            WormModule wormModule = worm.firstModule;
+            for (int i = 0; i < worm.Length; i++)
+            {
+                int x = collision.X(wormModule.Target.X);
+                int y = collision.Y(wormModule.Target.Y);
+                if (getBorders)
+                {
+                    collision.Set(this, x, y);
+                    if (x < left) left = x;
+                    if (y < bottom) bottom = y;
+                    if (x > right) right = x;
+                    if (y > top) top = y;
+                }
+                collision.blockField[x, y] = n;
+                wormModule = wormModule.Next;
+            }
         }
 
 
@@ -123,7 +155,6 @@ namespace WormGame.GameObject
             return disable;
         }
 
-
         private bool CheckNeighbour(Color color, int x, int y)
         {
             PoolableEntity cell = collision.Get(x, y);
@@ -135,6 +166,14 @@ namespace WormGame.GameObject
                         return true;
                     }
             return false;
+        }
+
+        public override void Disable()
+        {
+            if (lastModule != null)
+                lastModule.Disable();
+            ClearGraphics();
+            Enabled = false;
         }
     }
 }
