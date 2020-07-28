@@ -3,7 +3,7 @@
 namespace WormGame.Core
 {
     /// @author Antti Harju
-    /// @version 24.07.2020
+    /// @version 28.07.2020
     /// <summary>
     /// Configuration.
     /// </summary>
@@ -13,7 +13,7 @@ namespace WormGame.Core
         public readonly WormScene scene;
         public readonly Collision collision;
 #if DEBUG
-        public bool visualizeCollision = false;  // 119x29 fits in debug console
+        public bool visualizeCollision = false;   // 119x29 fits in debug console
         public bool visualizeBlocks = false;
 #endif
 
@@ -21,7 +21,7 @@ namespace WormGame.Core
         public readonly bool fullscreen = false;
         public readonly int windowWidth = 1280;
         public readonly int windowHeight = 720;
-        public readonly int refreshRate = 144;  // See wormSpeed before changing this
+        public readonly int refreshRate = 144;    // See wormSpeed before changing this
 
         // Scene
         public readonly int width = 200;
@@ -29,7 +29,7 @@ namespace WormGame.Core
         public readonly int margin = 1;
 
         // Worm
-        public readonly int wormCap = 0;        // Overrides wormPercentage if > 0.
+        public readonly int wormCap = 0;          // Overrides wormPercentage if > 0.
         public readonly int wormSpeed = 144;      // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
         public readonly int minWormLength = 6;
         public readonly float wormSpawnDuration = 0;
