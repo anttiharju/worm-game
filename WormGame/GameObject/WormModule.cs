@@ -125,12 +125,10 @@ namespace WormGame.GameObject
         /// <summary>
         /// Set module target.
         /// </summary>
-        /// <param name="x">Target.X</param>
-        /// <param name="y">Target.Y</param>
-        public void SetTarget(float x, float y)
+        /// <param name="target">Target</param>
+        public void SetTarget(Vector2 target)
         {
-            target.X = x;
-            target.Y = y;
+            this.target = target;
         }
 
 
