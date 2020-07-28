@@ -8,7 +8,7 @@ using WormGame.Pooling;
 namespace WormGame.GameObject
 {
     /// @author Antti Harju
-    /// @version 18.07.2020
+    /// @version 27.07.2020
     /// <summary>
     /// Brick class. Work in progress.
     /// </summary>
@@ -16,10 +16,12 @@ namespace WormGame.GameObject
     {
         private readonly Collision collision;
         private readonly int size;
-        private BlockModule lastModule;
+        private BlockModule firstModule;
+        private Vector2[] positions;
 
-        public new Image Graphic { get { return lastModule.Graphic ?? null; } }
-        public override Color Color { get { return lastModule.Graphic.Color ?? null; } set { lastModule.SetColor(value); } }
+        public new Image Graphic { get { return firstModule.Graphic ?? null; } }
+        public override Color Color { get { return firstModule.Graphic.Color ?? null; } }
+
 
         public Block(Config config)
         {
@@ -27,57 +29,81 @@ namespace WormGame.GameObject
             size = config.size;
         }
 
-        public Block Spawn(Worm worm, Pooler<BlockModule> blockModules)
+
+        public Block Spawn(Worm worm, Pooler<BlockModule> blockModules) // TODO: REMOVAL FROM COLLISION ON DISABLE.
         {
-            SetPosition(worm.Target.X, worm.Target.Y);
+            SetPosition(worm.firstModule.Target);
 
             WormModule wormModule = worm.firstModule;
+            BlockModule blockModule = null;
+            Vector2 direction;
+            Vector2 previousDirection = Vector2.Zero;
             collision.Set(this, wormModule.Target);
-            Vector2 direction = wormModule.Next.Target - wormModule.Target;
-            Vector2 previousDirection = direction;
-            lastModule = NewModule(worm, blockModules, wormModule, direction, -1);
-            for (int i = 0; i < worm.Length - 1; i++)
+            bool disable = false;
+            if (CheckNeighbours(worm.Color, collision.X(wormModule.Target.X), collision.Y(wormModule.Target.Y))) disable = true;
+
+            int i = 0;
+            do
             {
-                direction = wormModule.Next.Target - wormModule.Target;
-                if (direction == previousDirection)
-                {
-                    if (direction.Y == 0)
-                        Graphic.ScaleX += Mathf.Normalize(direction.X);
-                    else
-                        Graphic.ScaleY += Mathf.Normalize(direction.Y);
-                }
+                // Get direction
+                if (i < worm.Length - 1)
+                    direction = wormModule.Next.Target - wormModule.Target;
                 else
                 {
-                    lastModule.Next = NewModule(worm, blockModules, wormModule, direction);
-                    lastModule = lastModule.Next;
+                    if (i == 0)
+                        direction = Vector2.UnitX * size;
+                    else
+                        direction = previousDirection;
                 }
+                // Create a new module or scale the old one
+                if (direction != previousDirection)
+                {
+                    if (i == 0)
+                    {
+                        blockModule = NewModule(worm, blockModules, wormModule);
+                        firstModule = blockModule;
+                    }
+                    else
+                    {
+                        blockModule.Next = NewModule(worm, blockModules, wormModule);
+                        blockModule = blockModule.Next;
+                    }
+                }
+                blockModule.Scale(direction, worm.Length);
                 previousDirection = direction;
-                wormModule = wormModule.Next;
-                collision.Set(this, wormModule.Target);
+                if (wormModule.Next != null)
+                {
+                    wormModule = wormModule.Next;
+                    collision.Set(this, wormModule.Target);
+                    if (CheckNeighbours(worm.Color, collision.X(wormModule.Target.X), collision.Y(wormModule.Target.Y))) disable = true;
+                }
+                i++;
             }
+            while (i < worm.Length - 1);
+            if (disable)
+                Disable();
             return this;
         }
 
-
-        private BlockModule NewModule(Worm worm, Pooler<BlockModule> blockModules, WormModule wormModule, Vector2 direction, int first = 1)
+        private BlockModule NewModule(Worm worm, Pooler<BlockModule> blockModules, WormModule wormModule)
         {
-            BlockModule newModule = blockModules.Enable().Spawn(wormModule.Target - worm.Target, direction, first);
-            newModule.SetColor(Random.Color);
+            BlockModule newModule = blockModules.Enable().Spawn(wormModule.Target - worm.firstModule.Target);
+            newModule.Graphic.Color = Color.Random;
             AddGraphic(newModule.Graphic);
             return newModule;
         }
 
+
         public override void Disable()
         {
-            if (lastModule != null)
-                lastModule.Disable(Position);
+            if (firstModule != null)
+                firstModule.Disable();
             ClearGraphics();
             Enabled = false;
         }
 
 
-        /* Port to Block from BlockModule
-        private bool CheckNeighbours(Color color, int parentId, int x, int y)
+        private bool CheckNeighbours(Color color, int x, int y)
         {
             int[] xPositions = { -1, 1, 0, 0 };
             int[] yPositions = { 0, 0, -1, 1 };
@@ -91,23 +117,24 @@ namespace WormGame.GameObject
                     currentY >= 0 &&
                     currentX < collision.Width &&
                     currentY < collision.Height)
-                    if (CheckNeighbour(color, parentId, currentX, currentY))
+                    if (CheckNeighbour(color, currentX, currentY))
                         disable = true;
             }
             return disable;
         }
 
-        private bool CheckNeighbour(Color color, int parentId, int x, int y)
+
+        private bool CheckNeighbour(Color color, int x, int y)
         {
             PoolableEntity cell = collision.Get(x, y);
             if (cell is Block block)
-                if (parentId != block.Id)
+                if (Id != block.Id)
                     if (Help.Equal(block.Color, color))
                     {
                         block.Disable();
                         return true;
                     }
             return false;
-        }*/
+        }
     }
 }

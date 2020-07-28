@@ -1,33 +1,42 @@
 # 27.7.2020
-- First (broken) version of blockModule merging system! (optimized block rendering)
-    - Example of where it fails to do what I'd like it to do:
+- Add BlockModule merging (broken)
 
-    Worm:           Blocks (broken)    Blocks (correct)
-    -------         -------             -------
-    -oxo-o-         -4x4-1-             -3x3-1-
-    -x---x-         -x---x-             -x---x-
-    -oxoxo-         -3x2x2-             -2x2x1-
-    -------         -------             -------
-
-    o = wormModule, - = cell border, x = connection to next module, [number] = blockModule
-
-    - As you can see, current module merging uses four modules in this situation where only three are needed.
-    - The system also can't produce 1x1 blocks.
-
-    Benchmark comparison (just to see if it makes any sense to continue working on it):
-    broken: 27,0 AVG, Update 11ms, Render 11ms.
-    old:    15,4 AVG, Update 18ms, Render 27ms.
-
+              (Current)
+        Old     Okay    Best
+                  
+        5x6 1   3x4 1   1x1 1
+        x   x   x   x   x   x
+        4x3x2   2x2x1   1x1x1
+                                                   
+        x = worm connection, [number] = blockModule (doesn't necessarily respect worm connections)
+    - Currently the okay system is broken. It cannot produce 1x1 blocks.
+    - Benchmark comparison (200x100 field filled with worms the length of 6 turned into blocks)
+        - old:  15,4 AVG FPS, Update 18ms, Render 27ms.
+        - okay: 27,0 AVG FPS, Update 11ms, Render 11ms.
     - That's a 75% improvement! (15,4 * 1,75 = 26,95).
+    - The system is worth the effort.
 
-    Work continues!
-
+- Fix blockModule merging (disabling breaks collision)
+    - It's done! The system works well and I fully understand how it works.
+        - Collision after disabling is still broken: previously I used to set / unset collision with blockModule positions, but now that they dont map 1:1 cells we need something more sophisticated.
+    - Benchmarks
+        - okay (broken):    27,0 AVG, Update 11ms, Render 11ms.
+        - okay (fixed):     25,8 AVG, Update 12ms, Render 12ms.
+    - The performance from broken to fixed is pretty much what I expected. Broken was more performant because it couldn't spawn 1x1 blocks.
+    - The okay system **more than halved** our renderers amount (20 001 -> ~7 300) when a 200x100 field is filled with blocks.
+    - Ramble about variables and project length:
+        - On the programming courses I took we were told that memory is cheap, but reserving space from memory is not.
+            - To keep the game performant, I try to avoid as many new() calls during runtime as possible. (Hello, pooling system.) I also try to avoid local variables but those are probably a non-issue.
+        - The game seems performant and even though during times it's a pain in the ass to avoid new() calls I'd like to think it forces me to write better, more performant code.
+        - Initially I estimated the project to take a month. Which was realistic, I just got carried away with things and properly studying otter probably would've saved me like a week of work.
+            - My next project is not a game and I had a goal of starting it *this month*, but now the goal for that is starting it *during next month*.
+                - It's a budgeting tool and originally I was thinking of Java + JavaFX and SQLite as that's what we did during Programming 2, but now I'm thinking of WinForms or WPF and C# + SQL (SQLite?)
 
 # 24.07.2020
 - Add spawn animation for worms (WormWarning)
 - Update configuration file loading
-- Added settings.cfg from bin path to git, pretty sure that actual binaries won't be included.
-    - Just so there's no duplicates.
+- ~~Added settings.cfg from bin path to git, pretty sure that actual binaries won't be included.~~
+    - ~~Just so there's no duplicates.~~
 - Bunch of smaller fixes and improvements here and there
 - When pooling entities they no longer have to be manually added later on
 - Began work on optimizing block rendering:

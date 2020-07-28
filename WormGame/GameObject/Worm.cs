@@ -19,11 +19,13 @@ namespace WormGame.GameObject
         private readonly float step;
         private readonly int size;
 
-        private WormScene scene;
         private Pooler<WormModule> modules;
         private WormModule lastModule;
         private WormModule newModule;
+        private WormScene scene;
+        private Vector2 target;
         private bool moving;
+        private bool retry;
         private bool grow;
         private int LengthCap;
 
@@ -54,12 +56,6 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Get worm target.
-        /// </summary>
-        public Vector2 Target { get; private set; }
-
-
-        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
@@ -85,7 +81,7 @@ namespace WormGame.GameObject
             scene = (WormScene)Scene;
             modules = wormModules;
             SetPosition(collision.EntityX(x), collision.EntityY(y));
-            Target = Position;
+            target = Position;
             LengthCap = 1;
             Length = 1;
             moving = true;
@@ -112,21 +108,14 @@ namespace WormGame.GameObject
         {
             newModule = modules.Enable();
             if (newModule == null) return;
-            newModule.Graphic.SetPosition(lastModule.Graphic.X, lastModule.Graphic.Y);
-            newModule.SetTarget(X + lastModule.Graphic.X, Y + lastModule.Graphic.Y);
             newModule.Graphic.Color = Color;
+            newModule.Graphic.SetPosition(lastModule.Graphic.X, lastModule.Graphic.Y);
+            newModule.SetTarget(lastModule.Target);
             AddGraphic(newModule.Graphic);
             lastModule.ResetDirection();
             lastModule.Next = newModule;
             lastModule = newModule;
             LengthCap++;
-        }
-
-
-        public void Blockify()
-        {
-            scene.SpawnBlock(this);
-            Disable();
         }
 
 
@@ -139,10 +128,10 @@ namespace WormGame.GameObject
                 Grow();
             grow = false;
             moving = true;
-            bool retry = false;
+            retry = false;
         Retry:
-            Target = firstModule.Target + Direction * size;
-            int nextPosition = collision.Check(Target, true);
+            target = firstModule.Target + Direction * size;
+            int nextPosition = collision.Check(target, true);
             if (nextPosition >= 3) // Move if next position is empty (4) or fruit (3).
             {
                 if (Length < LengthCap)
@@ -152,14 +141,15 @@ namespace WormGame.GameObject
                 if (nextPosition == 3)
                     grow = true;
                 firstModule.DirectionFollow(direction);
-                firstModule.TargetFollow(Target);
-                collision.Set(this, Target);
+                firstModule.TargetFollow(target);
+                collision.Set(this, target);
             }
             else
             {
                 if (retry) // If stuck, turn into a block.
                 {
-                    Blockify();
+                    scene.SpawnBlock(this);
+                    Disable();
                 }
                 else if (Player == null) // Find a new direction if not posessed by player.
                 {
@@ -181,7 +171,7 @@ namespace WormGame.GameObject
             {
                 Vector2 positionDelta = firstModule.Direction * step;
                 Position += positionDelta;
-                firstModule.Next.GraphicFollow(positionDelta, step);
+                firstModule.GraphicFollow(positionDelta, step);
             }
         }
 
