@@ -1,3 +1,7 @@
+# Changelog explained
+What is it? For me it's a brain dump, a place to plan features and explain commit messages. When the project is "complete" I'll write a proper blog post based on this. Please excuse any grammatical errors: this is written by me for (mostly) me. I also hope this shows I put a lot of thought into the project and that I am very enthusiastic about programming. This is also a great way to learn markdown.
+
+
 # 28.07.2020
 - Improve BlockModule merging
     - System is now at the level of best (see old / okay / best comparison from yesterday)
@@ -143,7 +147,7 @@
     - I've fully switched over to single-entity model, as it's WAY MORE PERFORMANT than the old model.
         - Spending some time reading the documentation is a really good idea, future me.
         - I decided to do this so I could simplify the pooling system, but now the project doesn't show my usage of generics as much :(
-            - See <https://github.com/anvemaha/worm-bricks/tree/6e8e8e0794b29cb76de68f59b70f1b3c006bb2ae/WormGame/Pooling>
+            - See <https://github.com/anvemaha/worm-blocks/tree/6e8e8e0794b29cb76de68f59b70f1b3c006bb2ae/WormGame/Pooling>
     - I checked out Otter2ds' discord server and I don't seem to be the only one having a GPU usage issue lol.
         - Apparently Otter is using whatever the OS gives it.
         - Otter (SFML?) might have memory leaks? Apparently shutting down the application by pressing escape skips some important destructors.
