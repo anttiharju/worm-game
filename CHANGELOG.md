@@ -1,4 +1,24 @@
-# 27.7.2020
+# 28.07.2020
+- Improve BlockModule merging
+    - System is now at the level of best (see old / okay / best comparison from yesterday)
+    - Benchmark (200x100 field filled with blockified worms at the length of 6)
+        - okay: 25,8 AVG, Update 12ms, Render 12ms.
+        - best: 28,0 AVG, Update 11ms, Render 10ms.
+    - Best also further decreases our renderers amount from okays ~7 300 to ~5 500.
+        - There's ~3 700 entities and ~5 500 meaning that the average block uses 1,48 which when compared to old systems 6 is great!
+        - The improvements aren't as dramatic as from old to okay, but I'm really happy:
+            - Performance is increased by 81%! (Compared to old system, 15,4 * 1,81 = 27,874).
+                - Compared to okay the performance is improved by 6%.
+            - The code is clean, I finally understand how graphic origins and positions work (beware worms).
+            - It might be a bit CPU-heavier than previous systems (for loops and recursion) but they're used smartly and it improves performance more than it decreases it.
+    - Sidenote: keyboard is now the fifth player. I'm going on a trip and I don't want to carry a controller with me so ¯\\_(ツ)_/¯
+        - It's not recommended to use the keyboard as playing with it sucks. It doesn't have any kind of input queuing and I can't bother to implement one so it will miss individual keystrokes, but it's usable if you hold the desired direction key instead of tapping it.
+    - Next step: clean up the code, merge to master, continue work on new features.
+        - Further optimization: transform block system from modular entity to a triplet entity (blocks -> block -> blockModule) this way blocks can be PoolableObjects instead of PoolableEntities. Of course PoolableObjects aren't free, but I'm still expecting improved Update performance (currently 11ms).
+            - This would drop the entity amount (at the benchmark situtation) from ~3 700 to 2. Definitely worth pursuing.
+
+
+# 27.07.2020
 - Add BlockModule merging (broken)
 
               (Current)
@@ -31,6 +51,7 @@
         - Initially I estimated the project to take a month. Which was realistic, I just got carried away with things and properly studying otter probably would've saved me like a week of work.
             - My next project is not a game and I had a goal of starting it *this month*, but now the goal for that is starting it *during next month*.
                 - It's a budgeting tool and originally I was thinking of Java + JavaFX and SQLite as that's what we did during Programming 2, but now I'm thinking of WinForms or WPF and C# + SQL (SQLite?)
+
 
 # 24.07.2020
 - Add spawn animation for worms (WormWarning)

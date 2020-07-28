@@ -7,9 +7,10 @@ Educational project. The point wasn't to make a good game, but to learn Git and 
 - Field
     - Fruits and worms spawn on it
 - Players
-    - Up to four
-    - Controlled with gamepads (left stick + rb)
     - Can posess worms
+    - Up to five (4x gamepad + keyboard)
+        - Gamepad: left stick and right bumper
+        - Keyboard: arrow keys and space bar
 - Worms
     - Go straight until they hit something
     - Controlled like snake in the snake game
