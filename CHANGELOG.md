@@ -1,5 +1,7 @@
 # Changelog explained
-What is it? For me it's a brain dump, a place to plan features and explain commit messages. When the project is "complete" I'll write a proper blog post based on this. Please excuse any grammatical errors: this is written by me for (mostly) me. I also hope this shows I put a lot of thought into the project and that I am very enthusiastic about programming. This is also a great way to learn markdown.
+What is it? For me it's a brain dump, a place to plan features and explain commit messages. I hope this also shows I put a lot of thought into the project and that I am very enthusiastic about programming.
+
+When the project is "complete" I'll write a proper blog post based on this. Please excuse any grammatical errors: this is written by me for (mostly) me. 
 
 
 # 28.07.2020
