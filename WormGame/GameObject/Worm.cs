@@ -7,7 +7,7 @@ using WormGame.Pooling;
 namespace WormGame.GameObject
 {
     /// @author Antti Harju
-    /// @version 23.07.2020
+    /// @version 28.07.2020
     /// <summary>
     /// Worm entity. Worms are modular entities; it consists of one Otter2d entity and several regular objects (modules). This way the worm can grow infinitely.
     /// </summary>
@@ -68,7 +68,7 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Spawns the worm.
+        /// Spawn the worm.
         /// </summary>
         /// <param name="wormModules">WormBody pool so the worm can grow.</param>
         /// <param name="x">Horizontal field position</param>
@@ -163,7 +163,7 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Update position and modules.
+        /// Update entity position and recursively module graphic positions.
         /// </summary>
         public override void Update()
         {

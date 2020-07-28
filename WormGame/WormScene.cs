@@ -10,7 +10,7 @@ using WormGame.GameObject;
 namespace WormGame
 {
     /// @author Antti Harju
-    /// @version 18.07.2020
+    /// @version 28.07.2020
     /// <summary>
     /// Main scene for Worm Bricks.
     /// </summary>
@@ -22,7 +22,7 @@ namespace WormGame
         private readonly Config config;
         private readonly Collision collision;
         private readonly Pooler<Worm> worms;
-        private readonly Pooler<WormSpawn> wormSpawns;
+        private readonly Pooler<WormWarning> wormWarnings;
         private readonly Pooler<WormModule> wormModules;
         private readonly Pooler<Fruit> fruits;
         private readonly Pooler<Block> blocks;
@@ -35,7 +35,7 @@ namespace WormGame
         /// <summary>
         /// Initializes poolers and scene entities.
         /// </summary>
-        /// <param name="config"></param>
+        /// <param name="config">Configuration</param>
         public WormScene(Config config)
         {
             this.config = config;
@@ -48,7 +48,7 @@ namespace WormGame
             fruits = new Pooler<Fruit>(config, config.fruitAmount, this);
             worms = new Pooler<Worm>(config, config.wormAmount, this);
             blocks = new Pooler<Block>(config, config.moduleAmount, this);
-            if (config.wormSpawnDuration > 0) wormSpawns = new Pooler<WormSpawn>(config, config.wormAmount, this);
+            if (config.wormSpawnDuration > 0) wormWarnings = new Pooler<WormWarning>(config, config.wormAmount, this);
             wormModules = new Pooler<WormModule>(config, config.moduleAmount); // In theory there can be a worm that fills up the whole field.
             blockModules = new Pooler<BlockModule>(config, config.moduleAmount);
 
@@ -89,7 +89,7 @@ namespace WormGame
 
 
         /// <summary>
-        /// Makes calls to scenes entities to keep them moving.
+        /// Makes the world go round.
         /// </summary>
         public override void Update()
         {
@@ -131,15 +131,15 @@ namespace WormGame
 
 
         /// <summary>
-        /// Spawn either worm or warning depending on configuration as part of Update().
+        /// Spawn either worm or warning depending on configuration.
         /// </summary>
-        /// <param name="random">Spawn position</param>
-        private void SpawnWorm(Vector2 random)
+        /// <param name="position">Spawn position</param>
+        private void SpawnWorm(Vector2 position)
         {
             if (Mathf.FastRound(config.wormSpawnDuration) <= 0)
-                SpawnWorm(collision.X(random.X), collision.Y(random.Y));
+                SpawnWorm(collision.X(position.X), collision.Y(position.Y));
             else
-                SpawnWarning(collision.X(random.X), collision.Y(random.Y));
+                SpawnWormWarning(collision.X(position.X), collision.Y(position.Y));
             wormAmount++;
         }
 
@@ -162,15 +162,15 @@ namespace WormGame
 
 
         /// <summary>
-        /// Spawns a worm.
+        /// Spawns worm spawn warning.
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
         /// <param name="length">Length, default config.minWormLength</param>
         /// <param name="color">Color, default Random.Color</param>
-        public void SpawnWarning(int x, int y, int length = 0, Color color = null)
+        public void SpawnWormWarning(int x, int y, int length = 0, Color color = null)
         {
-            WormSpawn warning = wormSpawns.Enable();
+            WormWarning warning = wormWarnings.Enable();
             if (warning == null) return;
             if (color == null) color = Random.Color;
             if (length < config.minWormLength) length = config.minWormLength;
@@ -182,7 +182,7 @@ namespace WormGame
         /// Turn a worm into a block.
         /// </summary>
         /// <param name="worm">Worm to transform</param>
-        /// <returns>Block</returns>
+        /// <returns>Block or null</returns>
         public Block SpawnBlock(Worm worm)
         {
             Block block = blocks.Enable();

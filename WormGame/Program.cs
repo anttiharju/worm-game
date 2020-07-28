@@ -1,12 +1,11 @@
 ﻿using Otter.Core;
 using Otter.Graphics.Drawables;
-using System;
 using WormGame.Core;
 
 namespace WormGame
 {
     /// @author Antti Harju
-    /// @version 24.07.2020
+    /// @version 28.07.2020
     /// <summary>
     /// See README.md for an explanation of game mechanics.
     /// </summary>

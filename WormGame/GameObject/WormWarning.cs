@@ -1,15 +1,18 @@
 ﻿using Otter.Graphics;
 using Otter.Graphics.Drawables;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
 
 namespace WormGame.GameObject
 {
-    public class WormSpawn : PoolableEntity
+    /// @author Antti Harju
+    /// @version 28.07.2020
+    /// <summary>
+    /// Spawns a worm spawn warning animation that spawns a worm.
+    /// </summary>
+    /// TODO: Merge to worm once done with optimizing performance.
+    public class WormWarning : PoolableEntity
     {
         private readonly Collision collision;
         private readonly float size;
@@ -24,7 +27,12 @@ namespace WormGame.GameObject
         private int length;
         private bool spawnWorm;
 
-        public WormSpawn(Config config)
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="config"></param>
+        public WormWarning(Config config)
         {
             spawnDuration = config.wormSpawnDuration;
             step = 1 / spawnDuration;
@@ -36,6 +44,14 @@ namespace WormGame.GameObject
             Graphic.Scale = 0;
         }
 
+
+        /// <summary>
+        /// Spawns the warning.
+        /// </summary>
+        /// <param name="x">Horizontal field position</param>
+        /// <param name="y">Vertical field position</param>
+        /// <param name="length">Worm length</param>
+        /// <param name="color">Worm color</param>
         public void Spawn(int x, int y, int length, Color color = null)
         {
             spawnWorm = true;
@@ -50,6 +66,10 @@ namespace WormGame.GameObject
             collision.Set(this, x, y);
         }
 
+
+        /// <summary>
+        /// Animates the warning.
+        /// </summary>
         public override void Update()
         {
             if (Enabled)

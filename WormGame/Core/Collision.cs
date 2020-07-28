@@ -7,7 +7,7 @@ using WormGame.GameObject;
 namespace WormGame.Core
 {
     /// @author Antti Harju
-    /// @version 23.07.2020
+    /// @version 28.07.2020
     /// <summary>
     /// Collision field. Stays performant with large fields.
     /// </summary>
@@ -20,6 +20,7 @@ namespace WormGame.Core
         private readonly int size;
 
         public readonly int[,] blockField;
+
 
         /// <summary>
         /// Collision field width.
@@ -96,7 +97,7 @@ namespace WormGame.Core
             PoolableEntity current = field[x, y];
             if (current == null)
                 return 4;
-            if (current is Worm || current is WormSpawn)
+            if (current is Worm || current is WormWarning)
                 return 1;
             if (current is Block)
                 return 2;
@@ -222,7 +223,7 @@ namespace WormGame.Core
                         line.Append('x');
                         continue;
                     }
-                    if (current is Worm || current is WormSpawn)
+                    if (current is Worm || current is WormWarning)
                     {
                         line.Append('o');
                         continue;
