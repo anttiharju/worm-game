@@ -7,12 +7,14 @@ using WormGame.Pooling;
 
 namespace WormGame.GameObject
 {
+    /// @author Antti Harju
+    /// @version 28.07.2020
     /// <summary>
     /// Fruit class. Spawns automatically to a free position.
     /// </summary>
     public class Fruit : PoolableEntity
     {
-        private readonly Collision field;
+        private readonly Collision collision;
         private readonly int width;
         private readonly int height;
 
@@ -23,7 +25,7 @@ namespace WormGame.GameObject
         /// <param name="config"></param>
         public Fruit(Config config) : base()
         {
-            field = config.collision;
+            collision = config.collision;
             width = config.width;
             height = config.height;
             Image image = Image.CreateCircle(config.size / 4, Color.Black);
@@ -37,18 +39,18 @@ namespace WormGame.GameObject
         /// <summary>
         /// Spawns fruit to a free position.
         /// </summary>
-        /// <returns>Fruit</returns>
+        /// <returns>Fruit or null</returns>
         public Fruit Spawn()
         {
-            Vector2 random = Random.ValidPosition(field, width, height, 4);
-            if (random.X == -1 || field.Check(random) != 4)
+            Vector2 random = Random.ValidPosition(collision, width, height, 4);
+            if (random.X == -1 || collision.Check(random) != 4)
             {
                 Disable();
                 return null;
             }
             X = random.X;
             Y = random.Y;
-            field.Set(this, Position);
+            collision.Set(this, Position);
             return this;
         }
     }
