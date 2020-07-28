@@ -57,7 +57,7 @@ namespace WormGame
                 for (int i = 0; i < fruits.Count; i++)
                     fruits.Enable().Spawn();
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 5; i++)
                 SpawnPlayer(i);
 
             wormFrequency = config.size - config.step;
@@ -122,7 +122,9 @@ namespace WormGame
                 }
 #if DEBUG
                 if (config.visualizeCollision)
-                    collision.Visualize();
+                    collision.VisualizeCollision();
+                if (config.visualizeBlocks)
+                    collision.VisualizeBlocks();
 #endif
             }
         }

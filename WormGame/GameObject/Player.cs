@@ -7,7 +7,7 @@ using WormGame.Pooling;
 namespace WormGame.GameObject
 {
     /// @author Antti Harju
-    /// @version 18.07.2020
+    /// @version 28.07.2020
     /// <summary>
     /// Player class.
     /// </summary>
@@ -19,8 +19,8 @@ namespace WormGame.GameObject
         private readonly float playerSpeed = 0.05f;
 
         private Worm worm;
-        private float leftX;
-        private float leftY;
+        private float xMovement;
+        private float yMovement;
 
 
         /// <summary>
@@ -69,47 +69,64 @@ namespace WormGame.GameObject
 
 
         /// <summary>
-        /// Player controls.
+        /// Controls.
         /// </summary>
         public override void Update()
         {
-            #region Join game
-            if (Input.ButtonPressed(7, playerNumber)) // Start
+            #region Input
+            if (Input.ButtonPressed(7, playerNumber) || // Join game
+                (playerNumber == 4 && Input.KeyPressed(Key.Space))) 
                 Visible = true;
             if (!Visible) return;
+
+            if (playerNumber == 4) // Keyboard
+            {
+                xMovement = 0;
+                yMovement = 0;
+                if (Input.KeyDown(Key.Up))
+                    yMovement -= 100;
+                if (Input.KeyDown(Key.Left))
+                    xMovement -= 100;
+                if (Input.KeyDown(Key.Down))
+                    yMovement += 100;
+                if (Input.KeyDown(Key.Right))
+                    xMovement += 100;
+                if (Input.KeyPressed(Key.Space))
+                    Posess();
+            }
+            else // Gamepad
+            {
+                xMovement = Input.GetAxis(JoyAxis.X, playerNumber);
+                yMovement = Input.GetAxis(JoyAxis.Y, playerNumber);
+
+                if (Input.ButtonPressed(5, playerNumber)) // RB
+                    Posess();
+            }
             #endregion
 
-            #region Global controls
-            leftX = Input.GetAxis(JoyAxis.X, playerNumber);
-            leftY = Input.GetAxis(JoyAxis.Y, playerNumber);
-
-            if (Input.ButtonPressed(5, playerNumber)) // RB
-                Posess();
-            #endregion
-
-            #region Player controls
+            #region Player
             if (worm != null) goto Playerskip;
             float deadZone = 10;
-            if (Mathf.FastAbs(leftX) > deadZone)
-                X += leftX * playerSpeed;
-            if (Mathf.FastAbs(leftY) > deadZone)
-                Y += leftY * playerSpeed;
+            if (Mathf.FastAbs(xMovement) > deadZone)
+                X += xMovement * playerSpeed;
+            if (Mathf.FastAbs(yMovement) > deadZone)
+                Y += yMovement * playerSpeed;
             Playerskip:;
             #endregion
 
-            #region Worm controls
+            #region Worm
             if (worm == null) goto Wormskip;
             Position = worm.Position;
             deadZone = 90;
-            if (leftY < -deadZone)
+            if (yMovement < -deadZone)
                 worm.Direction = Help.directions[0]; // UP
-            if (leftX < -deadZone)
+            if (xMovement < -deadZone)
                 worm.Direction = Help.directions[1]; // LEFT
-            if (leftY > deadZone)
+            if (yMovement > deadZone)
                 worm.Direction = Help.directions[2]; // DOWN
-            if (leftX > deadZone)
+            if (xMovement > deadZone)
                 worm.Direction = Help.directions[3]; // RIGHT
-        Wormskip:;
+            Wormskip:;
             #endregion;
         }
     }
