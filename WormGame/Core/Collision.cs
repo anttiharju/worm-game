@@ -240,24 +240,6 @@ namespace WormGame.Core
             Console.CursorLeft = 0;
             Console.CursorTop = Height + 1;
         }
-
-
-        /// <summary>
-        /// Visualizes blockModule optimization buffer.
-        /// </summary>
-        public void VisualizeBlocks()
-        {
-            for (int y = 0; y < Height; y++)
-            {
-                Console.CursorTop = Height - y;
-                System.Text.StringBuilder line = new System.Text.StringBuilder(Width);
-                for (int x = 0; x < Width; x++)
-                    line.Append(blockBuffer[x, y]);
-                Console.WriteLine(line.ToString());
-            }
-            Console.CursorLeft = 0;
-            Console.CursorTop = Height + 1;
-        }
 #endif
     }
 }
