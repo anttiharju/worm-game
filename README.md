@@ -10,8 +10,8 @@ Educational project. The point wasn't to make a good game, but to learn Git and 
 - Players
     - Can posess worms
     - Up to five (4x gamepad + keyboard)
-        - Gamepad: left stick and right bumper
-        - Keyboard: arrow keys and space bar
+        - Gamepad: left stick to move, right bumper to posess, start to join / unjoin
+        - Keyboard: WASD to move, space to posess, return to join / unjoin
 - Worms
     - Go straight until they hit something
     - Controlled like snake in the snake game

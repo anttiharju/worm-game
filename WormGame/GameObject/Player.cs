@@ -21,6 +21,8 @@ namespace WormGame.GameObject
         private Worm worm;
         private float xMovement;
         private float yMovement;
+        private float spawnX;
+        private float spawnY;
 
 
         /// <summary>
@@ -44,8 +46,9 @@ namespace WormGame.GameObject
             image.OutlineColor = Color.Black;
             image.CenterOrigin();
             AddGraphic(image);
-            X = x;
-            Y = y;
+            spawnX = x;
+            spawnY = y;
+            SetPosition(spawnX, spawnY);
         }
 
 
@@ -75,21 +78,25 @@ namespace WormGame.GameObject
         {
             #region Input
             if (Input.ButtonPressed(7, playerNumber) || // Join game
-                (playerNumber == 4 && Input.KeyPressed(Key.Space))) 
-                Visible = true;
+                (playerNumber == 4 && Input.KeyPressed(Key.Return)))
+            {
+                if (Visible)
+                    SetPosition(spawnX, spawnY);
+                Visible = !Visible;
+            }
             if (!Visible) return;
 
             if (playerNumber == 4) // Keyboard
             {
                 xMovement = 0;
                 yMovement = 0;
-                if (Input.KeyDown(Key.Up))
+                if (Input.KeyDown(Key.W))
                     yMovement -= 100;
-                if (Input.KeyDown(Key.Left))
+                if (Input.KeyDown(Key.A))
                     xMovement -= 100;
-                if (Input.KeyDown(Key.Down))
+                if (Input.KeyDown(Key.S))
                     yMovement += 100;
-                if (Input.KeyDown(Key.Right))
+                if (Input.KeyDown(Key.D))
                     xMovement += 100;
                 if (Input.KeyPressed(Key.Space))
                     Posess();
