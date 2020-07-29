@@ -19,7 +19,7 @@ namespace WormGame.Core
         private readonly int topBorder;
         private readonly int size;
 
-        public readonly int[,] blockField;
+        public readonly int[,] blockBuffer;
 
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace WormGame.Core
             Height = config.height;
             size = config.size;
             field = new PoolableEntity[Width, Height];
-            blockField = new int[Width, Height];
+            blockBuffer = new int[Width, Height];
             leftBorder = config.windowWidth / 2 - Width / 2 * size;
             topBorder = config.windowHeight / 2 + Height / 2 * size;
             if (Width % 2 == 0)
@@ -86,7 +86,7 @@ namespace WormGame.Core
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
         /// <param name="consume">Consume fruits</param>
-        /// <returns>0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 empty</returns>
+        /// <returns>0 out of bounds, 1 worm, 2 block, 3 fruit, 4 empty</returns>
         public int Check(int x, int y, bool consume = false)
         {
             if (x < 0 ||
@@ -116,7 +116,7 @@ namespace WormGame.Core
         /// </summary>
         /// <param name="target">Entity position</param>
         /// <param name="consume">Consume fruits</param>
-        /// <returns>0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 empty</returns>
+        /// <returns>0 out of bounds, 1 worm, 2 block, 3 fruit, 4 empty</returns>
         public int Check(Vector2 target, bool consume = false)
         {
             return Check(X(target.X), Y(target.Y), consume);
@@ -252,7 +252,7 @@ namespace WormGame.Core
                 Console.CursorTop = Height - y;
                 System.Text.StringBuilder line = new System.Text.StringBuilder(Width);
                 for (int x = 0; x < Width; x++)
-                    line.Append(blockField[x, y]);
+                    line.Append(blockBuffer[x, y]);
                 Console.WriteLine(line.ToString());
             }
             Console.CursorLeft = 0;

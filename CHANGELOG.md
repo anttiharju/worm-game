@@ -4,6 +4,22 @@ What is it? For me it's a brain dump, a place to plan features and explain commi
 When the project is "complete" I'll write a proper blog post based on this. Please excuse any grammatical errors: this is written by me for (mostly) me. 
 
 
+# 29.07.2020
+- Fix blockModule collision on disable
+    - Other stuff:
+        - Adjust controls
+            - Joining and posessing now share the same button.
+            - It's no longer possible to leave the game once joined.
+        - Clean up Config
+        - Update documentation
+        - Somehow managed to improve framerate dramatically?
+            - I suspect config cleanup (some pooler probably had too many poolables) but hey I'll take it.
+                - Benchmark (200x100, worm length 6, all blocks):
+                    - Desktop (i7-4790k, GTX 1080): AVG FPS: 48,0, Update 6ms, Render 9ms (3701 Entities, 5466 Renderers)
+                    - Laptop (Surface Laptop 3):    (to be added)
+                        - Please note that the margin of error for update and render is one or two milliseconds.
+
+
 # 28.07.2020
 - Improve BlockModule merging
     - System is now at the level of best (see old / okay / best comparison from yesterday)

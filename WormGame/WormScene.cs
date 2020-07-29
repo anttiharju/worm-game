@@ -12,7 +12,7 @@ namespace WormGame
     /// @author Antti Harju
     /// @version 28.07.2020
     /// <summary>
-    /// Main scene for Worm Bricks.
+    /// Main scene for Worm Blocks.
     /// </summary>
     public class WormScene : Scene
     {

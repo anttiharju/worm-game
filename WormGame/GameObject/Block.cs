@@ -12,8 +12,12 @@ namespace WormGame.GameObject
     /// </summary>
     public class Block : PoolableEntity
     {
+#if DEBUG
+        private readonly bool disableBlocks;
+#endif
         private readonly Collision collision;
 
+        private BlockModule firstModule;
         private BlockModule lastModule;
         private int top;
         private int left;
@@ -34,6 +38,9 @@ namespace WormGame.GameObject
         public Block(Config config)
         {
             collision = config.collision;
+#if DEBUG
+            disableBlocks = config.disableBlocks;
+#endif
         }
 
 
@@ -51,23 +58,33 @@ namespace WormGame.GameObject
             left = collision.Width;
             bottom = collision.Height;
             right = 0;
+            if (SetBlockBuffer(worm, 1))
+            {
+                SetBlockBuffer(worm, 0, false);
+                Disable();
+                return null;
+            }
 
-            SetBlockfield(worm, 1, true);
-
-            for (int y = bottom; y <= top; y++)
+            for (int y = top; y >= bottom; y--)
                 for (int x = left; x <= right; x++)
-                    if (collision.blockField[x, y] == 1)
+                    if (collision.blockBuffer[x, y] == 1)
                     {
-                        lastModule = blockModules.Enable().Spawn(this, collision.EntityX(x) - X, collision.EntityY(y) - Y);
-                        collision.blockField[x, y] = 2;
+                        if (firstModule == null)
+                        {
+                            lastModule = blockModules.Enable().Spawn(this, collision.EntityX(x) - X, collision.EntityY(y) - Y);
+                            firstModule = lastModule;
+                        }
+                        else
+                        {
+                            lastModule.Next = blockModules.Enable().Spawn(this, collision.EntityX(x) - X, collision.EntityY(y) - Y);
+                            lastModule = lastModule.Next;
+                        }
+                        collision.blockBuffer[x, y] = 2;
                         ExpandBothX(x, y);
                         ExpandX(x, y);
                         ExpandY(x, y);
                     }
-            bool disable = false;
-            if (disable)
-                Disable();
-            SetBlockfield(worm, 0, false);
+            SetBlockBuffer(worm, 0, false, true);
             return this;
         }
 
@@ -131,11 +148,11 @@ namespace WormGame.GameObject
             int yScale = Mathf.FastRound(lastModule.Graphic.ScaleY);
             int xPos = x + Mathf.FastRound(lastModule.Graphic.ScaleX);
             if (xPos >= collision.Width) return false;
-            for (int yPos = y; yPos < y + yScale; yPos++)
-                if (collision.blockField[xPos, yPos] != 1)
+            for (int yPos = y; yPos > y - yScale; yPos--)
+                if (collision.blockBuffer[xPos, yPos] != 1)
                     return false;
-            for (int yPos = y; yPos < y + yScale; yPos++)
-                collision.blockField[xPos, yPos] = 2;
+            for (int yPos = y; yPos > y - yScale; yPos--)
+                collision.blockBuffer[xPos, yPos] = 2;
             lastModule.Graphic.ScaleX++;
             return true;
         }
@@ -150,13 +167,13 @@ namespace WormGame.GameObject
         private bool ScaleY(int x, int y)
         {
             int xScale = Mathf.FastRound(lastModule.Graphic.ScaleX);
-            int yPos = y + Mathf.FastRound(lastModule.Graphic.ScaleY);
-            if (yPos >= collision.Height) return false;
+            int yPos = y - Mathf.FastRound(lastModule.Graphic.ScaleY);
+            if (yPos < 0) return false;
             for (int xPos = x; xPos < x + xScale; xPos++)
-                if (collision.blockField[xPos, yPos] != 1)
+                if (collision.blockBuffer[xPos, yPos] != 1)
                     return false;
             for (int xPos = x; xPos < x + xScale; xPos++)
-                collision.blockField[xPos, yPos] = 2;
+                collision.blockBuffer[xPos, yPos] = 2;
             lastModule.Graphic.ScaleY++;
             return true;
         }
@@ -167,29 +184,44 @@ namespace WormGame.GameObject
         /// </summary>
         /// <param name="worm">Worm</param>
         /// <param name="n">1, used to keep track wheter or not that part of worm has been handled</param>
-        /// <param name="getBorders">Get the borders for the area which we loop through</param>
-        private void SetBlockfield(Worm worm, int n, bool getBorders)
+        /// <param name="initialize">Get for loop edges and destroy neighbours</param>
+        /// <param name="setCollision">Set to collision field</param>
+        /// <returns>To disable or not based on neighbours</returns>
+        private bool SetBlockBuffer(Worm worm, int n, bool initialize = true, bool setCollision = false)
         {
             WormModule wormModule = worm.firstModule;
+            bool disable = false;
             for (int i = 0; i < worm.Length; i++)
             {
                 int x = collision.X(wormModule.Target.X);
                 int y = collision.Y(wormModule.Target.Y);
-                if (getBorders)
-                {
+                collision.blockBuffer[x, y] = n;
+                if (setCollision)
                     collision.Set(this, x, y);
+                if (initialize)
+                {
+#if DEBUG
+                    if (disableBlocks)
+#endif
+                        if (CheckNeighbours(x, y)) disable = true;
                     if (x < left) left = x;
                     if (y < bottom) bottom = y;
                     if (x > right) right = x;
                     if (y > top) top = y;
                 }
-                collision.blockField[x, y] = n;
                 wormModule = wormModule.Next;
             }
+            return disable;
         }
 
 
-        /*private bool CheckNeighbours(Color color, int x, int y)
+        /// <summary>
+        /// Check neighbouring tiles (four).
+        /// </summary>
+        /// <param name="x">Horizontal field position</param>
+        /// <param name="y">Vertical field position</param>
+        /// <returns>To disable or not</returns>
+        private bool CheckNeighbours(int x, int y)
         {
             int[] xPositions = { -1, 1, 0, 0 };
             int[] yPositions = { 0, 0, -1, 1 };
@@ -203,24 +235,31 @@ namespace WormGame.GameObject
                     currentY >= 0 &&
                     currentX < collision.Width &&
                     currentY < collision.Height)
-                    if (CheckNeighbour(color, currentX, currentY))
+                    if (CheckNeighbour(currentX, currentY))
                         disable = true;
             }
             return disable;
         }
 
-        private bool CheckNeighbour(Color color, int x, int y)
+
+        /// <summary>
+        /// Check a neighbouring tile.
+        /// </summary>
+        /// <param name="x">Horizontal field position</param>
+        /// <param name="y">Vertical field position</param>
+        /// <returns>Is neighbour the same color</returns>
+        private bool CheckNeighbour(int x, int y)
         {
             PoolableEntity cell = collision.Get(x, y);
             if (cell is Block block)
                 if (Id != block.Id)
-                    if (Help.Equal(block.Color, color))
+                    if (Help.Equal(block.Color, Color))
                     {
                         block.Disable();
                         return true;
                     }
             return false;
-        }*/
+        }
 
 
         /// <summary>
@@ -228,8 +267,8 @@ namespace WormGame.GameObject
         /// </summary>
         public override void Disable()
         {
-            if (lastModule != null)
-                lastModule.Disable();
+            if (firstModule != null)
+                firstModule.Disable();
             ClearGraphics();
             Enabled = false;
         }
