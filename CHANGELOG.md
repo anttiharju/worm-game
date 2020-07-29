@@ -15,9 +15,9 @@ When the project is "complete" I'll write a proper blog post based on this. Plea
         - Somehow managed to improve framerate dramatically?
             - I suspect config cleanup (some pooler probably had too many poolables) but hey I'll take it.
                 - Benchmark (200x100, worm length 6, all blocks):
-                    - Desktop (i7-4790k, GTX 1080): AVG FPS: 48,0, Update 6ms, Render 9ms (3701 Entities, 5466 Renderers)
-                    - Laptop (Surface Laptop 3):    (to be added)
-                        - Please note that the margin of error for update and render is one or two milliseconds.
+                    - Desktop (i7-4790k, GTX 1080): AVG FPS: 48,0, Update 6ms, Render 9ms (3701 Entities, 5466 Renders)
+                    - Laptop (Surface Laptop 3):    AVG FPS: 11,1, Update 14ms, Render 50ms (3700 Entities, 5480 Renders)
+                        - Please note that update and render are not reliable metrics as they fluctuate a lot
 
 
 # 28.07.2020
