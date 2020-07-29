@@ -7,7 +7,7 @@ using WormGame.Pooling;
 namespace WormGame.GameObject
 {
     /// @author Antti Harju
-    /// @version 28.07.2020
+    /// @version 29.07.2020
     /// <summary>
     /// Player class.
     /// </summary>
@@ -77,13 +77,9 @@ namespace WormGame.GameObject
         public override void Update()
         {
             #region Input
-            if (Input.ButtonPressed(7, playerNumber) || // Join game
-                (playerNumber == 4 && Input.KeyPressed(Key.Return)))
-            {
-                if (Visible)
-                    SetPosition(spawnX, spawnY);
-                Visible = !Visible;
-            }
+            if ((Input.ButtonPressed(5, playerNumber)) || // Join game
+                (playerNumber == 4 && Input.KeyPressed(Key.Space)))
+                Visible = true;
             if (!Visible) return;
 
             if (playerNumber == 4) // Keyboard
