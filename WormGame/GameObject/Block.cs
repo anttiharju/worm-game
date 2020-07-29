@@ -64,7 +64,6 @@ namespace WormGame.GameObject
                 Disable();
                 return null;
             }
-
             for (int y = top; y >= bottom; y--)
                 for (int x = left; x <= right; x++)
                     if (collision.blockBuffer[x, y] == 1)

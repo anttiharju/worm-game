@@ -5,6 +5,13 @@ When the project is "complete" I'll write a proper blog post based on this. Plea
 
 
 # 29.07.2020
+- Remove block visualizer
+    - Not required anymore as the system is pretty much set in stone and if need be can be brought back to life from previous commits.
+    - Other stuff:
+        - Also updated previous commit in changelog
+        - Researched if I could use native resolution by default, didn't find an easy way, added 800x600 minimum resolution safeguard.
+        - Tested four gamepad and a keyboard player simultaneously. Works well!
+
 - Fix blockModule collision on disable
     - Other stuff:
         - Adjust controls
@@ -17,7 +24,17 @@ When the project is "complete" I'll write a proper blog post based on this. Plea
                 - Benchmark (200x100, worm length 6, all blocks):
                     - Desktop (i7-4790k, GTX 1080): AVG FPS: 48,0, Update 6ms, Render 9ms (3701 Entities, 5466 Renders)
                     - Laptop (Surface Laptop 3):    AVG FPS: 11,1, Update 14ms, Render 50ms (3700 Entities, 5480 Renders)
-                        - Please note that update and render are not reliable metrics as they fluctuate a lot
+                        - Please note that update and render are not reliable metrics as they fluctuate a lot, but they can tell about the load between CPU / GPU
+                        - I have now realised that the entity based approach I took was dumb performance-wise. Blocks would probably be way more performant as a tilemap (it's some Otter thing, haven't tried it).
+                            - Things to do to improve performance:
+                                - Change blocks to master entity model (previously referred to as triplet entity)
+                                    - Either after doing or skipping that, change it to tilemap. (Some Otter thing, need to research).
+                                - Change worms to use scalable rectangles instead of multiple circles.
+                            - Things I want to do:
+                                - Score counter with particle system (blocks explode when disabled)
+                                - Intro animation
+                            - Things I need to do:
+                                - Test multiple players (I have four xbox controllers, just haven't bothered to hook them up)
 
 
 # 28.07.2020

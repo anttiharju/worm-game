@@ -14,27 +14,26 @@ namespace WormGame.Core
         public readonly Collision collision;
 #if DEBUG
         public bool visualizeCollision = false;   // 119x29 fits in debug console
-        public bool visualizeBlocks = false;
-        public bool disableBlocks = false;
+        public bool disableBlocks = false;        // For benchmarking purposes
 #endif
 
         // Window
         public readonly bool fullscreen = false;
         public readonly int windowWidth = 1280;
         public readonly int windowHeight = 720;
-        public readonly int refreshRate = 60;    // See wormSpeed before changing this
+        public readonly int refreshRate = 144;    // See wormSpeed before changing this
 
         // Scene
-        public readonly int width = 200;
-        public readonly int height = 100;
+        public readonly int width = 40;
+        public readonly int height = 20;
         public readonly int margin = 1;
 
         // Worm
-        public readonly int wormCap = 5;          // Overrides wormPercentage if > 0.
-        public readonly int wormSpeed = 144;      // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
+        public readonly int wormCap = 0;          // Overrides wormPercentage if > 0.
+        public readonly int wormSpeed = 6;        // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
         public readonly int minWormLength = 6;
         public readonly float wormSpawnDuration = 0;
-        public readonly float wormPercentage = 1;
+        public readonly float wormPercentage = 0.05f;
 
         // Fruit
         public readonly bool fruits = false;
@@ -133,6 +132,8 @@ namespace WormGame.Core
             #endregion
 
             // Safeguards
+            if (windowWidth < 800) windowWidth = 800;
+            if (windowHeight < 800) windowHeight = 600;
             if (width < 2) width = 2;
             if (height < 2) height = 2;
             if (minWormLength < 1) minWormLength = 1;
@@ -159,7 +160,6 @@ namespace WormGame.Core
             step = (float)wormSpeed / refreshRate * size;
             collision = new Collision(this);
             scene = new WormScene(this);
-            System.Console.WriteLine(wormAmount + " " + wormCap);
         }
 
 

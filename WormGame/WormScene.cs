@@ -123,8 +123,6 @@ namespace WormGame
 #if DEBUG
                 if (config.visualizeCollision)
                     collision.VisualizeCollision();
-                if (config.visualizeBlocks)
-                    collision.VisualizeBlocks();
 #endif
             }
         }
