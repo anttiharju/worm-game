@@ -3,52 +3,64 @@ using Otter.Graphics;
 using Otter.Graphics.Drawables;
 using WormGame.Static;
 using WormGame.Pooling;
+using WormGame.Core;
 
 namespace WormGame.GameObject
 {
     /// @author Antti Harju
-    /// @version 29.07.2020
+    /// @version 30.07.2020
     /// <summary>
     /// Player class.
     /// </summary>
     public class Player : PoolableEntity
     {
-        public readonly WormScene scene;
-
-        private readonly int playerNumber;
         private readonly float playerSpeed = 0.05f;
 
         private Worm worm;
         private float xMovement;
         private float yMovement;
-        private float spawnX;
-        private float spawnY;
+        private int playerNumber;
+
+        public WormScene scene;
+
+
+        /// <summary>
+        /// Overriding default behaviour due to how player joining works
+        /// </summary>
+        public override bool Enabled { get; set; }
 
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="wormScene">WormScene, required for NearestWorm()</param>
-        /// <param name="playerNumber">Determines color and joypad</param>
-        /// <param name="x">Horizontal entity position</param>
-        /// <param name="y">Vertical entity position</param>
-        /// <param name="size">Entity size</param>
-        public Player(WormScene wormScene, int playerNumber, float x, float y, int size)
+        /// <param name="config">Configuration</param>
+        public Player(Config config)
         {
-            Visible = false;
-            scene = wormScene;
+            Image image = Image.CreateCircle(config.size / 3);
+            image.OutlineThickness = config.size / 15;
+            image.OutlineColor = Color.Black;
+            image.CenterOrigin();
+            AddGraphic(image);
+        }
+
+
+        /// <summary>
+        /// Spawns player.
+        /// </summary>
+        /// <param name="x">Horizontal entity position.</param>
+        /// <param name="y">Vertical entity position</param>
+        /// <returns>Player</returns>
+        public Player Spawn(int playerNumber, float x, float y)
+        {
+            scene = (WormScene)Scene;
             this.playerNumber = playerNumber;
             int color = playerNumber;
             if (color >= Help.colors.Length)
                 color = Help.colors.Length - 1;
-            Image image = Image.CreateCircle(size / 3, Help.colors[color]);
-            image.OutlineThickness = size / 15;
-            image.OutlineColor = Color.Black;
-            image.CenterOrigin();
-            AddGraphic(image);
-            spawnX = x;
-            spawnY = y;
-            SetPosition(spawnX, spawnY);
+            Graphic.Color = Help.colors[color];
+            SetPosition(x, y);
+            Visible = false;
+            return this;
         }
 
 
@@ -77,9 +89,12 @@ namespace WormGame.GameObject
         public override void Update()
         {
             #region Input
-            if ((Input.ButtonPressed(5, playerNumber)) || // Join game
-                (playerNumber == 4 && Input.KeyPressed(Key.Space)))
+            if (!Visible && ((Input.ButtonPressed(5, playerNumber)) || // Join game
+                (playerNumber == 4 && Input.KeyPressed(Key.Space))))
+            {
                 Visible = true;
+                return;
+            }
             if (!Visible) return;
 
             if (playerNumber == 4) // Keyboard
@@ -131,6 +146,17 @@ namespace WormGame.GameObject
                 worm.Direction = Help.directions[3]; // RIGHT
             Wormskip:;
             #endregion;
+        }
+
+
+        /// <summary>
+        /// Disable player.
+        /// </summary>
+        public override void Disable()
+        {
+            Enabled = false;
+            Visible = false;
+            worm = null;
         }
     }
 }

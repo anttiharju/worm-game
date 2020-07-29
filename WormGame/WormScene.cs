@@ -10,22 +10,23 @@ using WormGame.GameObject;
 namespace WormGame
 {
     /// @author Antti Harju
-    /// @version 28.07.2020
+    /// @version 30.07.2020
     /// <summary>
     /// Main scene for Worm Blocks.
     /// </summary>
     public class WormScene : Scene
     {
-        public int wormAmount;
         public int wormCap;
+        public int wormAmount;
 
         private readonly Config config;
         private readonly Collision collision;
+        private readonly Pooler<Player> players;
         private readonly Pooler<Worm> worms;
-        private readonly Pooler<WormWarning> wormWarnings;
-        private readonly Pooler<WormModule> wormModules;
         private readonly Pooler<Fruit> fruits;
         private readonly Pooler<Block> blocks;
+        private readonly Pooler<WormWarning> wormWarnings;
+        private readonly Pooler<WormModule> wormModules;
         private readonly Pooler<BlockModule> blockModules;
         private readonly float stepAccuracy;
 
@@ -39,28 +40,49 @@ namespace WormGame
         public WormScene(Config config)
         {
             this.config = config;
+            wormCap = config.wormCap;
             collision = config.collision;
             stepAccuracy = config.step / 2;
-            wormCap = config.wormCap;
+            wormFrequency = config.size - config.step;
             CreateBorders();
-
-            // Poolers
-            fruits = new Pooler<Fruit>(config, config.fruitAmount, this);
+            wormWarnings = new Pooler<WormWarning>(config, config.wormAmount, this);
             worms = new Pooler<Worm>(config, config.wormAmount, this);
             blocks = new Pooler<Block>(config, config.moduleAmount, this);
-            if (config.wormSpawnDuration > 0) wormWarnings = new Pooler<WormWarning>(config, config.wormAmount, this);
-            wormModules = new Pooler<WormModule>(config, config.moduleAmount); // In theory there can be a worm that fills up the whole field.
+            fruits = new Pooler<Fruit>(config, config.fruitAmount, this);
+            players = new Pooler<Player>(config, 5, this);
+            wormModules = new Pooler<WormModule>(config, config.moduleAmount);
             blockModules = new Pooler<BlockModule>(config, config.moduleAmount);
+            Start();
+        }
 
-            // Entity setup
+
+        /// <summary>
+        /// Spawns initial entities. Worm spawning is handled in Update().
+        /// </summary>
+        private void Start()
+        {
             if (config.fruits)
                 for (int i = 0; i < fruits.Count; i++)
-                    fruits.Enable().Spawn();
-
+                    SpawnFruit();
             for (int i = 0; i < 5; i++)
                 SpawnPlayer(i);
+        }
 
-            wormFrequency = config.size - config.step;
+
+        /// <summary>
+        /// Restarts the game by resetting poolers and calling Start().
+        /// </summary>
+        private void Restart()
+        {
+            players.Reset();
+            worms.Reset();
+            fruits.Reset();
+            blocks.Reset();
+            wormWarnings.Reset();
+            wormModules.Reset();
+            blockModules.Reset();
+            wormAmount = 0;
+            Start();
         }
 
 
@@ -93,6 +115,8 @@ namespace WormGame
         /// </summary>
         public override void Update()
         {
+            if (Input.KeyPressed(Key.R))
+                Restart();
             wormFrequency += config.step;
             if (Mathf.FastRound(wormFrequency, stepAccuracy) >= config.size)
             {
@@ -199,9 +223,16 @@ namespace WormGame
         /// <returns>Player</returns>
         public Player SpawnPlayer(int playerNumber)
         {
-            Player player = new Player(this, playerNumber, config.windowWidth / 2, config.windowHeight / 2, config.size);
-            Add(player);
-            return player;
+            return players.Enable().Spawn(playerNumber, config.windowWidth / 2, config.windowHeight / 2);
+        }
+
+
+        /// <summary>
+        /// Spawn a fruit.
+        /// </summary>
+        private void SpawnFruit()
+        {
+            fruits.Enable().Spawn();
         }
 
 
@@ -210,7 +241,7 @@ namespace WormGame
         /// </summary>
         private void CreateBorders()
         {
-            Image backgroundGraphic = Image.CreateRectangle(config.width * config.size, config.height * config.size, Color.Black);
+            Image backgroundGraphic = Image.CreateRectangle(collision.Width * config.size, collision.Height * config.size, Color.Black);
             backgroundGraphic.CenterOrigin();
             backgroundGraphic.OutlineColor = Color.White;
             backgroundGraphic.OutlineThickness = config.size / 6;

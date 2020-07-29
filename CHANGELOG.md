@@ -4,6 +4,15 @@ What is it? For me it's a brain dump, a place to plan features and explain commi
 When the project is "complete" I'll write a proper blog post based on this. Please excuse any grammatical errors: this is written by me for (mostly) me. 
 
 
+# 30.07.2020
+- Add restart
+    - Press R to restart.
+    - Due to this Players are now poolable entities.
+        - Don't really benefit from pooling but restarting is easier.
+    - Poolers can now be Reset.
+        - Disables all entities and sets EnablingIndex to 0.
+
+
 # 29.07.2020
 - Remove block visualizer
     - Not required anymore as the system is pretty much set in stone and if need be can be brought back to life from previous commits.
