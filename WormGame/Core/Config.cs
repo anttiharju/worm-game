@@ -1,4 +1,5 @@
-﻿using WormGame.Static;
+﻿using WormGame.GameObject;
+using WormGame.Static;
 
 namespace WormGame.Core
 {
@@ -15,6 +16,7 @@ namespace WormGame.Core
 #if DEBUG
         public bool visualizeCollision = false;   // 119x29 fits in debug console
         public bool visualizeBlocks = false;
+        public bool disableBlocks = false;
 #endif
 
         // Window
@@ -24,13 +26,13 @@ namespace WormGame.Core
         public readonly int refreshRate = 144;    // See wormSpeed before changing this
 
         // Scene
-        public readonly int width = 20;
-        public readonly int height = 10;
+        public readonly int width = 200;
+        public readonly int height = 100;
         public readonly int margin = 1;
 
         // Worm
-        public readonly int wormCap = 1;          // Overrides wormPercentage if > 0.
-        public readonly int wormSpeed = 6;      // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
+        public readonly int wormCap = 5;          // Overrides wormPercentage if > 0.
+        public readonly int wormSpeed = 144;      // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
         public readonly int minWormLength = 6;
         public readonly float wormSpawnDuration = 0;
         public readonly float wormPercentage = 1;
@@ -64,7 +66,7 @@ namespace WormGame.Core
             }
             catch (System.IO.FileNotFoundException)
             {
-                goto Skip;
+                goto Fileskip;
             }
 
             foreach (string line in lines)
@@ -77,7 +79,7 @@ namespace WormGame.Core
                     endIndex = line.Length;
                 string name = line.Substring(0, equalIndex).Trim();
                 string value = line.Substring(endStartIndex, endIndex - endStartIndex).Trim();
-                switch (name) // 
+                switch (name)
                 {
                     // Window
                     case "fullscreen":
@@ -127,32 +129,38 @@ namespace WormGame.Core
                         break;
                 }
             }
-        Skip: // End file reading
+        Fileskip:
 #endif
             #endregion
 
+            // Safeguards
             if (width < 2) width = 2;
             if (height < 2) height = 2;
             if (minWormLength < 1) minWormLength = 1;
             if (wormSpeed < 1) wormSpeed = 1;
             while (refreshRate % wormSpeed != 0)
                 wormSpeed--;
+
+            // Pooler amounts
             fruitAmount = (int)(width * height * fruitPercentage);
-            if (fruitAmount < 1) fruitAmount = 1;
-            if (wormCap <= 0)
-            {
-                float tmp = width * height * wormPercentage;
-                wormCap = (int)(tmp + 1);
-            }
-            wormAmount = wormCap * 2;  // Although rare, there's a chance that every worm turns into a block simultaneously, that's why * 2.
-            if (wormAmount < 1)
-                wormAmount = 1;
+            if (fruitAmount < 1)
+                fruitAmount = 1;
+
             moduleAmount = width * height;
             entityAmount = moduleAmount / minWormLength;
+
+            wormAmount = Mathf.FastRound(moduleAmount / minWormLength * wormPercentage);
+            wormCap = wormAmount;
+            if (wormCap > 0)
+                wormAmount = wormCap;
+            wormAmount *= 2; // Every worm might blockify simultaneously
+
+            // Other
             size = CalculateSize(windowWidth, windowHeight);
             step = (float)wormSpeed / refreshRate * size;
             collision = new Collision(this);
             scene = new WormScene(this);
+            System.Console.WriteLine(wormAmount + " " + wormCap);
         }
 
 

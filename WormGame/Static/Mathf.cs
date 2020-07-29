@@ -3,9 +3,9 @@
 namespace WormGame.Static
 {
     /// @author Antti Harju
-    /// @version 18.07.2020
+    /// @version 29.07.2020
     /// <summary>
-    /// Class for miscellaneous mathematical functions.
+    /// Custom math library.
     /// </summary>
     public static class Mathf
     {
@@ -65,7 +65,7 @@ namespace WormGame.Static
         ///  FastRound(-2.0000000000000000000000001f) === -2;
         /// </pre>
         /// </example>
-        public static int FastRound(float number, float accuracy = 0.1f)
+        public static int FastRound(float number, float accuracy = 0.5f)
         {
             if (number < 0)
                 return (int)(number - accuracy);

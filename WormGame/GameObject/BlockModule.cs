@@ -1,6 +1,9 @@
 ﻿using Otter.Graphics.Drawables;
 using WormGame.Core;
+using WormGame.Static;
 using WormGame.Pooling;
+using Otter.Utility.MonoGame;
+using Otter.Graphics;
 
 namespace WormGame.GameObject
 {
@@ -12,8 +15,11 @@ namespace WormGame.GameObject
     /// TODO: Removal from collision field on disable.
     public class BlockModule : PoolableObject
     {
+        private readonly Collision collision;
         private readonly int size;
         private readonly int halfSize;
+        private int startX;
+        private int startY;
 
 
         /// <summary>
@@ -41,6 +47,7 @@ namespace WormGame.GameObject
         /// <param name="config">Configuration.</param>
         public BlockModule(Config config)
         {
+            collision = config.collision;
             size = config.size;
             halfSize = size / 2;
             Graphic = Image.CreateRectangle(config.size);
@@ -52,27 +59,34 @@ namespace WormGame.GameObject
         /// Spawn module.
         /// </summary>
         /// <param name="parent">Block</param>
-        /// <param name="x">Horizontal field position</param>
-        /// <param name="y">Vertical field position</param>
+        /// <param name="x">Relative entity position to firstModule</param>
+        /// <param name="y">Relative vertical entity position to firstModule</param>
         /// <returns>Module</returns>
         public BlockModule Spawn(Block parent, float x, float y)
         {
             Graphic.Scale = 1;
-            Graphic.SetOrigin(0, size);
-            Graphic.SetPosition(x - halfSize, y + halfSize);
+            Graphic.SetOrigin(0, 0);
+            Graphic.SetPosition(x - halfSize, y - halfSize);
             parent.AddGraphic(Graphic);
             Graphic.Color = parent.Color;
+            startX = collision.X(parent.X + x);
+            startY = collision.Y(parent.Y + y);
             return this;
         }
 
 
         /// <summary>
-        /// Disable module.
+        /// Recursively disables all modules and removes them from collision.
         /// </summary>
         public override void Disable()
         {
             if (Next != null)
                 Next.Disable();
+            int endX = startX + Mathf.FastRound(Graphic.ScaleX);
+            int endY = startY - Mathf.FastRound(Graphic.ScaleY);
+            for (int x = startX; x < endX; x++)
+                for (int y = startY; y > endY; y--)
+                    collision.Set(null, x, y);
             Enabled = false;
             Graphic.SetPosition(0, 0);
             Graphic.SetOrigin(0, 0);

@@ -83,7 +83,7 @@ namespace WormGame.Static
         /// <param name="collision">Collision</param>
         /// <param name="width">Field width</param>
         /// <param name="height">Field height</param>
-        /// <param name="validity">Inclusive and includes larger numbers: 0 out of bounds, 1 worm, 2 brick, 3 fruit, 4 free</param>
+        /// <param name="validity">Inclusive and includes larger numbers: 0 out of bounds, 1 worm, 2 block, 3 fruit, 4 free</param>
         /// <returns>Random valid position</returns>
         public static Vector2 ValidPosition(Collision collision, int width, int height, int validity)
         {
