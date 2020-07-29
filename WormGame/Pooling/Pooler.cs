@@ -5,7 +5,7 @@ using WormGame.Core;
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 24.07.2020
+    /// @version 30.07.2020
     /// <summary>
     /// Object pooler.
     /// </summary>
@@ -84,6 +84,22 @@ namespace WormGame.Pooling
 
 
         /// <summary>
+        /// Disables all entities in the pool.
+        /// </summary>
+        public void Reset()
+        {
+            while (EnableIndex > 0)
+            {
+                if (pool[EnableIndex].Enabled)
+                    pool[EnableIndex].Disable();
+                EnableIndex--;
+            }
+            if (pool[EnableIndex].Enabled)
+                pool[EnableIndex].Disable();
+        }
+
+
+        /// <summary>
         /// Check if the pool has enough poolables available.
         /// </summary>
         /// <param name="amount">Needed poolable amountd</param>
@@ -156,8 +172,7 @@ namespace WormGame.Pooling
                             current++;
                             break;
                         }
-                        else
-                            EnableIndex--;
+                        EnableIndex--;
                     }
                 }
             }
