@@ -1,5 +1,4 @@
-﻿using WormGame.GameObject;
-using WormGame.Static;
+﻿using WormGame.Static;
 
 namespace WormGame.Core
 {
@@ -23,7 +22,7 @@ namespace WormGame.Core
         public readonly bool fullscreen = false;
         public readonly int windowWidth = 1280;
         public readonly int windowHeight = 720;
-        public readonly int refreshRate = 144;    // See wormSpeed before changing this
+        public readonly int refreshRate = 60;    // See wormSpeed before changing this
 
         // Scene
         public readonly int width = 200;
