@@ -2,17 +2,15 @@
 using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
-using Otter.Utility.MonoGame;
 using Otter.Graphics;
 
 namespace WormGame.GameObject
 {
     /// @author Antti Harju
-    /// @version 28.07.2020
+    /// @version 06.08.2020
     /// <summary>
     /// BlockModule. Scaled as needed by Block.
     /// </summary>
-    /// TODO: Removal from collision field on disable.
     public class BlockModule : PoolableObject
     {
         private readonly Collision collision;
