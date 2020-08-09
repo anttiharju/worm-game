@@ -3,6 +3,18 @@ What is it? For me it's a brain dump, a place to plan features and explain commi
 
 When the project is "complete" I'll write a proper blog post based on this. Please excuse any grammatical errors: this is written by me for (mostly) me. 
 
+# 09.08.2020
+- Update documentation
+    - Merge to master
+    - How to make the game better:
+        - Tested tilemaps, they can use colors and only take up one entity and one render. This is the way to implement blocks
+        - Dived further into otter examples, found surfaces. Surfaces don't have to clear before rendering: meaning that they are probably the way to implement worm rendering.
+            - We'll still need one module per worm length, but we don't need a render per worm length as we'll only render the worm head and clear at the end. Meaning that worm of any length will only take up two or three renders.
+        - With the aformentioned improvements to rendering, I hope I can achieve even more massive scale. (going from thousands to tens of thousands)
+        - Also began work on the budgeting tool UWP app. It's kind of confusing, but there are a lot of parallels to JavaFX development.
+            - For now the repo is private as I still have lots of things to figure out, hopefully it will be completed before next summer.
+                - I would really like to continue working on this worm game.
+
 
 # 30.07.2020
 - Add restart
