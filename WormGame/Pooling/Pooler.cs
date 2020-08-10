@@ -37,6 +37,7 @@ namespace WormGame.Pooling
         public Pooler(Scene scene, Config config, int size)
         {
             pool = new T[size];
+            endIndex = size - 1;
             for (int i = 0; i < size; i++)
             {
                 T currentPoolable = (T)Activator.CreateInstance(typeof(T), new object[] { config });
@@ -45,7 +46,6 @@ namespace WormGame.Pooling
                 pool[i] = currentPoolable;
                 currentPoolable.Add(scene);
             }
-            endIndex = --size;
         }
 
 
@@ -72,12 +72,9 @@ namespace WormGame.Pooling
         public void Reset()
         {
             for (int i = EnableIndex; i >= 0; i--)
-            {
-                if (pool[EnableIndex].Enabled)
-                    pool[EnableIndex].Disable();
-                EnableIndex--;
-            }
-            EnableIndex++; // -1 -> 0
+                if (pool[i].Enabled)
+                    pool[i].Disable();
+            EnableIndex = 0;
         }
 
 
