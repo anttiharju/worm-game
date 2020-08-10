@@ -16,6 +16,7 @@ namespace WormGame.Entity
         private readonly Collision collision;
         private readonly int size;
         private readonly int halfSize;
+
         private int startX;
         private int startY;
 
@@ -49,7 +50,7 @@ namespace WormGame.Entity
             size = config.size;
             halfSize = size / 2;
             Graphic = Image.CreateRectangle(config.size);
-            Graphic.Scale = 0;
+            Graphic.SetOrigin(0, 0);
         }
 
 
@@ -62,11 +63,9 @@ namespace WormGame.Entity
         /// <returns>Module</returns>
         public BlockModule Spawn(Block parent, float x, float y)
         {
-            Graphic.Scale = 1;
-            Graphic.SetOrigin(0, 0);
             Graphic.SetPosition(x - halfSize, y - halfSize);
-            parent.AddGraphic(Graphic);
             Graphic.Color = parent.Color;
+            parent.AddGraphic(Graphic);
             startX = collision.X(parent.X + x);
             startY = collision.Y(parent.Y + y);
             return this;
@@ -79,19 +78,15 @@ namespace WormGame.Entity
         public override void Disable()
         {
             if (Next != null)
-            {
                 Next.Disable();
-                Next = null;
-            }
+            Next = null;
             int endX = startX + Mathf.FastRound(Graphic.ScaleX);
             int endY = startY - Mathf.FastRound(Graphic.ScaleY);
             for (int x = startX; x < endX; x++)
                 for (int y = startY; y > endY; y--)
                     collision.Set(null, x, y);
             Enabled = false;
-            Graphic.SetPosition(0, 0);
-            Graphic.SetOrigin(0, 0);
-            Graphic.Scale = 0;
+            Graphic.Scale = 1;
         }
     }
 }

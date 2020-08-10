@@ -2,6 +2,18 @@
 I use changelog as a brain dump where I explain future plans and further explain commit messages. I hope it shows my enthusiasm for programming and the amount of thought and care put into the project.
 
 
+# 11.08.2020
+- Add collision visualization toggle
+    - Brought back concept.svg
+        - It doesn't really reflect current goals or mechanics but it's fun & cute!
+    - Debug research:
+        - The stack overflow is caused some weird cyclical references between two (multiple?) blockModules. This only seems to happen after sorting has happened which shouldn't be the case.
+            - Sorting the module pool seems to mess things up. Or / and restarting. I'm going to go bed now and hopefully fix this mess during the day.
+            - Block pooler also runs out of blocks.
+        - The system just seems to break more and more the more I investigate.
+            - I swear this was working just fine at some point, I have no idea what happened.
+
+
 # 10.08.2020
 - Simplify worm GraphicFollow
     - I player around with Otters surfaces (autoclear off) and during that found that manipulating worm position AND graphic positions were kind of laggy during direction changes, so now I only manipulate graphic positions.
@@ -28,6 +40,7 @@ I use changelog as a brain dump where I explain future plans and further explain
             - Apply DRY to Reset method
             - Changed Sort from private -> public virtual to prepare for moving blocks to tilemap (custom Pooler)
         - Known issues: Blocks sometimes don't spawn (near the end) and BlockModules cause stack overflows. Committing in broken state and returning to master branch with the same config to see if these issues existed back then.
+            - I'm back from master branch and these stack overflows also exist there. How have I not noticed these before?
 
 
 # 09.08.2020
