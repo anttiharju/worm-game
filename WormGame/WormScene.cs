@@ -5,7 +5,7 @@ using Otter.Graphics.Drawables;
 using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
-using WormGame.Entity;
+using WormGame.Entities;
 
 namespace WormGame
 {
@@ -60,7 +60,7 @@ namespace WormGame
         private void Start()
         {
             if (config.fruits)
-                for (int i = 0; i < fruits.Count; i++)
+                for (int i = 0; i < fruits.Length; i++)
                     SpawnFruit();
             for (int i = 0; i < 5; i++)
                 SpawnPlayer(i);

@@ -2,7 +2,7 @@
 using Otter.Utility.MonoGame;
 using WormGame.Static;
 using WormGame.Pooling;
-using WormGame.Entity;
+using WormGame.Entities;
 
 namespace WormGame.Core
 {
