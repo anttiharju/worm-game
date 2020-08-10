@@ -32,7 +32,6 @@ namespace WormGame.Core
         public readonly int wormCap = 0;          // Overrides wormPercentage if > 0.
         public readonly int wormSpeed = 6;       // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
         public readonly int minWormLength = 3;
-        public readonly float wormSpawnDuration = 1;
         public readonly float wormPercentage = 0.1f;
 
         // Fruit
@@ -109,9 +108,6 @@ namespace WormGame.Core
                     case "minWormLength":
                         minWormLength = int.Parse(value);
                         break;
-                    case "wormSpawnDuration":
-                        wormSpawnDuration = float.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
-                        break;
                     case "wormPercentage":
                         wormPercentage = float.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
                         break;
@@ -149,11 +145,14 @@ namespace WormGame.Core
             moduleAmount = width * height;
             entityAmount = moduleAmount / minWormLength;
 
-            wormAmount = Mathf.FastRound(moduleAmount / minWormLength * wormPercentage);
-            wormCap = wormAmount;
             if (wormCap > 0)
                 wormAmount = wormCap;
-            wormAmount *= 2; // Every worm might blockify simultaneously
+            else
+            {
+                wormAmount = Mathf.FastRound(moduleAmount / minWormLength * wormPercentage);
+                wormCap = wormAmount;
+            }
+            wormAmount *= 2; // Every worm might turn into a block simultaneously
 
             // Other
             size = CalculateSize(windowWidth, windowHeight);
