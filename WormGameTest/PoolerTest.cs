@@ -12,12 +12,12 @@ namespace TestWormGame.Pooling
 		public  void TestSort108()
 		{
 			Config testConfig = new Config();
-			Pooler<PoolableObject> testPool = new Pooler<PoolableObject>(testConfig, 5);
-			PoolableObject p1 = testPool.Enable();
-			PoolableObject p2 = testPool.Enable();
-			PoolableObject p3 = testPool.Enable();
-			PoolableObject p4 = testPool.Enable();
-			PoolableObject p5 = testPool.Enable();
+			Pooler<Poolable> testPool = new Pooler<Poolable>(testConfig, 5);
+			Poolable p1 = testPool.Enable();
+			Poolable p2 = testPool.Enable();
+			Poolable p3 = testPool.Enable();
+			Poolable p4 = testPool.Enable();
+			Poolable p5 = testPool.Enable();
 			p1.Disable();
 			p3.Disable();
 			Assert.AreEqual( p1, testPool[0] , "in method Sort, line 118");

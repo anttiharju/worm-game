@@ -4,7 +4,7 @@ using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
 
-namespace WormGame.GameObject
+namespace WormGame.Entity
 {
     /// @author Antti Harju
     /// @version 28.07.2020
@@ -168,7 +168,11 @@ namespace WormGame.GameObject
         public override void Update()
         {
             if (moving)
-                firstModule.GraphicFollow(step);
+            {
+                Vector2 positionDelta = firstModule.Direction * step;
+                Position += positionDelta;
+                firstModule.GraphicFollow(positionDelta, step);
+            }
         }
 
 

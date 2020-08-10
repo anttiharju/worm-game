@@ -4,14 +4,14 @@ using Otter.Utility.MonoGame;
 using WormGame.Core;
 using WormGame.Pooling;
 
-namespace WormGame.GameObject
+namespace WormGame.Entity
 {
     /// @author Antti Harju
     /// @version 28.07.2020
     /// <summary>
     /// WormModule. Thanks to modularity worm length can be increased during runtime.
     /// </summary>
-    public class WormModule : PoolableObject
+    public class WormModule : Poolable
     {
         private readonly Collision collision;
 
@@ -76,14 +76,15 @@ namespace WormGame.GameObject
         /// <summary>
         /// Recursively update every worm module graphic position.
         /// </summary>
+        /// <param name="positionDelta">Worm entity position delta</param>
         /// <param name="step">Worm step</param>
-        public void GraphicFollow(float step)
+        public void GraphicFollow(Vector2 positionDelta, float step)
         {
-            Vector2 delta = Direction * step;
+            Vector2 delta = Direction * step - positionDelta;
             Graphic.X += delta.X;
             Graphic.Y += delta.Y;
             if (Next != null)
-                Next.GraphicFollow(step);
+                Next.GraphicFollow(positionDelta, step);
         }
 
 

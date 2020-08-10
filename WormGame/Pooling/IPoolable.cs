@@ -1,7 +1,9 @@
-﻿namespace WormGame.Pooling
+﻿using Otter.Core;
+
+namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 18.07.2020
+    /// @version 10.08.2020
     /// <summary>
     /// Interface for all poolables.
     /// </summary>
@@ -14,14 +16,21 @@
 
 
         /// <summary>
-        /// Set / get wheter or not object is in use.
+        /// Enable or get poolable status. To disable entity use Disable -method.
         /// </summary>
         public bool Enabled { get; set; }
 
 
         /// <summary>
-        /// Frees poolable back to the pool.
+        /// Disable poolable. Technically Enabled = false would be the same, but we also need to reset poolable variables so that's why separate method.
         /// </summary>
         public abstract void Disable();
+
+
+        /// <summary>
+        /// Only required by PoolableEntity, but Poolable also having this simplifies things.
+        /// </summary>
+        /// <param name="scene">Scene to add the entity to.</param>
+        public abstract void Add(Scene scene);
     }
 }

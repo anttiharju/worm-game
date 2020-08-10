@@ -1,8 +1,6 @@
 # Changelog
 I use changelog as a brain dump where I explain future plans and further explain commit messages. I hope it shows my enthusiasm for programming and the amount of thought and care put into the project.
 
-When the project is "complete" I'll write a proper blog post based on this. Please excuse any grammatical errors: this is written by me for (mostly) me. 
-
 
 # 10.08.2020
 - Simplify worm GraphicFollow
@@ -21,6 +19,15 @@ When the project is "complete" I'll write a proper blog post based on this. Plea
     - More unrelated thoughts:
         - If I went with the Surface with no autoclear approach to worm rendering, I probably should Implement a separate eraser system which could use the current block scaler for erasing disappearing blocks and worms.
             - This approach would probably cause lots of unnecessary complexity but I still kind of want to explore it as there are nice performance gains to be had.
+- Cleanup
+    - File organization (GameObject -> Entity, Entity/Block, Entity/Worm)
+    - Pooling
+        - Renamed PoolableObject -> Poolable
+        - Pooler
+            - Got rid of unnecessary #if DEBUG statements
+            - Apply DRY to Reset method
+            - Changed Sort from private -> public virtual to prepare for moving blocks to tilemap (custom Pooler)
+        - Known issues: Blocks sometimes don't spawn (near the end) and BlockModules cause stack overflows. Committing in broken state and returning to master branch with the same config to see if these issues existed back then.
 
 
 # 09.08.2020

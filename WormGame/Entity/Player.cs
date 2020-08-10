@@ -5,7 +5,7 @@ using WormGame.Static;
 using WormGame.Pooling;
 using WormGame.Core;
 
-namespace WormGame.GameObject
+namespace WormGame.Entity
 {
     /// @author Antti Harju
     /// @version 30.07.2020
@@ -134,8 +134,7 @@ namespace WormGame.GameObject
 
             #region Worm
             if (worm == null) goto Wormskip;
-            X = worm.X + worm.firstModule.Graphic.X;
-            Y = worm.Y + worm.firstModule.Graphic.Y;
+            Position = worm.Position;
             deadZone = 90;
             if (yMovement < -deadZone)
                 worm.Direction = Help.directions[0]; // UP

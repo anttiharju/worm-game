@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace WormGame.GameObject
+namespace WormGame.Entity
 {
-    class Blocks
+    class BlockPooler
     {
     }
 }
