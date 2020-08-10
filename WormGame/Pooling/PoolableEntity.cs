@@ -4,11 +4,11 @@ using Otter.Graphics;
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 30.07.2020
+    /// @version 10.08.2020
     /// <summary>
     /// Class for poolable entities.
     /// </summary>
-    public class PoolableEntity : Entity, IPoolable
+    public class PoolableEntity : Otter.Core.Entity, IPoolable
     {
         /// <summary>
         /// Disables Otter2D collision.
@@ -38,17 +38,17 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Add entity to scene.
+        /// Add entity to the scene.
         /// </summary>
         /// <param name="scene"></param>
-        public virtual void Add(WormScene scene)
+        public virtual void Add(Scene scene)
         {
             scene.Add(this);
         }
 
 
         /// <summary>
-        /// Frees the entity back to the pool.
+        /// Disable entity.
         /// </summary>
         public virtual void Disable()
         {

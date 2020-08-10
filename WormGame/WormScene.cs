@@ -5,7 +5,7 @@ using Otter.Graphics.Drawables;
 using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
-using WormGame.GameObject;
+using WormGame.Entity;
 
 namespace WormGame
 {
@@ -44,12 +44,12 @@ namespace WormGame
             stepAccuracy = config.step / 2;
             wormFrequency = config.size - config.step;
             CreateBorders();
-            worms = new Pooler<Worm>(config, config.wormAmount, this);
-            blocks = new Pooler<Block>(config, config.moduleAmount, this);
-            fruits = new Pooler<Fruit>(config, config.fruitAmount, this);
-            players = new Pooler<Player>(config, 5, this);
-            wormModules = new Pooler<WormModule>(config, config.moduleAmount);
-            blockModules = new Pooler<BlockModule>(config, config.moduleAmount);
+            worms = new Pooler<Worm>(this, config, config.wormAmount);
+            blocks = new Pooler<Block>(this, config, config.moduleAmount);
+            fruits = new Pooler<Fruit>(this, config, config.fruitAmount);
+            players = new Pooler<Player>(this, config, 5);
+            wormModules = new Pooler<WormModule>(this, config, config.moduleAmount);
+            blockModules = new Pooler<BlockModule>(this, config, config.moduleAmount);
             Start();
         }
 
@@ -76,10 +76,16 @@ namespace WormGame
             worms.Reset();
             fruits.Reset();
             blocks.Reset();
-            wormModules.Reset();
-            blockModules.Reset();
+            collision.Reset();
+            wormModules.Sort();
+            blockModules.Sort();
+            wormFrequency = config.size - config.step;
             wormAmount = 0;
             Start();
+#if DEBUG
+            System.Console.Clear();
+            System.Console.WriteLine("[ Otter is running in debug mode! ]");
+#endif
         }
 
 
@@ -212,7 +218,7 @@ namespace WormGame
             backgroundGraphic.CenterOrigin();
             backgroundGraphic.OutlineColor = Color.White;
             backgroundGraphic.OutlineThickness = config.size / 6;
-            Entity background = new Entity(config.windowWidth / 2, config.windowHeight / 2, backgroundGraphic)
+            Otter.Core.Entity background = new Otter.Core.Entity(config.windowWidth / 2, config.windowHeight / 2, backgroundGraphic)
             {
                 Collidable = false
             };
