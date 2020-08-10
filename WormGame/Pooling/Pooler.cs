@@ -26,7 +26,7 @@ namespace WormGame.Pooling
         /// <summary>
         /// Get pool length.
         /// </summary>
-        public int Count { get { return pool.Length; } }
+        public int Length { get { return pool.Length; } }
 
 
         /// <summary>
@@ -88,10 +88,10 @@ namespace WormGame.Pooling
         /// <returns>Is asked amount of poolables available</returns>
         public bool HasAvailable(int amount)
         {
-            if (EnableIndex <= Count - amount)
+            if (EnableIndex <= Length - amount)
                 return true;
             Sort();
-            return EnableIndex <= Count - amount;
+            return EnableIndex <= Length - amount;
         }
 
 
