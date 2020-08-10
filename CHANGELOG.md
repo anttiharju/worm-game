@@ -16,6 +16,11 @@ When the project is "complete" I'll write a proper blog post based on this. Plea
                         - Although I fear that opens a whole another jar of worms with floating point and division inaccuracies.
                             - I've said it before and I'll say it again: this is an educational project and doing stuff the wrong way to figure out & being confident in the right way is okay even if it takes a ton of time.
     - This is something I might revert later on, we'll see.
+- Remove wormWarning
+    - To further simplify things. It's easy enough to re-implement later on.
+    - More unrelated thoughts:
+        - If I went with the Surface with no autoclear approach to worm rendering, I probably should Implement a separate eraser system which could use the current block scaler for erasing disappearing blocks and worms.
+            - This approach would probably cause lots of unnecessary complexity but I still kind of want to explore it as there are nice performance gains to be had.
 
 
 # 09.08.2020

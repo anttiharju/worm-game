@@ -25,7 +25,6 @@ namespace WormGame
         private readonly Pooler<Worm> worms;
         private readonly Pooler<Fruit> fruits;
         private readonly Pooler<Block> blocks;
-        private readonly Pooler<WormWarning> wormWarnings;
         private readonly Pooler<WormModule> wormModules;
         private readonly Pooler<BlockModule> blockModules;
         private readonly float stepAccuracy;
@@ -45,7 +44,6 @@ namespace WormGame
             stepAccuracy = config.step / 2;
             wormFrequency = config.size - config.step;
             CreateBorders();
-            wormWarnings = new Pooler<WormWarning>(config, config.wormAmount, this);
             worms = new Pooler<Worm>(config, config.wormAmount, this);
             blocks = new Pooler<Block>(config, config.moduleAmount, this);
             fruits = new Pooler<Fruit>(config, config.fruitAmount, this);
@@ -78,7 +76,6 @@ namespace WormGame
             worms.Reset();
             fruits.Reset();
             blocks.Reset();
-            wormWarnings.Reset();
             wormModules.Reset();
             blockModules.Reset();
             wormAmount = 0;
@@ -128,7 +125,7 @@ namespace WormGame
                 {
                     Vector2 random = Random.ValidPosition(collision, config.width, config.height, 4);
                     if (random.X != -1)
-                        SpawnWorm(random);
+                        SpawnWorm(collision.X(random.X), collision.Y(random.Y));
                     else
                     {
                         random = Random.ValidPosition(collision, config.width, config.height, 3);
@@ -136,7 +133,7 @@ namespace WormGame
                         {
                             Fruit fruit = (Fruit)collision.Get(random);
                             fruit.Disable();
-                            SpawnWorm(random);
+                            SpawnWorm(collision.X(random.X), collision.Y(random.Y));
                         }
                         else
                         {
@@ -149,20 +146,6 @@ namespace WormGame
                     collision.VisualizeCollision();
 #endif
             }
-        }
-
-
-        /// <summary>
-        /// Spawn either worm or warning depending on configuration.
-        /// </summary>
-        /// <param name="position">Spawn position</param>
-        private void SpawnWorm(Vector2 position)
-        {
-            if (Mathf.FastRound(config.wormSpawnDuration) <= 0)
-                SpawnWorm(collision.X(position.X), collision.Y(position.Y));
-            else
-                SpawnWormWarning(collision.X(position.X), collision.Y(position.Y));
-            wormAmount++;
         }
 
 
@@ -180,23 +163,7 @@ namespace WormGame
             if (color == null) color = Random.Color;
             if (length < config.minWormLength) length = config.minWormLength;
             worm.Spawn(wormModules, x, y, length, color);
-        }
-
-
-        /// <summary>
-        /// Spawns worm spawn warning.
-        /// </summary>
-        /// <param name="x">Horizontal field position</param>
-        /// <param name="y">Vertical field position</param>
-        /// <param name="length">Length, default config.minWormLength</param>
-        /// <param name="color">Color, default Random.Color</param>
-        public void SpawnWormWarning(int x, int y, int length = 0, Color color = null)
-        {
-            WormWarning warning = wormWarnings.Enable();
-            if (warning == null) return;
-            if (color == null) color = Random.Color;
-            if (length < config.minWormLength) length = config.minWormLength;
-            warning.Spawn(x, y, length, color);
+            wormAmount++;
         }
 
 

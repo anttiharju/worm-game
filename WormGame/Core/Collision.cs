@@ -97,7 +97,7 @@ namespace WormGame.Core
             PoolableEntity current = field[x, y];
             if (current == null)
                 return 4;
-            if (current is Worm || current is WormWarning)
+            if (current is Worm)
                 return 1;
             if (current is Block)
                 return 2;
@@ -223,7 +223,7 @@ namespace WormGame.Core
                         line.Append('x');
                         continue;
                     }
-                    if (current is Worm || current is WormWarning)
+                    if (current is Worm)
                     {
                         line.Append('o');
                         continue;
