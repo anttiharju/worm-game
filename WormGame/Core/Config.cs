@@ -14,7 +14,7 @@ namespace WormGame.Core
         public readonly Collision collision;
 #if DEBUG
         public bool visualizeCollision = false;   // 119x29 fits in debug console
-        public bool disableBlocks = true;         // For benchmarking purposes
+        public bool disableBlocks = false;         // For benchmarking purposes
 #endif
 
         // Window
