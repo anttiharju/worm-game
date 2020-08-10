@@ -24,13 +24,13 @@ namespace WormGame.Core
         public readonly int refreshRate = 144;    // See wormSpeed before changing this
 
         // Scene
-        public readonly int width = 80;
-        public readonly int height = 45;
-        public readonly int margin = 2;
+        public readonly int width = 20;
+        public readonly int height = 10;
+        public readonly int margin = 3;
 
         // Worm
         public readonly int wormCap = 0;          // Overrides wormPercentage if > 0.
-        public readonly int wormSpeed = 12;       // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
+        public readonly int wormSpeed = 6;       // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
         public readonly int minWormLength = 3;
         public readonly float wormSpawnDuration = 1;
         public readonly float wormPercentage = 0.1f;

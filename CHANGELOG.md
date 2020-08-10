@@ -1,7 +1,22 @@
-# Changelog explained
-What is it? For me it's a brain dump, a place to plan features and explain commit messages. I hope this also shows I put a lot of thought into the project and that I am very enthusiastic about programming.
+# Changelog
+I use changelog as a brain dump where I explain future plans and further explain commit messages. I hope it shows my enthusiasm for programming and the amount of thought and care put into the project.
 
 When the project is "complete" I'll write a proper blog post based on this. Please excuse any grammatical errors: this is written by me for (mostly) me. 
+
+
+# 10.08.2020
+- Simplify worm GraphicFollow
+    - I player around with Otters surfaces (autoclear off) and during that found that manipulating worm position AND graphic positions were kind of laggy during direction changes, so now I only manipulate graphic positions.
+        - Due to this, worm.Position cannot be used properly anymore.
+            - But to the point: I could render worm of *any length* with only three renders (head, tail, eraser), but manually clearing old graphics opened a can of worms with framerate related stuff so for now I've decided to revert those changes.
+                - It would work flawlessly with Game.FixedFramerate = false, but since worm movement isn't framerate-independent, it's not a viable fix.
+                    - I could restrict the framerate with RTSS as I did before for the GPU usage issue, but that's too hacky. Maybe turning VSync on from GPU control panel could be enough? (untested)
+                    - I also one other way of optimizing worm rendering (worm using modules as needed & scaling them on-the-fly) so that's why I didn't pursue this further yet.
+                    - This way could still be valid if I could untie worm speed from framerate.
+                        - Although I fear that opens a whole another jar of worms with floating point and division inaccuracies.
+                            - I've said it before and I'll say it again: this is an educational project and doing stuff the wrong way to figure out & being confident in the right way is okay even if it takes a ton of time.
+    - This is something I might revert later on, we'll see.
+
 
 # 09.08.2020
 - Update documentation
