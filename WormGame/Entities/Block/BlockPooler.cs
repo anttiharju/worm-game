@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace WormGame.Entity
+namespace WormGame.Entities
 {
     class BlockPooler
     {
