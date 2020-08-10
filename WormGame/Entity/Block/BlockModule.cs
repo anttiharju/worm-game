@@ -2,16 +2,16 @@
 using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
-using Otter.Graphics;
 
-namespace WormGame.GameObject
+namespace WormGame.Entity
 {
     /// @author Antti Harju
     /// @version 06.08.2020
     /// <summary>
     /// BlockModule. Scaled as needed by Block.
     /// </summary>
-    public class BlockModule : PoolableObject
+    /// TODO: Fix Disable stackoverflow
+    public class BlockModule : Poolable
     {
         private readonly Collision collision;
         private readonly int size;
@@ -79,7 +79,10 @@ namespace WormGame.GameObject
         public override void Disable()
         {
             if (Next != null)
+            {
                 Next.Disable();
+                Next = null;
+            }
             int endX = startX + Mathf.FastRound(Graphic.ScaleX);
             int endY = startY - Mathf.FastRound(Graphic.ScaleY);
             for (int x = startX; x < endX; x++)

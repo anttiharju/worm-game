@@ -2,7 +2,7 @@
 using Otter.Utility.MonoGame;
 using WormGame.Static;
 using WormGame.Pooling;
-using WormGame.GameObject;
+using WormGame.Entity;
 
 namespace WormGame.Core
 {
@@ -14,12 +14,20 @@ namespace WormGame.Core
     public class Collision
     {
         private readonly Exception unknownPoolableException = new Exception("Unknown poolable entity on collision field.");
-        private readonly PoolableEntity[,] field;
+        private readonly PoolableEntity[,] collision;
         private readonly int leftBorder;
         private readonly int topBorder;
         private readonly int size;
 
         public readonly int[,] blockBuffer;
+
+        /// Collision values exist to improve code readability and maintainablility. Values >= 0 are reserved for blocks.
+        #region Collision values
+        public int WormValue { get { return -1; } }
+        public int InvalidValue { get { return -2; } }
+        public int FruitValue { get { return -3; } }
+        public int FreeValue { get { return -4; } }
+        #endregion
 
 
         /// <summary>
@@ -46,7 +54,7 @@ namespace WormGame.Core
             Width = config.width;
             Height = config.height;
             size = config.size;
-            field = new PoolableEntity[Width, Height];
+            collision = new PoolableEntity[Width, Height];
             blockBuffer = new int[Width, Height];
             leftBorder = config.windowWidth / 2 - Width / 2 * size;
             topBorder = config.windowHeight / 2 + Height / 2 * size;
@@ -65,7 +73,7 @@ namespace WormGame.Core
         /// <returns>Poolable entity as reference</returns>
         public ref PoolableEntity Get(int x, int y)
         {
-            return ref field[x, y];
+            return ref collision[x, y];
         }
 
 
@@ -94,7 +102,7 @@ namespace WormGame.Core
                 x >= Width ||
                 y >= Height)
                 return 0;
-            PoolableEntity current = field[x, y];
+            PoolableEntity current = collision[x, y];
             if (current == null)
                 return 4;
             if (current is Worm)
@@ -131,7 +139,7 @@ namespace WormGame.Core
         /// <param name="y">Vertical field position</param>
         public void Set(PoolableEntity entity, int x, int y)
         {
-            field[x, y] = entity;
+            collision[x, y] = entity;
         }
 
 
@@ -200,6 +208,19 @@ namespace WormGame.Core
         {
             return topBorder - size * y;
         }
+
+
+        /// <summary>
+        /// Reset collision.
+        /// </summary>
+        public void Reset()
+        {
+            for (int x = 0; x < Width; x++)
+                for (int y = 0; y < Height; y++)
+                {
+                    collision[x, y] = null;
+                }
+        }
 #if DEBUG
         /// <summary>
         /// Visualizes collision field in debug console as ASCII art.
@@ -212,7 +233,7 @@ namespace WormGame.Core
                 System.Text.StringBuilder line = new System.Text.StringBuilder(Width);
                 for (int x = 0; x < Width; x++)
                 {
-                    PoolableEntity current = field[x, y];
+                    PoolableEntity current = collision[x, y];
                     if (current == null)
                     {
                         line.Append('.');

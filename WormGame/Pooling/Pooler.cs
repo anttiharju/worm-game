@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections;
+using Otter.Core;
 using WormGame.Core;
 
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 30.07.2020
+    /// @version 10.08.2020
     /// <summary>
     /// Object pooler.
     /// </summary>
     /// <typeparam name="T">Poolable object type</typeparam>
     public class Pooler<T> : IEnumerable where T : class, IPoolable
     {
-#if DEBUG
-        private readonly string type;
-#endif
         private readonly T[] pool;
         private readonly int endIndex;
 
@@ -36,33 +34,18 @@ namespace WormGame.Pooling
         /// </summary>
         /// <param name="config">Configuration object</param>
         /// <param name="size">Pool size</param>
-        public Pooler(Config config, int size, WormScene scene = null)
+        public Pooler(Scene scene, Config config, int size)
         {
-            endIndex = size - 1;
             pool = new T[size];
             for (int i = 0; i < size; i++)
             {
-                T currentPoolable;
-                currentPoolable = (T)Activator.CreateInstance(typeof(T), new object[] { config });
+                T currentPoolable = (T)Activator.CreateInstance(typeof(T), new object[] { config });
                 currentPoolable.Enabled = false;
                 currentPoolable.Id = i;
                 pool[i] = currentPoolable;
-                if (currentPoolable is PoolableEntity entity)
-                {
-#if DEBUG
-                    if (scene == null)
-                        throw new Exception("You can't pool entities without giving the scene as parameter."); ;
-#endif
-                    entity.Add(scene);
-                }
+                currentPoolable.Add(scene);
             }
-#if DEBUG
-            System.Text.RegularExpressions.MatchCollection matches = System.Text.RegularExpressions.Regex.Matches("" + pool[0].GetType(), @"\.([^\.]*)$");
-            if (matches.Count > 0 && matches[0].Groups.Count > 1)
-                type = matches[0].Groups[1].Value;
-            else
-                throw new Exception("Couldn't solve poolable type.");
-#endif
+            endIndex = --size;
         }
 
 
@@ -88,14 +71,13 @@ namespace WormGame.Pooling
         /// </summary>
         public void Reset()
         {
-            while (EnableIndex > 0)
+            for (int i = EnableIndex; i >= 0; i--)
             {
                 if (pool[EnableIndex].Enabled)
                     pool[EnableIndex].Disable();
                 EnableIndex--;
             }
-            if (pool[EnableIndex].Enabled)
-                pool[EnableIndex].Disable();
+            EnableIndex++; // -1 -> 0
         }
 
 
@@ -116,7 +98,7 @@ namespace WormGame.Pooling
         /// <summary>
         /// Sorts (defragments) the pool in a way that disabled poolables are at the end of the array, readily available to be enabled.
         /// </summary>
-        /// <returns>Are all poolables enabled</returns>
+        /// <returns>Is pool fully utilized</returns>
         /// <example>
         /// Before: [.2.45]
         ///              ^
@@ -150,11 +132,8 @@ namespace WormGame.Pooling
         ///  testPool[4] === p1;
         /// </pre>
         /// </example>
-        private bool Sort()
+        public virtual bool Sort()
         {
-#if DEBUG
-            int freedAmount = EnableIndex;
-#endif
             int current = 0;
             while (current < EnableIndex)
             {
@@ -177,24 +156,23 @@ namespace WormGame.Pooling
                 }
             }
 #if DEBUG
-            freedAmount -= EnableIndex;
             ConsoleColor defaultColor = Console.ForegroundColor;
-            if (freedAmount == 0)
-            {   // Sorting didn't free any poolables: pool is fully utilized. This shouldn't happen with the correct pool size.
+            if (EnableIndex == endIndex)
+            {   // Sorting didn't free any poolables: pool is fully utilized. If this happens, it means your pool is not big enough.
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.Write("[POOLER] ");
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"{type,-11}");
+                Console.WriteLine($"{pool[0].GetType().Name,-(11 + 5 * 2)}");
                 Console.ForegroundColor = defaultColor;
             }
             else
-            {   // Sorting freed {freedAmount} of poolables back to use.
+            {   // How many poolables are available to enable after sorting
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.Write($"[POOLER] ");
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write($"{type,-11}");
+                Console.Write($"{pool[0].GetType().Name,-11} ");
                 Console.ForegroundColor = defaultColor;
-                Console.WriteLine($" {freedAmount}     ");
+                Console.WriteLine($"{pool.Length - EnableIndex,5}");
             }
 #endif
             return EnableIndex == endIndex;
