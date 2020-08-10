@@ -3,7 +3,7 @@ using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
 
-namespace WormGame.Entity
+namespace WormGame.Entities
 {
     /// @author Antti Harju
     /// @version 06.08.2020

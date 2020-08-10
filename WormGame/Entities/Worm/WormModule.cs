@@ -4,7 +4,7 @@ using Otter.Utility.MonoGame;
 using WormGame.Core;
 using WormGame.Pooling;
 
-namespace WormGame.Entity
+namespace WormGame.Entities
 {
     /// @author Antti Harju
     /// @version 28.07.2020
