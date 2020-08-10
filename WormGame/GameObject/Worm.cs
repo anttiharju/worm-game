@@ -168,11 +168,7 @@ namespace WormGame.GameObject
         public override void Update()
         {
             if (moving)
-            {
-                Vector2 positionDelta = firstModule.Direction * step;
-                Position += positionDelta;
-                firstModule.GraphicFollow(positionDelta, step);
-            }
+                firstModule.GraphicFollow(step);
         }
 
 
