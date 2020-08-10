@@ -76,15 +76,14 @@ namespace WormGame.GameObject
         /// <summary>
         /// Recursively update every worm module graphic position.
         /// </summary>
-        /// <param name="positionDelta">Worm entity position delta</param>
         /// <param name="step">Worm step</param>
-        public void GraphicFollow(Vector2 positionDelta, float step)
+        public void GraphicFollow(float step)
         {
-            Vector2 delta = Direction * step - positionDelta;
+            Vector2 delta = Direction * step;
             Graphic.X += delta.X;
             Graphic.Y += delta.Y;
             if (Next != null)
-                Next.GraphicFollow(positionDelta, step);
+                Next.GraphicFollow(step);
         }
 
 
