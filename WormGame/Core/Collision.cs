@@ -13,7 +13,6 @@ namespace WormGame.Core
     /// </summary>
     public class Collision
     {
-        private readonly Exception unknownPoolableException = new Exception("Unknown poolable entity on collision field.");
         private readonly PoolableEntity[,] collision;
         private readonly int leftBorder;
         private readonly int topBorder;
@@ -115,7 +114,7 @@ namespace WormGame.Core
                     fruit.Spawn();
                 return 3;
             }
-            throw unknownPoolableException;
+            throw new Exception("Unknown collision entity.");
         }
 
 
@@ -254,7 +253,7 @@ namespace WormGame.Core
                         line.Append('f');
                         continue;
                     }
-                    throw unknownPoolableException;
+                    throw new Exception("Unknown collision entity.");
                 }
                 Console.WriteLine(line.ToString());
             }
