@@ -134,7 +134,8 @@ namespace WormGame.GameObject
 
             #region Worm
             if (worm == null) goto Wormskip;
-            Position = worm.Position;
+            X = worm.X + worm.firstModule.Graphic.X;
+            Y = worm.Y + worm.firstModule.Graphic.Y;
             deadZone = 90;
             if (yMovement < -deadZone)
                 worm.Direction = Help.directions[0]; // UP
