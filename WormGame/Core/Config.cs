@@ -29,7 +29,7 @@ namespace WormGame.Core
         public readonly int margin = 3;
 
         // Worm
-        public readonly int wormCap = 0;          // Overrides wormPercentage if > 0.
+        public readonly int wormCap = 0;           // Overrides wormPercentage if > 0.
         public readonly int wormSpeed = 144;       // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
         public readonly int minWormLength = 3;
         public readonly float wormPercentage = 0.1f;
@@ -42,7 +42,6 @@ namespace WormGame.Core
         public readonly int fruitAmount;
         public readonly int wormAmount;
         public readonly int warningAmount;
-        public readonly int entityAmount;
         public readonly int moduleAmount;
         public readonly float step;
         public readonly int size;
@@ -143,7 +142,6 @@ namespace WormGame.Core
                 fruitAmount = 1;
 
             moduleAmount = width * height;
-            entityAmount = moduleAmount / minWormLength;
 
             if (wormCap > 0)
                 wormAmount = wormCap;
