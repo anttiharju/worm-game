@@ -2,6 +2,7 @@
 using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
+using Otter.Graphics;
 
 namespace WormGame.Entities
 {
@@ -43,13 +44,13 @@ namespace WormGame.Entities
         /// Constructor.
         /// </summary>
         /// <param name="config">Configuration.</param>
-        public BlockModule(Config config, int id) : base(id)
+        public BlockModule(Config config)
         {
             collision = config.collision;
             size = config.size;
-            halfSize = size / 2;
+            halfSize = config.halfSize;
             Graphic = Image.CreateRectangle(config.size);
-            Graphic.SetOrigin(0, 0);
+            Graphic.SetOrigin(0, config.size);
         }
 
 
@@ -62,7 +63,7 @@ namespace WormGame.Entities
         /// <returns>Module</returns>
         public BlockModule Spawn(Block parent, float x, float y)
         {
-            Graphic.SetPosition(x - halfSize, y - halfSize);
+            Graphic.SetPosition(x - halfSize, y + halfSize);
             Graphic.Color = parent.Color;
             parent.AddGraphic(Graphic);
             startX = collision.X(parent.X + x);

@@ -13,17 +13,15 @@ namespace WormGame.Pooling
         /// <summary>
         /// Default constructor.
         /// </summary>
-        /// <param name="id">Identifier</param>
-        public Poolable(int id) => Id = id;
+        public Poolable() { }
 
 
         /// <summary>
-        /// Constructor for testing purposes.
+        /// Constructor for tests.
         /// </summary>
         /// <param name="config">Configuration</param>
-        /// <param name="id">Identifier</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Simplifies pooler generics for testing.")]
-        public Poolable(Config config, int id) { }
+        public Poolable(Config config) { }
 
 
         /// <summary>
@@ -48,11 +46,5 @@ namespace WormGame.Pooling
         /// </summary>
         public virtual bool Active { get { return active; } set { if (value) active = true; else Disable(); } }
         private bool active;
-
-
-        /// <summary>
-        /// Identifier. Unique within the same pool.
-        /// </summary>
-        public int Id { get; }
     }
 }
