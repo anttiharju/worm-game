@@ -23,18 +23,11 @@ namespace WormGame.Entities
 
         public WormScene scene;
 
-
-        /// <summary>
-        /// Overriding default behaviour due to how player joining works
-        /// </summary>
-        public override bool Enabled { get; set; }
-
-
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public Player(Config config)
+        public Player(Config config, int id) : base(id)
         {
             Image image = Image.CreateCircle(config.size / 3);
             image.OutlineThickness = config.size / 15;
@@ -125,9 +118,9 @@ namespace WormGame.Entities
             #region Player
             if (worm != null) goto Playerskip;
             float deadZone = 10;
-            if (Mathf.FastAbs(xMovement) > deadZone)
+            if (FastMath.Abs(xMovement) > deadZone)
                 X += xMovement * playerSpeed;
-            if (Mathf.FastAbs(yMovement) > deadZone)
+            if (FastMath.Abs(yMovement) > deadZone)
                 Y += yMovement * playerSpeed;
             Playerskip:;
             #endregion
@@ -152,10 +145,10 @@ namespace WormGame.Entities
         /// <summary>
         /// Disable player.
         /// </summary>
-        public override void Disable()
+        /// <param name="recursive">Disable recursively. False only when disabling is done by pooler.</param>
+        public override void Disable(bool recursive = true)
         {
-            Enabled = false;
-            Visible = false;
+            base.Disable();
             worm = null;
         }
     }

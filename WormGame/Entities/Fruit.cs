@@ -23,7 +23,7 @@ namespace WormGame.Entities
         /// Constructor.
         /// </summary>
         /// <param name="config"></param>
-        public Fruit(Config config) : base()
+        public Fruit(Config config, int id) : base(id)
         {
             collision = config.collision;
             width = config.width;

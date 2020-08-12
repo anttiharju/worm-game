@@ -59,7 +59,7 @@ namespace WormGame.Entities
         /// Constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public Worm(Config config) : base()
+        public Worm(Config config, int id) : base(id)
         {
             size = config.size;
             step = config.step;
@@ -179,11 +179,13 @@ namespace WormGame.Entities
         /// <summary>
         /// Disable worm.
         /// </summary>
-        public override void Disable()
+        /// <param name="recursive">Disable recursively. False only when disabling is done by pooler.</param>
+        public override void Disable(bool recursive = true)
         {
-            firstModule.Disable();
+            base.Disable();
+            if (recursive)
+                firstModule.Disable();
             ClearGraphics();
-            Enabled = false;
             moving = false;
         }
     }

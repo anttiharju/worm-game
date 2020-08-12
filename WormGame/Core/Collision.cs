@@ -172,7 +172,7 @@ namespace WormGame.Core
         /// <returns>Horizontal field position</returns>
         public int X(float x)
         {
-            return (Mathf.FastRound(x) - leftBorder) / size;
+            return (FastMath.Round(x) - leftBorder) / size;
         }
 
 
@@ -183,7 +183,7 @@ namespace WormGame.Core
         /// <returns>Vertical field position</returns>
         public int Y(float y)
         {
-            return (topBorder - Mathf.FastRound(y)) / size;
+            return (topBorder - FastMath.Round(y)) / size;
         }
 
 

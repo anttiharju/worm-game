@@ -16,9 +16,6 @@ namespace WormGame
     /// </summary>
     public class WormScene : Scene
     {
-        public int wormCap;
-        public int wormAmount;
-
         private readonly Config config;
         private readonly Collision collision;
         private readonly Pooler<Player> players;
@@ -28,9 +25,10 @@ namespace WormGame
         private readonly Pooler<WormModule> wormModules;
         private readonly Pooler<BlockModule> blockModules;
         private readonly float stepAccuracy;
+        private readonly int wormCap;
 
         private float wormFrequency;
-
+        private int wormAmount;
 
         /// <summary>
         /// Initializes poolers and scene entities.
@@ -77,8 +75,8 @@ namespace WormGame
             fruits.Reset();
             blocks.Reset();
             collision.Reset();
-            wormModules.Sort();
-            blockModules.Sort();
+            wormModules.Reset();
+            blockModules.Reset();
             wormFrequency = config.size - config.step;
             wormAmount = 0;
             Start();
@@ -100,7 +98,7 @@ namespace WormGame
             Worm nearestWorm = null;
             float nearestDistance = range;
             foreach (Worm worm in worms)
-                if (worm.Enabled)
+                if (worm.Active)
                 {
                     float distance = Vector2.Distance(position, worm.firstModule.Target);
                     if (distance < nearestDistance)
@@ -121,10 +119,10 @@ namespace WormGame
             if (Input.KeyPressed(Key.R))
                 Restart();
             wormFrequency += config.step;
-            if (Mathf.FastRound(wormFrequency, stepAccuracy) >= config.size)
+            if (FastMath.Round(wormFrequency, stepAccuracy) >= config.size)
             {
                 foreach (Worm worm in worms)
-                    if (worm.Enabled)
+                    if (worm.Active)
                         worm.Move();
                 wormFrequency = 0;
                 if (wormAmount < wormCap)
@@ -143,10 +141,13 @@ namespace WormGame
                         }
                         else
                         {
-                            wormAmount--;
+                            if (wormAmount > 0)
+                                wormAmount--;
                         }
                     }
                 }
+                if (wormAmount == 0)
+                    Restart();
 #if DEBUG
                 if (config.visualizeCollision)
                     collision.VisualizeCollision();
@@ -181,10 +182,11 @@ namespace WormGame
         public Block SpawnBlock(Worm worm)
         {
             Block block = blocks.Enable();
-            if (block == null || blockModules.HasAvailable(worm.Length) == false)
+            if (block == null)
                 return null;
             block = block.Spawn(worm, blockModules);
-            wormAmount--;
+            if (wormAmount > 0)
+                wormAmount--;
             return block;
         }
 

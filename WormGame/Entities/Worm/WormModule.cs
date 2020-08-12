@@ -1,6 +1,7 @@
 ﻿using Otter.Graphics;
 using Otter.Graphics.Drawables;
 using Otter.Utility.MonoGame;
+using System.ComponentModel.Design;
 using WormGame.Core;
 using WormGame.Pooling;
 
@@ -45,15 +46,15 @@ namespace WormGame.Entities
         /// <summary>
         /// Get or set wheter or not module is in use.
         /// </summary>
-        public override bool Enabled { get { return enabled; } set { enabled = value; Graphic.Visible = value; } }
-        private bool enabled;
+        public override bool Active { get { return active; } set { if (value) { active = true; Graphic.Visible = true; } else Disable(); } }
+        private bool active;
 
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public WormModule(Config config)
+        public WormModule(Config config, int id) : base(id)
         {
             collision = config.collision;
             Graphic = Image.CreateCircle(config.size / 2);
@@ -135,14 +136,16 @@ namespace WormGame.Entities
         /// <summary>
         /// Recursively disable every one of worms modules.
         /// </summary>
-        public override void Disable()
+        /// <param name="recursive">Disable recursively. False only when disabling is done by pooler.</param>
+        public override void Disable(bool recursive = true)
         {
-            Enabled = false;
-            if (Next != null)
+            base.Disable();
+            active = false;
+            if (recursive && Next != null)
                 Next.Disable();
+            Next = null;
             if (collision.Check(target) == 1)
                 collision.Set(null, target);
-            Next = null;
             ResetDirection();
             Graphic.X = 0;
             Graphic.Y = 0;

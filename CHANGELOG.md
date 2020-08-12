@@ -2,6 +2,22 @@
 I use changelog as a brain dump where I explain future plans and further explain commit messages. I hope it shows my enthusiasm for programming and the amount of thought and care put into the project.
 
 
+# 12.08.2020
+- Fix block crash and faulty object disabling
+    - The root cause for the crashes were that I didn't set blocks firstModule to null when disabling it, because of that after every block had been used one they would spawn incorrectly as part of their spawning logic relies on firstModule being null.
+        - I fixed it as part of improving pooling system, we now use base() more often and id is readonly as it was supposed to be.
+            - Removed HasAvailability as it was only used by Block and it's not as relevant as it used to be.
+            - Renamed Pooler: Sort() -> Defragment() and Poolable(s): Enable -> Active.
+                - Also Active = false is now the same as Disable().
+                    - Moving worms to a tilemap-module hybrid (graphics owned by worm, not modules) will remove the need for Poolable.Active to be virtual.
+            - Also fixed a faulty edge-case logic (line 142 EnableIndex == endIndex is also true when the pool only has one object available)
+            - Rewrote the documentation in a way that it uses common programming concepts instead of concepts I've created. (poolable -> object)
+            - Player enabling is less hacky.
+            - I'll have to see if I can get rid of Id once blocks have been moved to a tilemap based system.
+    - Renamed Mathf -> FastMath
+        - Got rid of unnecessary functions.
+
+
 # 11.08.2020
 - Add collision visualization toggle
     - Brought back concept.svg
