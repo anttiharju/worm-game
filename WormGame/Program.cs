@@ -11,16 +11,7 @@ namespace WormGame
     /// </summary>
     public class Program
     {
-        private static readonly Config config;
-
-
-        /// <summary>
-        /// Static constructor to initialize configuration.
-        /// </summary>
-        static Program()
-        {
-            config = new Config();
-        }
+        private static Config config;
 
 
         /// <summary>
@@ -28,6 +19,7 @@ namespace WormGame
         /// </summary>
         public static void Main()
         {
+            config = new Config();
             Game game = new Game("Worm Blocks", config.windowWidth, config.windowHeight, config.refreshRate, config.fullscreen)
             {
                 WindowResize = false,

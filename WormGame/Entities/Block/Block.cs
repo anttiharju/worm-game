@@ -23,21 +23,24 @@ namespace WormGame.Entities
         private int left;
         private int bottom;
         private int right;
-
+        private int width;
+        private int height;
 
         /// <summary>
         /// Block color.
         /// </summary>
-        public new Color Color { get; private set; }
+        public Color Color { get; private set; }
 
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public Block(Config config, int id) : base(id)
+        public Block(Config config)
         {
             collision = config.collision;
+            width = config.width;
+            height = config.height;
 #if DEBUG
             disableBlocks = config.disableBlocks;
 #endif
@@ -55,10 +58,10 @@ namespace WormGame.Entities
             SetPosition(worm.firstModule.Target);
             Color = worm.Color;
             top = 0;
-            left = collision.Width;
-            bottom = collision.Height;
+            left = width;
+            bottom = height;
             right = 0;
-            if (SetBlockBuffer(worm, 1))
+            if (SetBlockBuffer(worm))
             {
                 SetBlockBuffer(worm, 0, false);
                 Disable();
@@ -146,7 +149,7 @@ namespace WormGame.Entities
         {
             int yScale = FastMath.Round(lastModule.Graphic.ScaleY);
             int xPos = x + FastMath.Round(lastModule.Graphic.ScaleX);
-            if (xPos >= collision.Width) return false;
+            if (xPos >= width) return false;
             for (int yPos = y; yPos > y - yScale; yPos--)
                 if (collision.blockBuffer[xPos, yPos] != 1)
                     return false;
@@ -182,11 +185,11 @@ namespace WormGame.Entities
         /// Copies worm position data to a buffer which is used to optimize blockModule usage.
         /// </summary>
         /// <param name="worm">Worm</param>
-        /// <param name="n">1, used to keep track wheter or not that part of worm has been handled</param>
+        /// <param name="n">Keeps track wheter or not that part of worm has been handled</param>
         /// <param name="initialize">Get for loop edges and destroy neighbours</param>
         /// <param name="setCollision">Set to collision field</param>
         /// <returns>To disable or not based on neighbours</returns>
-        private bool SetBlockBuffer(Worm worm, int n, bool initialize = true, bool setCollision = false)
+        private bool SetBlockBuffer(Worm worm, int n = 1, bool initialize = true, bool setCollision = false)
         {
             WormModule wormModule = worm.firstModule;
             bool disable = false;
@@ -232,8 +235,8 @@ namespace WormGame.Entities
                 int currentY = y + yPositions[i];
                 if (currentX >= 0 &&
                     currentY >= 0 &&
-                    currentX < collision.Width &&
-                    currentY < collision.Height)
+                    currentX < width &&
+                    currentY < height)
                     if (CheckNeighbour(currentX, currentY))
                         disable = true;
             }
@@ -251,7 +254,7 @@ namespace WormGame.Entities
         {
             PoolableEntity cell = collision.Get(x, y);
             if (cell is Block block)
-                if (Id != block.Id)
+                if (!ReferenceEquals(this, block))
                     if (Help.Equal(block.Color, Color))
                     {
                         block.Disable();

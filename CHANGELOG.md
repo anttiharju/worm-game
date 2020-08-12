@@ -3,6 +3,30 @@ I use changelog as a brain dump where I explain future plans and further explain
 
 
 # 12.08.2020
+- Cleanup
+    - Moved leftBorder and topBorder from collision to config
+        - Finally found out why I was having such a hard time with blockModule scaling: topBorder was in reality bottomBorder, meaning everything was upside down. I wonder how I made it work regardless of that.
+    - Collision
+        - UnknowEntityException
+            - I didn't like having Exception("Unknown entity") everywhere so I did this.
+            - I included it in the same file as it's quite small
+        - We now have names for different types of collidables. Functionally the same, but the code is more readable.
+            - We probably will have to integrate it more thightly to layers once we have entity managers using tilemaps.
+    - Pooling
+        - Pooler
+            - Sorted methods to alphabetical order.
+            - Defragment method no longer virtual as inherting will not be supported.
+                - I scrapped the original idea for custom poolers to avoid unnecessary complexity and to have less code to maintain.
+                    - Going with entity managers (see blockManager) instead.
+        - Poolables
+            - Removed identifiers as ReferenceEquals was enough.
+            - PoolablesEntity
+                - Removed Color because not every entity needs it and ones that do override it anyway.
+                - Add method is no longer virtual (never should have been)
+                    - I always thought override was overwrite but turns out it's not
+                        - huh
+
+
 - Fix block crash and faulty object disabling
     - The root cause for the crashes were that I didn't set blocks firstModule to null when disabling it, because of that after every block had been used one they would spawn incorrectly as part of their spawning logic relies on firstModule being null.
         - I fixed it as part of improving pooling system, we now use base() more often and id is readonly as it was supposed to be.
@@ -47,6 +71,7 @@ I use changelog as a brain dump where I explain future plans and further explain
     - More unrelated thoughts:
         - If I went with the Surface with no autoclear approach to worm rendering, I probably should Implement a separate eraser system which could use the current block scaler for erasing disappearing blocks and worms.
             - This approach would probably cause lots of unnecessary complexity but I still kind of want to explore it as there are nice performance gains to be had.
+
 - Cleanup
     - File organization (GameObject -> Entity, Entity/Block, Entity/Worm)
     - Pooling

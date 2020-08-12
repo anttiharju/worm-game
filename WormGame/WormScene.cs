@@ -24,6 +24,7 @@ namespace WormGame
         private readonly Pooler<Block> blocks;
         private readonly Pooler<WormModule> wormModules;
         private readonly Pooler<BlockModule> blockModules;
+        private readonly BlockManager blockManager;
         private readonly float stepAccuracy;
         private readonly int wormCap;
 
@@ -41,13 +42,14 @@ namespace WormGame
             collision = config.collision;
             stepAccuracy = config.step / 2;
             wormFrequency = config.size - config.step;
-            CreateBorders();
+            CreateBorders(config.width, config.height);
             worms = new Pooler<Worm>(this, config, config.wormAmount);
             blocks = new Pooler<Block>(this, config, config.moduleAmount);
             fruits = new Pooler<Fruit>(this, config, config.fruitAmount);
             players = new Pooler<Player>(this, config, 5);
             wormModules = new Pooler<WormModule>(this, config, config.moduleAmount);
             blockModules = new Pooler<BlockModule>(this, config, config.moduleAmount);
+            blockManager = new BlockManager(this, config);
             Start();
         }
 
@@ -84,6 +86,7 @@ namespace WormGame
             System.Console.Clear();
             System.Console.WriteLine("[ Otter is running in debug mode! ]");
 #endif
+            System.GC.Collect();
         }
 
 
@@ -93,6 +96,7 @@ namespace WormGame
         /// <param name="position">Player position</param>
         /// <param name="range">Maximum distance from position to worm</param>
         /// <returns>Worm or null</returns>
+        /// TODO: Optimize using collision.
         public Worm NearestWorm(Vector2 position, float range)
         {
             Worm nearestWorm = null;
@@ -127,13 +131,13 @@ namespace WormGame
                 wormFrequency = 0;
                 if (wormAmount < wormCap)
                 {
-                    Vector2 random = Random.ValidPosition(collision, config.width, config.height, 4);
+                    Vector2 random = Random.ValidPosition(collision, config.width, config.height, collision.empty);
                     if (random.X != -1)
                         SpawnWorm(collision.X(random.X), collision.Y(random.Y));
                     else
                     {
-                        random = Random.ValidPosition(collision, config.width, config.height, 3);
-                        if (random.X != -1 && collision.Check(random) == 3)
+                        random = Random.ValidPosition(collision, config.width, config.height, collision.fruit);
+                        if (random.X != -1 && collision.Check(random) == collision.fruit)
                         {
                             Fruit fruit = (Fruit)collision.Get(random);
                             fruit.Disable();
@@ -146,8 +150,6 @@ namespace WormGame
                         }
                     }
                 }
-                if (wormAmount == 0)
-                    Restart();
 #if DEBUG
                 if (config.visualizeCollision)
                     collision.VisualizeCollision();
@@ -214,13 +216,13 @@ namespace WormGame
         /// <summary>
         /// Creates a visible border for the field.
         /// </summary>
-        private void CreateBorders()
+        private void CreateBorders(int width, int height)
         {
-            Image backgroundGraphic = Image.CreateRectangle(collision.Width * config.size, collision.Height * config.size, Color.Black);
+            Image backgroundGraphic = Image.CreateRectangle(width * config.size, height * config.size, Color.None);
             backgroundGraphic.CenterOrigin();
             backgroundGraphic.OutlineColor = Color.White;
             backgroundGraphic.OutlineThickness = config.size / 6;
-            Otter.Core.Entity background = new Otter.Core.Entity(config.windowWidth / 2, config.windowHeight / 2, backgroundGraphic)
+            Entity background = new Entity(config.windowWidth / 2, config.windowHeight / 2, backgroundGraphic)
             {
                 Collidable = false
             };

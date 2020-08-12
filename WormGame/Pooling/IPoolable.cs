@@ -16,7 +16,7 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Add object to scene.
+        /// Adds object to scene.
         /// </summary>
         /// <param name="scene">Scene to add the entity to.</param>
         public abstract void Add(Scene scene);
@@ -27,11 +27,5 @@ namespace WormGame.Pooling
         /// </summary>
         /// <param name="recursive">Disable other related objects</param>
         public void Disable(bool recursive = true);
-
-
-        /// <summary>
-        /// Poolable identifier. Unique within the same pool.
-        /// </summary>
-        public int Id { get; }
     }
 }

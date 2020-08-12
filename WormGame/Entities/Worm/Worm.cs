@@ -45,7 +45,7 @@ namespace WormGame.Entities
         /// <summary>
         /// Get worm color.
         /// </summary>
-        public override Color Color { get { return firstModule.Graphic.Color ?? null; } }
+        public Color Color { get { return firstModule.Graphic.Color ?? null; } }
 
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace WormGame.Entities
         /// Constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public Worm(Config config, int id) : base(id)
+        public Worm(Config config)
         {
             size = config.size;
             step = config.step;
@@ -132,13 +132,13 @@ namespace WormGame.Entities
         Retry:
             target = firstModule.Target + Direction * size;
             int nextPosition = collision.Check(target, true);
-            if (nextPosition >= 3) // Move if next position is empty (4) or fruit (3).
+            if (nextPosition >= collision.fruit) // Move if next position is empty (4) or fruit (3).
             {
                 if (Length < LengthCap)
                     Length++;
                 else
                     collision.Set(null, lastModule.Target);
-                if (nextPosition == 3)
+                if (nextPosition == collision.fruit)
                     grow = true;
                 firstModule.DirectionFollow(direction);
                 firstModule.TargetFollow(target);

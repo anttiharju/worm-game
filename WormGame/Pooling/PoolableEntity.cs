@@ -13,10 +13,9 @@ namespace WormGame.Pooling
         /// <summary>
         /// Default constructor.
         /// </summary>
-        public PoolableEntity(int id)
+        public PoolableEntity()
         {
             Collidable = false;
-            Id = id;
         }
 
 
@@ -24,16 +23,10 @@ namespace WormGame.Pooling
         /// Add entity to the scene.
         /// </summary>
         /// <param name="scene">Scene</param>
-        public virtual void Add(Scene scene)
+        public void Add(Scene scene)
         {
             scene.Add(this);
         }
-
-
-        /// <summary>
-        /// Entity color.
-        /// </summary>
-        public virtual Color Color { get { return Graphic.Color ?? null; } set { Graphic.Color = value; } }
 
 
         /// <summary>
@@ -52,11 +45,5 @@ namespace WormGame.Pooling
         /// Is entity active.
         /// </summary>
         public bool Active { get { return Visible; } set { if (value) { AutoRender = true; AutoUpdate = true; Visible = true; } else Disable(); } }
-
-
-        /// <summary>
-        /// Identifier. Unique within the same pool.
-        /// </summary>
-        public int Id { get; }
     }
 }

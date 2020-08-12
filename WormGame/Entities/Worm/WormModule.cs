@@ -54,7 +54,7 @@ namespace WormGame.Entities
         /// Constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public WormModule(Config config, int id) : base(id)
+        public WormModule(Config config)
         {
             collision = config.collision;
             Graphic = Image.CreateCircle(config.size / 2);
@@ -144,7 +144,7 @@ namespace WormGame.Entities
             if (recursive && Next != null)
                 Next.Disable();
             Next = null;
-            if (collision.Check(target) == 1)
+            if (collision.Check(target) == collision.worm)
                 collision.Set(null, target);
             ResetDirection();
             Graphic.X = 0;
