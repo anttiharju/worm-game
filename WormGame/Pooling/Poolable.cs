@@ -4,51 +4,55 @@ using WormGame.Core;
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 10.08.2020
+    /// @version 12.08.2020
     /// <summary>
-    /// Class for poolable non-entity objects.
+    /// Base class for poolable non-entity objects.
     /// </summary>
     public class Poolable : IPoolable
     {
         /// <summary>
-        /// Config constructor. Simplifies Pooler generics.
+        /// Default constructor.
+        /// </summary>
+        /// <param name="id">Identifier</param>
+        public Poolable(int id) => Id = id;
+
+
+        /// <summary>
+        /// Constructor for testing purposes.
         /// </summary>
         /// <param name="config">Configuration</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Simplifies Pooler generics")]
-        public Poolable(Config config) { }
+        /// <param name="id">Identifier</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Simplifies pooler generics for testing.")]
+        public Poolable(Config config, int id) { }
 
 
         /// <summary>
-        /// Parameterless constructor so inheritors don't need base(config).
+        /// Only used by PoolableEntity, but by also existing here it simplifies Pooler generics.
         /// </summary>
-        public Poolable() { }
-
-
-        /// <summary>
-        /// Entity identifier. Ids are unique per pool.
-        /// </summary>
-        public int Id { get; set; }
-
-
-        /// <summary>
-        /// Get or set poolable status is in use or not.
-        /// </summary>
-        public virtual bool Enabled { get; set; }
+        /// <param name="scene">Scene to add poolable to</param>
+        public void Add(Scene scene) { }
 
 
         /// <summary>
         /// Disables poolable.
         /// </summary>
-        public virtual void Disable()
+        /// <param name="recursive">Disable recursively. False only when disabling is done by pooler.</param>
+        public virtual void Disable(bool recursive = true)
         {
-            Enabled = false;
+            active = false;
         }
 
 
         /// <summary>
-        /// Not used, but simplifies Pooler generics.
+        /// Is object active.
         /// </summary>
-        /// <param name="scene">Scene to add poolable to</param>
-        public void Add(Scene scene) { }
+        public virtual bool Active { get { return active; } set { if (value) active = true; else Disable(); } }
+        private bool active;
+
+
+        /// <summary>
+        /// Identifier. Unique within the same pool.
+        /// </summary>
+        public int Id { get; }
     }
 }

@@ -6,11 +6,11 @@ using WormGame.Core;
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 10.08.2020
+    /// @version 12.08.2020
     /// <summary>
-    /// Object pooler.
+    /// Object pooler. It's computationally cheaper to recycle objects by resetting their variables instead of destroying and creating a new ones.
     /// </summary>
-    /// <typeparam name="T">Poolable object type</typeparam>
+    /// <typeparam name="T">Object type</typeparam>
     public class Pooler<T> : IEnumerable where T : class, IPoolable
     {
         private readonly T[] pool;
@@ -18,13 +18,13 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// The index from where new poolables are enabled from.
+        /// Index to enable disabled objects from. Pool is full when the object at this index is enabled.
         /// </summary>
         public int EnableIndex { get; private set; }
 
 
         /// <summary>
-        /// Get pool length.
+        /// Returns pool capacity.
         /// </summary>
         public int Length { get { return pool.Length; } }
 
@@ -32,17 +32,16 @@ namespace WormGame.Pooling
         /// <summary>
         /// Initializes pool.
         /// </summary>
-        /// <param name="config">Configuration object</param>
-        /// <param name="size">Pool size</param>
-        public Pooler(Scene scene, Config config, int size)
+        /// <param name="config">Configuration</param>
+        /// <param name="capacity">Capacity</param>
+        public Pooler(Scene scene, Config config, int capacity)
         {
-            pool = new T[size];
-            endIndex = size - 1;
-            for (int i = 0; i < size; i++)
+            pool = new T[capacity];
+            endIndex = capacity - 1;
+            for (int i = 0; i < capacity; i++)
             {
-                T currentPoolable = (T)Activator.CreateInstance(typeof(T), new object[] { config });
-                currentPoolable.Enabled = false;
-                currentPoolable.Id = i;
+                T currentPoolable = (T)Activator.CreateInstance(typeof(T), new object[] { config, i });
+                currentPoolable.Disable(false);
                 pool[i] = currentPoolable;
                 currentPoolable.Add(scene);
             }
@@ -50,97 +49,83 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Enable a disabled poolable.
+        /// Enable a disabled object. Use object's Spawn method to configure it.
         /// </summary>
-        /// <returns>Enabled poolable</returns>
+        /// <returns>Enabled object</returns>
         public T Enable()
         {
-            if (EnableIndex == endIndex && pool[EnableIndex].Enabled)
-                if (Sort())
+            if (EnableIndex == endIndex && pool[EnableIndex].Active)
+                if (Defragment())
                     return null;
-            int newEntity = EnableIndex;
-            pool[newEntity].Enabled = true;
+            int enabled = EnableIndex;
+            pool[enabled].Active = true;
             if (EnableIndex != endIndex)
                 EnableIndex++;
-            return pool[newEntity];
+            return pool[enabled];
         }
 
 
         /// <summary>
-        /// Disables all entities in the pool.
+        /// Disables all pooler objects.
         /// </summary>
         public void Reset()
         {
             for (int i = EnableIndex; i >= 0; i--)
-                if (pool[i].Enabled)
-                    pool[i].Disable();
+                if (pool[i].Active)
+                    pool[i].Disable(false);
             EnableIndex = 0;
         }
 
 
         /// <summary>
-        /// Check if the pool has enough poolables available.
+        /// Defragments the pool so that enabled objects come first.
         /// </summary>
-        /// <param name="amount">Needed poolable amountd</param>
-        /// <returns>Is asked amount of poolables available</returns>
-        public bool HasAvailable(int amount)
-        {
-            if (EnableIndex <= Length - amount)
-                return true;
-            Sort();
-            return EnableIndex <= Length - amount;
-        }
-
-
-        /// <summary>
-        /// Sorts (defragments) the pool in a way that disabled poolables are at the end of the array, readily available to be enabled.
-        /// </summary>
-        /// <returns>Is pool fully utilized</returns>
+        /// <returns>Is pool full</returns>
         /// <example>
         /// Before: [.2.45]
         ///              ^
         /// After:  [524..]
         ///             ^
-        /// . = disabled, [number] = enabled, ^ = EnableIndex
+        /// . = disabled, [number] = enabled, ^ = EnablingIndex
         /// <pre name="test">
-        ///  Config testConfig = new Config();
-        ///  Pooler<PoolableObject> testPool = new Pooler<PoolableObject>(testConfig, 5);
-        ///  PoolableObject p1 = testPool.Enable();
-        ///  PoolableObject p2 = testPool.Enable();
-        ///  PoolableObject p3 = testPool.Enable();
-        ///  PoolableObject p4 = testPool.Enable();
-        ///  PoolableObject p5 = testPool.Enable();
+        ///  Scene scene = new Scene();
+        ///  Config config = new Config();
+        ///  Pooler<Poolable> pooler = new Pooler<Poolable>(scene, config, 5);
+        ///  Poolable p1 = pooler.Enable();
+        ///  Poolable p2 = pooler.Enable();
+        ///  Poolable p3 = pooler.Enable();
+        ///  Poolable p4 = pooler.Enable();
+        ///  Poolable p5 = pooler.Enable();
         ///  p1.Disable();
         ///  p3.Disable();
-        ///  testPool[0] === p1;
-        ///  testPool[1] === p2;
-        ///  testPool[2] === p3;
-        ///  testPool[3] === p4;
-        ///  testPool[4] === p5;
-        ///  testPool[5] === p5; #THROWS IndexOutOfRangeException
-        ///  testPool.EnableIndex === 4;
-        ///  testPool.HasAvailable(2) === true; // Triggers Sort()
-        ///  testPool.HasAvailable(3) === false;
-        ///  testPool.EnableIndex === 3;
-        ///  testPool[0] === p5;
-        ///  testPool[1] === p2;
-        ///  testPool[2] === p4;
-        ///  testPool[3] === p3;
-        ///  testPool[4] === p1;
+        ///  pooler[0] === p1;
+        ///  pooler[1] === p2;
+        ///  pooler[2] === p3;
+        ///  pooler[3] === p4;
+        ///  pooler[4] === p5;
+        ///  pooler[5] === p5; #THROWS IndexOutOfRangeException
+        ///  pooler.EnableIndex === 4;
+        ///  pooler.Defragment();
+        ///  pooler.EnableIndex === 3;
+        ///  pooler[0] === p5;
+        ///  pooler[1] === p2;
+        ///  pooler[2] === p4;
+        ///  pooler[3] === p3;
+        ///  pooler[4] === p1;
         /// </pre>
         /// </example>
-        public virtual bool Sort()
+        public virtual bool Defragment()
         {
             int current = 0;
             while (current < EnableIndex)
             {
-                if (pool[current].Enabled)
+                if (pool[current].Active)
                     current++;
                 else
                 {
                     for (int enabled = EnableIndex; enabled > current; enabled--)
                     {
-                        if (pool[enabled].Enabled)
+                        if (pool[enabled].Active)
                         {
                             T swap = pool[enabled];
                             pool[enabled] = pool[current];
@@ -154,8 +139,8 @@ namespace WormGame.Pooling
             }
 #if DEBUG
             ConsoleColor defaultColor = Console.ForegroundColor;
-            if (EnableIndex == endIndex)
-            {   // Sorting didn't free any poolables: pool is fully utilized. If this happens, it means your pool is not big enough.
+            if (pool[EnableIndex].Active)
+            {   // Pool is full. This can be intentional, but you can fix it by increasing pool capacity.
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.Write("[POOLER] ");
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -163,7 +148,7 @@ namespace WormGame.Pooling
                 Console.ForegroundColor = defaultColor;
             }
             else
-            {   // How many poolables are available to enable after sorting
+            {   // Tells how many objects pooler has available.
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.Write($"[POOLER] ");
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -172,12 +157,12 @@ namespace WormGame.Pooling
                 Console.WriteLine($"{pool.Length - EnableIndex,5}");
             }
 #endif
-            return EnableIndex == endIndex;
+            return pool[EnableIndex].Active;
         }
 
 
         /// <summary>
-        /// Enables us to foreach the pool.
+        /// Enables foreach'ing pooler.
         /// </summary>
         /// <returns>Pool enumerator</returns>
         public IEnumerator GetEnumerator()
@@ -187,10 +172,10 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Enables us to for-loop the pool. Also required for testing.
+        /// Enables for-loop'ing pooler. Also required for tests.
         /// </summary>
         /// <param name="i">Index</param>
-        /// <returns>Poolable at index</returns>
+        /// <returns>Object at index</returns>
         public T this[int i]
         {
             get { return pool[i]; }

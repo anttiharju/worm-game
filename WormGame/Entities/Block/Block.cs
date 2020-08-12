@@ -35,7 +35,7 @@ namespace WormGame.Entities
         /// Constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public Block(Config config)
+        public Block(Config config, int id) : base(id)
         {
             collision = config.collision;
 #if DEBUG
@@ -144,8 +144,8 @@ namespace WormGame.Entities
         /// <returns>Was the module scaled or not</returns>
         private bool ScaleX(int x, int y)
         {
-            int yScale = Mathf.FastRound(lastModule.Graphic.ScaleY);
-            int xPos = x + Mathf.FastRound(lastModule.Graphic.ScaleX);
+            int yScale = FastMath.Round(lastModule.Graphic.ScaleY);
+            int xPos = x + FastMath.Round(lastModule.Graphic.ScaleX);
             if (xPos >= collision.Width) return false;
             for (int yPos = y; yPos > y - yScale; yPos--)
                 if (collision.blockBuffer[xPos, yPos] != 1)
@@ -165,8 +165,8 @@ namespace WormGame.Entities
         /// <returns>Was the module scaled or not</returns>
         private bool ScaleY(int x, int y)
         {
-            int xScale = Mathf.FastRound(lastModule.Graphic.ScaleX);
-            int yPos = y - Mathf.FastRound(lastModule.Graphic.ScaleY);
+            int xScale = FastMath.Round(lastModule.Graphic.ScaleX);
+            int yPos = y - FastMath.Round(lastModule.Graphic.ScaleY);
             if (yPos < 0) return false;
             for (int xPos = x; xPos < x + xScale; xPos++)
                 if (collision.blockBuffer[xPos, yPos] != 1)
@@ -264,12 +264,14 @@ namespace WormGame.Entities
         /// <summary>
         /// Disable entity.
         /// </summary>
-        public override void Disable()
+        /// <param name="recursive">Disable recursively. False only when disabling is done by pooler.</param>
+        public override void Disable(bool recursive = true)
         {
-            if (firstModule != null)
+            base.Disable();
+            if (recursive && firstModule != null)
                 firstModule.Disable();
+            firstModule = null;
             ClearGraphics();
-            Enabled = false;
         }
     }
 }
