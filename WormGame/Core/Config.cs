@@ -14,7 +14,7 @@ namespace WormGame.Core
         public readonly Collision collision;
 #if DEBUG
         public bool visualizeCollision = false;   // 119x29 fits in debug console
-        public bool disableBlocks = false;         // For benchmarking purposes
+        public bool disableBlocks = true;         // For benchmarking purposes
 #endif
 
         // Window
@@ -24,28 +24,36 @@ namespace WormGame.Core
         public readonly int refreshRate = 144;    // See wormSpeed before changing this
 
         // Scene
-        public readonly int width = 40;
-        public readonly int height = 20;
+        public readonly int width = 20;
+        public readonly int height = 10;
         public readonly int margin = 2;
 
         // Worm
         public readonly int wormCap = 0;           // Overrides wormPercentage if > 0.
-        public readonly int wormSpeed = 144;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
-        public readonly int minWormLength = 1;
+        public readonly int wormSpeed = 6;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
+        public readonly int minWormLength = 8;
         public readonly float wormPercentage = 1;
 
         // Fruit
-        public readonly bool fruits = true;
+        public readonly bool fruits = false;
         public readonly float fruitPercentage = 0.15f;
 
-        // Dynamic values
+        #region Calculated variables
+        // Amounts
         public readonly int fruitAmount;
         public readonly int wormAmount;
         public readonly int warningAmount;
         public readonly int moduleAmount;
+
+        // Misc
         public readonly float step;
         public readonly int size;
+        public readonly int halfSize;
 
+        // Scene
+        public readonly int leftBorder;
+        public readonly int topBorder;
+        #endregion
 
         /// <summary>
         /// Calculates dynamic values and initializes collision field.
@@ -128,7 +136,7 @@ namespace WormGame.Core
 
             // Safeguards
             if (windowWidth < 800) windowWidth = 800;
-            if (windowHeight < 800) windowHeight = 600;
+            if (windowHeight < 600) windowHeight = 600;
             if (width < 2) width = 2;
             if (height < 2) height = 2;
             if (minWormLength < 1) minWormLength = 1;
@@ -154,9 +162,15 @@ namespace WormGame.Core
 
             // Other
             size = CalculateSize(windowWidth, windowHeight);
+            halfSize = size / 2;
+            leftBorder = windowWidth / 2 - width / 2 * size;
+            topBorder = windowHeight / 2 - height / 2 * size;
+            if (width % 2 == 0) leftBorder += size / 2;
+            if (height % 2 == 0) topBorder += size / 2;
             step = (float)wormSpeed / refreshRate * size;
             collision = new Collision(this);
             scene = new WormScene(this);
+
         }
 
 

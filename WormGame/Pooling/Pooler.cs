@@ -18,18 +18,6 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Index to enable disabled objects from. Pool is full when the object at this index is enabled.
-        /// </summary>
-        public int EnableIndex { get; private set; }
-
-
-        /// <summary>
-        /// Returns pool capacity.
-        /// </summary>
-        public int Length { get { return pool.Length; } }
-
-
-        /// <summary>
         /// Initializes pool.
         /// </summary>
         /// <param name="config">Configuration</param>
@@ -40,7 +28,7 @@ namespace WormGame.Pooling
             endIndex = capacity - 1;
             for (int i = 0; i < capacity; i++)
             {
-                T currentPoolable = (T)Activator.CreateInstance(typeof(T), new object[] { config, i });
+                T currentPoolable = (T)Activator.CreateInstance(typeof(T), new object[] { config });
                 currentPoolable.Disable(false);
                 pool[i] = currentPoolable;
                 currentPoolable.Add(scene);
@@ -49,36 +37,7 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Enable a disabled object. Use object's Spawn method to configure it.
-        /// </summary>
-        /// <returns>Enabled object</returns>
-        public T Enable()
-        {
-            if (EnableIndex == endIndex && pool[EnableIndex].Active)
-                if (Defragment())
-                    return null;
-            int enabled = EnableIndex;
-            pool[enabled].Active = true;
-            if (EnableIndex != endIndex)
-                EnableIndex++;
-            return pool[enabled];
-        }
-
-
-        /// <summary>
-        /// Disables all pooler objects.
-        /// </summary>
-        public void Reset()
-        {
-            for (int i = EnableIndex; i >= 0; i--)
-                if (pool[i].Active)
-                    pool[i].Disable(false);
-            EnableIndex = 0;
-        }
-
-
-        /// <summary>
-        /// Defragments the pool so that enabled objects come first.
+        /// Defragments the pool in a way that puts enabled objects at the beginning of the pool array.
         /// </summary>
         /// <returns>Is pool full</returns>
         /// <example>
@@ -114,7 +73,7 @@ namespace WormGame.Pooling
         ///  pooler[4] === p1;
         /// </pre>
         /// </example>
-        public virtual bool Defragment()
+        public bool Defragment()
         {
             int current = 0;
             while (current < EnableIndex)
@@ -162,7 +121,30 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Enables foreach'ing pooler.
+        /// Enable a disabled object. Use object's Spawn method to configure it.
+        /// </summary>
+        /// <returns>Enabled object</returns>
+        public T Enable()
+        {
+            if (EnableIndex == endIndex && pool[EnableIndex].Active)
+                if (Defragment())
+                    return null;
+            int enabled = EnableIndex;
+            pool[enabled].Active = true;
+            if (EnableIndex != endIndex)
+                EnableIndex++;
+            return pool[enabled];
+        }
+
+
+        /// <summary>
+        /// Index from where to enable a disabled object. If the object is already enabled the pool is full.
+        /// </summary>
+        public int EnableIndex { get; private set; }
+
+
+        /// <summary>
+        /// Enables the usage of foreach.
         /// </summary>
         /// <returns>Pool enumerator</returns>
         public IEnumerator GetEnumerator()
@@ -172,13 +154,31 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Enables for-loop'ing pooler. Also required for tests.
+        /// Indexer. Enables the usage of for loop. Required for testing purposes.
         /// </summary>
         /// <param name="i">Index</param>
         /// <returns>Object at index</returns>
         public T this[int i]
         {
             get { return pool[i]; }
+        }
+
+
+        /// <summary>
+        /// Returns pool capacity.
+        /// </summary>
+        public int Length { get { return pool.Length; } }
+
+
+        /// <summary>
+        /// Disables all pooler objects.
+        /// </summary>
+        public void Reset()
+        {
+            for (int i = EnableIndex; i >= 0; i--)
+                if (pool[i].Active)
+                    pool[i].Disable(false);
+            EnableIndex = 0;
         }
     }
 }
