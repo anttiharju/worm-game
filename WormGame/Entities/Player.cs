@@ -27,7 +27,7 @@ namespace WormGame.Entities
         /// Constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public Player(Config config, int id) : base(id)
+        public Player(Config config)
         {
             Image image = Image.CreateCircle(config.size / 3);
             image.OutlineThickness = config.size / 15;

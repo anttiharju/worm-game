@@ -7,38 +7,25 @@ using WormGame.Entities;
 namespace WormGame.Core
 {
     /// @author Antti Harju
-    /// @version 28.07.2020
+    /// @version 12.08.2020
     /// <summary>
-    /// Collision field. Stays performant with large fields.
+    /// Collision system.
     /// </summary>
     public class Collision
     {
+        public readonly int[,] blockBuffer;
+        public readonly int invalid = 0;
+        public readonly int worm = 1;
+        public readonly int block = 2;
+        public readonly int fruit = 3;
+        public readonly int empty = 4;
+
         private readonly PoolableEntity[,] collision;
         private readonly int leftBorder;
         private readonly int topBorder;
         private readonly int size;
-
-        public readonly int[,] blockBuffer;
-
-        /// Collision values exist to improve code readability and maintainablility. Values >= 0 are reserved for blocks.
-        #region Collision values
-        public int WormValue { get { return -1; } }
-        public int InvalidValue { get { return -2; } }
-        public int FruitValue { get { return -3; } }
-        public int FreeValue { get { return -4; } }
-        #endregion
-
-
-        /// <summary>
-        /// Collision field width.
-        /// </summary>
-        public int Width { get; }
-
-
-        /// <summary>
-        /// Collision field height.
-        /// </summary>
-        public int Height { get; }
+        private readonly int width;
+        private readonly int height;
 
 
         /// <summary>
@@ -50,17 +37,13 @@ namespace WormGame.Core
         /// <param name="margin">Field margin</param>
         public Collision(Config config)
         {
-            Width = config.width;
-            Height = config.height;
+            width = config.width;
+            height = config.height;
             size = config.size;
-            collision = new PoolableEntity[Width, Height];
-            blockBuffer = new int[Width, Height];
-            leftBorder = config.windowWidth / 2 - Width / 2 * size;
-            topBorder = config.windowHeight / 2 + Height / 2 * size;
-            if (Width % 2 == 0)
-                leftBorder += size / 2;
-            if (Height % 2 == 0)
-                topBorder -= size / 2;
+            collision = new PoolableEntity[width, height];
+            blockBuffer = new int[width, height];
+            leftBorder = config.leftBorder;
+            topBorder = config.topBorder;
         }
 
 
@@ -92,29 +75,29 @@ namespace WormGame.Core
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
-        /// <param name="consume">Consume fruits</param>
-        /// <returns>0 out of bounds, 1 worm, 2 block, 3 fruit, 4 empty</returns>
+        /// <param name="consume">Consume fruit</param>
+        /// <returns>invalid 0, worm 1, block 2, fruit 3, empty 4</returns>
         public int Check(int x, int y, bool consume = false)
         {
             if (x < 0 ||
                 y < 0 ||
-                x >= Width ||
-                y >= Height)
-                return 0;
+                x >= width ||
+                y >= height)
+                return invalid;
             PoolableEntity current = collision[x, y];
             if (current == null)
-                return 4;
-            if (current is Worm)
-                return 1;
+                return empty;
             if (current is Block)
-                return 2;
+                return block;
+            if (current is Worm)
+                return worm;
             if (current is Fruit fruit)
             {
                 if (consume)
                     fruit.Spawn();
-                return 3;
+                return this.fruit;
             }
-            throw new Exception("Unknown collision entity.");
+            throw new UnknownEntityException();
         }
 
 
@@ -122,8 +105,8 @@ namespace WormGame.Core
         /// Check a cell from field. Returns numbers instead of strings so we can use > < operators.
         /// </summary>
         /// <param name="target">Entity position</param>
-        /// <param name="consume">Consume fruits</param>
-        /// <returns>0 out of bounds, 1 worm, 2 block, 3 fruit, 4 empty</returns>
+        /// <param name="consume">Consume fruit</param>
+        /// <returns>out of bounds is 0, worm is 1, block is 2, fruit is 3, empty is 4</returns>
         public int Check(Vector2 target, bool consume = false)
         {
             return Check(X(target.X), Y(target.Y), consume);
@@ -183,7 +166,7 @@ namespace WormGame.Core
         /// <returns>Vertical field position</returns>
         public int Y(float y)
         {
-            return (topBorder - FastMath.Round(y)) / size;
+            return (FastMath.Round(y) - topBorder) / size;
         }
 
 
@@ -205,7 +188,7 @@ namespace WormGame.Core
         /// <returns>Vertical entity position</returns>
         public int EntityY(int y)
         {
-            return topBorder - size * y;
+            return topBorder + size * y;
         }
 
 
@@ -214,8 +197,8 @@ namespace WormGame.Core
         /// </summary>
         public void Reset()
         {
-            for (int x = 0; x < Width; x++)
-                for (int y = 0; y < Height; y++)
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
                 {
                     collision[x, y] = null;
                 }
@@ -226,11 +209,11 @@ namespace WormGame.Core
         /// </summary>
         public void VisualizeCollision()
         {
-            for (int y = 0; y < Height; y++)
+            for (int y = 0; y < height; y++)
             {
-                Console.CursorTop = Height - y;
-                System.Text.StringBuilder line = new System.Text.StringBuilder(Width);
-                for (int x = 0; x < Width; x++)
+                Console.CursorTop = y;
+                System.Text.StringBuilder line = new System.Text.StringBuilder(width);
+                for (int x = 0; x < width; x++)
                 {
                     PoolableEntity current = collision[x, y];
                     if (current == null)
@@ -253,13 +236,25 @@ namespace WormGame.Core
                         line.Append('f');
                         continue;
                     }
-                    throw new Exception("Unknown collision entity.");
+                    throw new UnknownEntityException();
                 }
                 Console.WriteLine(line.ToString());
             }
             Console.CursorLeft = 0;
-            Console.CursorTop = Height + 1;
+            Console.CursorTop = height + 1;
         }
 #endif
+    }
+
+
+    /// <summary>
+    /// Exception to use when entity is unknown.
+    /// </summary>
+    public class UnknownEntityException : Exception
+    {
+        /// <summary>
+        /// Constructor. Creates custom exception message.
+        /// </summary>
+        public UnknownEntityException() : base("Unknown entity.") { }
     }
 }

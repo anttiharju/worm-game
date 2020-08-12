@@ -16,11 +16,12 @@ namespace WormGame.Static
 
 
         /// <summary>
-        /// Check if two colors are the same. Otter doesn't implement one properly so I have to use my own.
+        /// Check if two colors are the same. Otter doesn't have one so I made this.
         /// </summary>
         /// <param name="a">Color a</param>
         /// <param name="b">Color b</param>
         /// <returns>Are the two colors the same (ignores alpha)</returns>
+        /// TODO: Contribute to Otter? But in a way that == operator works.
         public static bool Equal(Color a, Color b)
         {
             if (a.R == b.R && a.G == b.G && a.B == b.B)
@@ -39,7 +40,7 @@ namespace WormGame.Static
         public static bool ValidateDirection(Collision collision, Vector2 target, int size, Vector2 direction)
         {
             target += direction * size;
-            return collision.Check(collision.X(target.X), collision.Y(target.Y)) >= 3;
+            return collision.Check(collision.X(target.X), collision.Y(target.Y)) >= collision.fruit;
         }
     }
 }

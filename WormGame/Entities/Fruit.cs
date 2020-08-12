@@ -22,8 +22,8 @@ namespace WormGame.Entities
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="config"></param>
-        public Fruit(Config config, int id) : base(id)
+        /// <param name="config">Configuration</param>
+        public Fruit(Config config)
         {
             collision = config.collision;
             width = config.width;
@@ -42,8 +42,8 @@ namespace WormGame.Entities
         /// <returns>Fruit or null</returns>
         public Fruit Spawn()
         {
-            Vector2 random = Random.ValidPosition(collision, width, height, 4);
-            if (random.X == -1 || collision.Check(random) != 4)
+            Vector2 random = Random.ValidPosition(collision, width, height, collision.empty);
+            if (random.X == -1)
             {
                 Disable();
                 return null;
