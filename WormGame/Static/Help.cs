@@ -5,7 +5,7 @@ using WormGame.Core;
 namespace WormGame.Static
 {
     /// @author Antti Harju
-    /// @version 29.07.2020
+    /// @version 12.08.2020
     /// <summary>
     /// Class for static things that don't belong anywhere else.
     /// </summary>
@@ -20,7 +20,7 @@ namespace WormGame.Static
         /// </summary>
         /// <param name="a">Color a</param>
         /// <param name="b">Color b</param>
-        /// <returns>Is a the same color as b? (alpha ignored)</returns>
+        /// <returns>Are the two colors the same (ignores alpha)</returns>
         public static bool Equal(Color a, Color b)
         {
             if (a.R == b.R && a.G == b.G && a.B == b.B)

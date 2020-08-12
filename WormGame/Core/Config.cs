@@ -24,19 +24,19 @@ namespace WormGame.Core
         public readonly int refreshRate = 144;    // See wormSpeed before changing this
 
         // Scene
-        public readonly int width = 20;
-        public readonly int height = 10;
-        public readonly int margin = 3;
+        public readonly int width = 40;
+        public readonly int height = 20;
+        public readonly int margin = 2;
 
         // Worm
         public readonly int wormCap = 0;           // Overrides wormPercentage if > 0.
-        public readonly int wormSpeed = 144;       // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
-        public readonly int minWormLength = 3;
-        public readonly float wormPercentage = 0.1f;
+        public readonly int wormSpeed = 144;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
+        public readonly int minWormLength = 1;
+        public readonly float wormPercentage = 1;
 
         // Fruit
-        public readonly bool fruits = false;
-        public readonly float fruitPercentage = 0.01f;
+        public readonly bool fruits = true;
+        public readonly float fruitPercentage = 0.15f;
 
         // Dynamic values
         public readonly int fruitAmount;
@@ -147,7 +147,7 @@ namespace WormGame.Core
                 wormAmount = wormCap;
             else
             {
-                wormAmount = Mathf.FastRound(moduleAmount / minWormLength * wormPercentage);
+                wormAmount = FastMath.Round(moduleAmount / minWormLength * wormPercentage);
                 wormCap = wormAmount;
             }
             wormAmount *= 2; // Every worm might turn into a block simultaneously
@@ -170,9 +170,22 @@ namespace WormGame.Core
         {
             int xSize = windowWidth / (width + margin * 2);
             int ySize = windowHeight / (height + margin * 2);
-            int size = Mathf.Smaller(xSize, ySize);
+            int size = Smaller(xSize, ySize);
             if (size % 2 != 0) size--;
             return size;
+        }
+
+
+        /// <summary>
+        /// Returns smaller number.
+        /// </summary>
+        /// <param name="a">Number a</param>
+        /// <param name="b">Number b</param>
+        /// <returns>Smaller number</returns>
+        private int Smaller(int a, int b)
+        {
+            if (a < b) return a;
+            return b;
         }
     }
 }

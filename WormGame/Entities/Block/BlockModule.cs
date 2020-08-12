@@ -10,7 +10,6 @@ namespace WormGame.Entities
     /// <summary>
     /// BlockModule. Scaled as needed by Block.
     /// </summary>
-    /// TODO: Fix Disable stackoverflow
     public class BlockModule : Poolable
     {
         private readonly Collision collision;
@@ -36,15 +35,15 @@ namespace WormGame.Entities
         /// <summary>
         /// Enable the entity.
         /// </summary>
-        public override bool Enabled { get { return enabled; } set { enabled = value; Graphic.Visible = value; } }
-        private bool enabled;
+        public override bool Active { get { return active; } set { if (value) { active = true; Graphic.Visible = true; } else Disable(); } }
+        private bool active;
 
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="config">Configuration.</param>
-        public BlockModule(Config config)
+        public BlockModule(Config config, int id) : base(id)
         {
             collision = config.collision;
             size = config.size;
@@ -75,17 +74,19 @@ namespace WormGame.Entities
         /// <summary>
         /// Recursively disables all modules and removes them from collision.
         /// </summary>
-        public override void Disable()
+        /// <param name="recursive">Disable recursively. False only when disabling is done by pooler.</param>
+        public override void Disable(bool recursive = true)
         {
-            if (Next != null)
+            base.Disable();
+            active = false;
+            if (recursive && Next != null)
                 Next.Disable();
             Next = null;
-            int endX = startX + Mathf.FastRound(Graphic.ScaleX);
-            int endY = startY - Mathf.FastRound(Graphic.ScaleY);
+            int endX = startX + FastMath.Round(Graphic.ScaleX);
+            int endY = startY - FastMath.Round(Graphic.ScaleY);
             for (int x = startX; x < endX; x++)
                 for (int y = startY; y > endY; y--)
                     collision.Set(null, x, y);
-            Enabled = false;
             Graphic.Scale = 1;
         }
     }
