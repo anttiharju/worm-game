@@ -1,7 +1,6 @@
 ﻿using Otter.Graphics;
 using Otter.Graphics.Drawables;
 using Otter.Utility.MonoGame;
-using System.ComponentModel.Design;
 using WormGame.Core;
 using WormGame.Pooling;
 

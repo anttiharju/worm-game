@@ -13,12 +13,12 @@ namespace WormGame.Pooling
     /// <typeparam name="T">Object type</typeparam>
     public class Pooler<T> : IEnumerable where T : class, IPoolable
     {
-        private readonly T[] pool;
-        private readonly int endIndex;
+        protected T[] pool;
+        protected int endIndex;
 
 
         /// <summary>
-        /// Initializes pool.
+        /// Default constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
         /// <param name="capacity">Capacity</param>
@@ -34,6 +34,12 @@ namespace WormGame.Pooling
                 currentPoolable.Add(scene);
             }
         }
+
+
+        /// <summary>
+        /// Base constructor for custom poolers.
+        /// </summary>
+        public Pooler() { }
 
 
         /// <summary>
@@ -64,8 +70,10 @@ namespace WormGame.Pooling
         ///  pooler[4] === p5;
         ///  pooler[5] === p5; #THROWS IndexOutOfRangeException
         ///  pooler.EnableIndex === 4;
+        ///  pooler[pooler.EnableIndex].Active === true;
         ///  pooler.Defragment();
         ///  pooler.EnableIndex === 3;
+        ///  pooler[pooler.EnableIndex].Active === false;
         ///  pooler[0] === p5;
         ///  pooler[1] === p2;
         ///  pooler[2] === p4;
@@ -140,7 +148,7 @@ namespace WormGame.Pooling
         /// <summary>
         /// Index from where to enable a disabled object. If the object is already enabled the pool is full.
         /// </summary>
-        public int EnableIndex { get; private set; }
+        public int EnableIndex { get; protected set; }
 
 
         /// <summary>
@@ -173,7 +181,7 @@ namespace WormGame.Pooling
         /// <summary>
         /// Disables all pooler objects.
         /// </summary>
-        public void Reset()
+        public virtual void Reset()
         {
             for (int i = EnableIndex; i >= 0; i--)
                 if (pool[i].Active)

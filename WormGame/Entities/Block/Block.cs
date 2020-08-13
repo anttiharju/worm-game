@@ -2,6 +2,7 @@
 using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
+using System;
 
 namespace WormGame.Entities
 {
@@ -10,12 +11,15 @@ namespace WormGame.Entities
     /// <summary>
     /// Block class.
     /// </summary>
-    public class Block : PoolableEntity
+    public class Block : Poolable
     {
 #if DEBUG
         private readonly bool disableBlocks;
 #endif
         private readonly Collision collision;
+        private readonly BlockManager manager;
+        private readonly int width;
+        private readonly int height;
 
         private BlockModule firstModule;
         private BlockModule lastModule;
@@ -23,22 +27,22 @@ namespace WormGame.Entities
         private int left;
         private int bottom;
         private int right;
-        private int width;
-        private int height;
 
         /// <summary>
         /// Block color.
         /// </summary>
+        /// TODO: use firstmodule or worm.color?
         public Color Color { get; private set; }
 
 
         /// <summary>
-        /// Constructor.
+        /// Default constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public Block(Config config)
+        public Block(Config config, BlockManager manager)
         {
             collision = config.collision;
+            this.manager = manager;
             width = config.width;
             height = config.height;
 #if DEBUG
@@ -51,15 +55,14 @@ namespace WormGame.Entities
         /// Spawns the block and optimizes module usage.
         /// </summary>
         /// <param name="worm">Worm</param>
-        /// <param name="blockModules">Module pooler</param>
+        /// <param name="manager">Module pooler</param>
         /// <returns>Block</returns>
-        public Block Spawn(Worm worm, Pooler<BlockModule> blockModules)
+        public Block Spawn(Worm worm, BlockManager manager)
         {
-            SetPosition(worm.firstModule.Target);
             Color = worm.Color;
-            top = 0;
-            left = width;
             bottom = height;
+            left = width;
+            top = 0;
             right = 0;
             if (SetBlockBuffer(worm))
             {
@@ -67,24 +70,25 @@ namespace WormGame.Entities
                 Disable();
                 return null;
             }
-            for (int y = top; y >= bottom; y--)
+            for (int y = bottom; y <= top; y++)
                 for (int x = left; x <= right; x++)
-                    if (collision.blockBuffer[x, y] == 1)
+                    if (manager.blockBuffer[x, y] == 1)
                     {
                         if (firstModule == null)
                         {
-                            lastModule = blockModules.Enable().Spawn(this, collision.EntityX(x) - X, collision.EntityY(y) - Y);
+                            lastModule = manager.modules.Enable().Spawn(x, y);
                             firstModule = lastModule;
                         }
                         else
                         {
-                            lastModule.Next = blockModules.Enable().Spawn(this, collision.EntityX(x) - X, collision.EntityY(y) - Y);
+                            lastModule.Next = manager.modules.Enable().Spawn(x, y);
                             lastModule = lastModule.Next;
                         }
-                        collision.blockBuffer[x, y] = 2;
-                        ExpandBothX(x, y);
-                        ExpandX(x, y);
-                        ExpandY(x, y);
+                        if (ExpandBothX(x, y))
+                            ExpandY(x, y);
+                        else
+                            ExpandX(x, y);
+                        lastModule.Set(this);
                     }
             SetBlockBuffer(worm, 0, false, true);
             return this;
@@ -96,10 +100,12 @@ namespace WormGame.Entities
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
-        private void ExpandBothX(int x, int y)
+        /// <returns>ScaleX failure</returns>
+        private bool ExpandBothX(int x, int y)
         {
             if (ScaleX(x, y))
-                ExpandBothY(x, y);
+                return ExpandBothY(x, y);
+            return true;
         }
 
 
@@ -108,10 +114,12 @@ namespace WormGame.Entities
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
-        private void ExpandBothY(int x, int y)
+        /// <returns>ScaleX failure</returns>
+        private bool ExpandBothY(int x, int y)
         {
             if (ScaleY(x, y))
-                ExpandBothX(x, y);
+                return ExpandBothX(x, y);
+            return false;
         }
 
 
@@ -147,15 +155,15 @@ namespace WormGame.Entities
         /// <returns>Was the module scaled or not</returns>
         private bool ScaleX(int x, int y)
         {
-            int yScale = FastMath.Round(lastModule.Graphic.ScaleY);
-            int xPos = x + FastMath.Round(lastModule.Graphic.ScaleX);
+            int yScale = lastModule.Height;
+            int xPos = x + lastModule.Width;
             if (xPos >= width) return false;
-            for (int yPos = y; yPos > y - yScale; yPos--)
-                if (collision.blockBuffer[xPos, yPos] != 1)
+            for (int yPos = y; yPos < y + yScale; yPos++)
+                if (manager.blockBuffer[xPos, yPos] != 1)
                     return false;
-            for (int yPos = y; yPos > y - yScale; yPos--)
-                collision.blockBuffer[xPos, yPos] = 2;
-            lastModule.Graphic.ScaleX++;
+            for (int yPos = y; yPos < y + yScale; yPos++)
+                manager.blockBuffer[xPos, yPos] = 2;
+            lastModule.Width++;
             return true;
         }
 
@@ -168,15 +176,15 @@ namespace WormGame.Entities
         /// <returns>Was the module scaled or not</returns>
         private bool ScaleY(int x, int y)
         {
-            int xScale = FastMath.Round(lastModule.Graphic.ScaleX);
-            int yPos = y - FastMath.Round(lastModule.Graphic.ScaleY);
-            if (yPos < 0) return false;
+            int xScale = lastModule.Width;
+            int yPos = y + lastModule.Height;
+            if (yPos >= height) return false;
             for (int xPos = x; xPos < x + xScale; xPos++)
-                if (collision.blockBuffer[xPos, yPos] != 1)
+                if (manager.blockBuffer[xPos, yPos] != 1)
                     return false;
             for (int xPos = x; xPos < x + xScale; xPos++)
-                collision.blockBuffer[xPos, yPos] = 2;
-            lastModule.Graphic.ScaleY++;
+                manager.blockBuffer[xPos, yPos] = 2;
+            lastModule.Height++;
             return true;
         }
 
@@ -197,7 +205,7 @@ namespace WormGame.Entities
             {
                 int x = collision.X(wormModule.Target.X);
                 int y = collision.Y(wormModule.Target.Y);
-                collision.blockBuffer[x, y] = n;
+                manager.blockBuffer[x, y] = n;
                 if (setCollision)
                     collision.Set(this, x, y);
                 if (initialize)
@@ -252,7 +260,7 @@ namespace WormGame.Entities
         /// <returns>Is neighbour the same color</returns>
         private bool CheckNeighbour(int x, int y)
         {
-            PoolableEntity cell = collision.Get(x, y);
+            Object cell = collision.Get(x, y);
             if (cell is Block block)
                 if (!ReferenceEquals(this, block))
                     if (Help.Equal(block.Color, Color))
@@ -274,7 +282,6 @@ namespace WormGame.Entities
             if (recursive && firstModule != null)
                 firstModule.Disable();
             firstModule = null;
-            ClearGraphics();
         }
     }
 }
