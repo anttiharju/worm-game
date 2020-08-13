@@ -7,7 +7,7 @@ using WormGame.Pooling;
 namespace WormGame.Entities
 {
     /// @author Antti Harju
-    /// @version 28.07.2020
+    /// @version 14.08.2020
     /// <summary>
     /// Worm entity. Worms are modular entities; it consists of one Otter2d entity and several regular objects (modules). This way the worm can grow infinitely.
     /// </summary>
@@ -96,7 +96,7 @@ namespace WormGame.Entities
                 Grow();
 
             direction = Random.ValidDirection(collision, Position, size);
-            collision.Set(this, x, y);
+            collision.Add(this, x, y);
             return this;
         }
 
@@ -137,12 +137,12 @@ namespace WormGame.Entities
                 if (Length < LengthCap)
                     Length++;
                 else
-                    collision.Set(null, lastModule.Target);
+                    collision.Add(null, lastModule.Target);
                 if (nextPosition == collision.fruit)
                     grow = true;
                 firstModule.DirectionFollow(direction);
                 firstModule.TargetFollow(target);
-                collision.Set(this, target);
+                collision.Add(this, target);
             }
             else
             {
