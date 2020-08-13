@@ -35,11 +35,11 @@ namespace TestWormGame.Pooling
 			catch (IndexOutOfRangeException)
 			{
 			}
-			Assert.AreEqual( 4, pooler.EnableIndex , "in method Defragment, line 66");
-			Assert.AreEqual( true, pooler[pooler.EnableIndex].Active , "in method Defragment, line 67");
+			Assert.AreEqual( 4, pooler.Index , "in method Defragment, line 66");
+			Assert.AreEqual( true, pooler[pooler.Index].Active , "in method Defragment, line 67");
 			pooler.Defragment();
-			Assert.AreEqual( 3, pooler.EnableIndex , "in method Defragment, line 69");
-			Assert.AreEqual( false, pooler[pooler.EnableIndex].Active , "in method Defragment, line 70");
+			Assert.AreEqual( 3, pooler.Index , "in method Defragment, line 69");
+			Assert.AreEqual( false, pooler[pooler.Index].Active , "in method Defragment, line 70");
 			Assert.AreEqual( p5, pooler[0] , "in method Defragment, line 71");
 			Assert.AreEqual( p2, pooler[1] , "in method Defragment, line 72");
 			Assert.AreEqual( p4, pooler[2] , "in method Defragment, line 73");

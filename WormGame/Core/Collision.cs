@@ -1,13 +1,12 @@
 ﻿using System;
 using Otter.Utility.MonoGame;
 using WormGame.Static;
-using WormGame.Pooling;
 using WormGame.Entities;
 
 namespace WormGame.Core
 {
     /// @author Antti Harju
-    /// @version 12.08.2020
+    /// @version 14.08.2020
     /// <summary>
     /// Collision system.
     /// </summary>
@@ -85,7 +84,7 @@ namespace WormGame.Core
             Object current = collision[x, y];
             if (current == null)
                 return empty;
-            if (current is Block)
+            if (current is BlockModule)
                 return block;
             if (current is Worm)
                 return worm;
@@ -117,7 +116,7 @@ namespace WormGame.Core
         /// <param name="entity">Worm</param>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
-        public void Set(Object entity, int x, int y)
+        public void Add(Object entity, int x, int y)
         {
             collision[x, y] = entity;
         }
@@ -128,9 +127,9 @@ namespace WormGame.Core
         /// </summary>
         /// <param name="entity">Entity</param>
         /// <param name="position">Entity position</param>
-        public void Set(Object entity, Vector2 position)
+        public void Add(Object entity, Vector2 position)
         {
-            Set(entity, X(position.X), Y(position.Y));
+            Add(entity, X(position.X), Y(position.Y));
         }
 
 
@@ -140,18 +139,27 @@ namespace WormGame.Core
         /// <param name="entity">Entity</param>
         /// <param name="x">Horizontal entity position</param>
         /// <param name="y">Vertical entity position</param>
-        public void Set(Object entity, float x, float y)
+        public void Add(Object entity, float x, float y)
         {
-            Set(entity, X(x), Y(y));
+            Add(entity, X(x), Y(y));
         }
 
 
-        public void Set(Object entity, int startX, int startY, int scaleX, int scaleY)
+        /// <summary>
+        /// Adds a rectangular object to collision.
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="startX"></param>
+        /// <param name="startY"></param>
+        /// <param name="scaleX"></param>
+        /// <param name="scaleY"></param>
+        public void Add(Object entity, int startX, int startY, int scaleX, int scaleY)
         {
             for (int x = startX; x < startX + scaleX; x++)
                 for (int y = startY; y < startY + scaleY; y++)
-                    Set(entity, x, y);
+                    Add(entity, x, y);
         }
+
 
         /// <summary>
         /// Translates horizontal entity position to a field one.
@@ -226,7 +234,7 @@ namespace WormGame.Core
                         line.Append('.');
                         continue;
                     }
-                    if (current is Block)
+                    if (current is BlockSpawner)
                     {
                         line.Append('x');
                         continue;

@@ -1,10 +1,9 @@
-﻿using WormGame.Entities;
-using WormGame.Static;
+﻿using WormGame.Static;
 
 namespace WormGame.Core
 {
     /// @author Antti Harju
-    /// @version 30.07.2020
+    /// @version 14.08.2020
     /// <summary>
     /// Configuration.
     /// </summary>
@@ -184,22 +183,11 @@ namespace WormGame.Core
         {
             int xSize = windowWidth / (width + margin * 2);
             int ySize = windowHeight / (height + margin * 2);
-            int size = Smaller(xSize, ySize);
+            int size;
+            if (xSize < ySize) size = xSize;
+            else size = ySize;
             if (size % 2 != 0) size--;
             return size;
-        }
-
-
-        /// <summary>
-        /// Returns smaller number.
-        /// </summary>
-        /// <param name="a">Number a</param>
-        /// <param name="b">Number b</param>
-        /// <returns>Smaller number</returns>
-        private int Smaller(int a, int b)
-        {
-            if (a < b) return a;
-            return b;
         }
     }
 }

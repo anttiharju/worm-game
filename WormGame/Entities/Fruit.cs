@@ -8,7 +8,7 @@ using WormGame.Pooling;
 namespace WormGame.Entities
 {
     /// @author Antti Harju
-    /// @version 28.07.2020
+    /// @version 14.08.2020
     /// <summary>
     /// Fruit class. Spawns automatically to a free position.
     /// </summary>
@@ -50,7 +50,7 @@ namespace WormGame.Entities
             }
             X = random.X;
             Y = random.Y;
-            collision.Set(this, Position);
+            collision.Add(this, Position);
             return this;
         }
     }

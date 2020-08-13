@@ -5,7 +5,7 @@ using WormGame.Core;
 namespace WormGame
 {
     /// @author Antti Harju
-    /// @version 28.07.2020
+    /// @version 14.08.2020
     /// <summary>
     /// See README.md for an explanation of game mechanics.
     /// </summary>
@@ -19,6 +19,7 @@ namespace WormGame
         /// </summary>
         public static void Main()
         {
+            System.Console.ForegroundColor = System.ConsoleColor.DarkGray;
             config = new Config();
             Game game = new Game("Worm Blocks", config.windowWidth, config.windowHeight, config.refreshRate, config.fullscreen)
             {

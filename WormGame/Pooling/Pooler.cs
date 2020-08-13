@@ -2,11 +2,12 @@
 using System.Collections;
 using Otter.Core;
 using WormGame.Core;
+using WormGame.Static;
 
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 12.08.2020
+    /// @version 14.08.2020
     /// <summary>
     /// Object pooler. It's computationally cheaper to recycle objects by resetting their variables instead of destroying and creating a new ones.
     /// </summary>
@@ -21,17 +22,17 @@ namespace WormGame.Pooling
         /// Default constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
-        /// <param name="capacity">Capacity</param>
+        /// <param name="capacity">Pool length</param>
         public Pooler(Scene scene, Config config, int capacity)
         {
             pool = new T[capacity];
             endIndex = capacity - 1;
             for (int i = 0; i < capacity; i++)
             {
-                T currentPoolable = (T)Activator.CreateInstance(typeof(T), new object[] { config });
-                currentPoolable.Disable(false);
-                pool[i] = currentPoolable;
-                currentPoolable.Add(scene);
+                T current = (T)Activator.CreateInstance(typeof(T), new object[] { config });
+                current.Disable(false);
+                pool[i] = current;
+                current.Add(scene);
             }
         }
 
@@ -83,48 +84,54 @@ namespace WormGame.Pooling
         /// </example>
         public bool Defragment()
         {
-            int current = 0;
-            while (current < EnableIndex)
+            int i = 0;
+            while (i < Index)
             {
-                if (pool[current].Active)
-                    current++;
+                if (pool[i].Active)
+                    i++;
                 else
                 {
-                    for (int enabled = EnableIndex; enabled > current; enabled--)
+                    for (int enabled = Index; enabled > i; enabled--)
                     {
                         if (pool[enabled].Active)
                         {
                             T swap = pool[enabled];
-                            pool[enabled] = pool[current];
-                            pool[current] = swap;
-                            current++;
+                            pool[enabled] = pool[i];
+                            pool[i] = swap;
+                            i++;
                             break;
                         }
-                        EnableIndex--;
+                        Index--;
                     }
                 }
             }
 #if DEBUG
             ConsoleColor defaultColor = Console.ForegroundColor;
-            if (pool[EnableIndex].Active)
-            {   // Pool is full. This can be intentional, but you can fix it by increasing pool capacity.
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write("[POOLER] ");
-                Console.ForegroundColor = ConsoleColor.Red;
+            if (pool[Index].Active)
+            {   // Pool is full. This can be intentional, but in this project it shouldn't happen.
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.Write("[Pooling] ");
+                if (Help.color)
+                    Console.ForegroundColor = ConsoleColor.Red;
+                else
+                    Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine($"{pool[0].GetType().Name,-(11 + 5 * 2)}");
-                Console.ForegroundColor = defaultColor;
             }
             else
             {   // Tells how many objects pooler has available.
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write($"[POOLER] ");
-                Console.ForegroundColor = ConsoleColor.Green;
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.Write($"[Pooling] ");
+                if (Help.color)
+                    Console.ForegroundColor = ConsoleColor.Green;
+                else
+                    Console.ForegroundColor = ConsoleColor.Gray;
                 Console.Write($"{pool[0].GetType().Name,-11} ");
-                Console.ForegroundColor = defaultColor;
-                Console.WriteLine($"{pool.Length - EnableIndex,5}");
+                Console.WriteLine($"{pool.Length - Index,5}");
             }
+            Console.ForegroundColor = defaultColor;
+            Help.color = !Help.color;
 #endif
-            return pool[EnableIndex].Active;
+            return pool[Index].Active;
         }
 
 
@@ -134,21 +141,21 @@ namespace WormGame.Pooling
         /// <returns>Enabled object</returns>
         public T Enable()
         {
-            if (EnableIndex == endIndex && pool[EnableIndex].Active)
+            if (Index == endIndex && pool[Index].Active)
                 if (Defragment())
                     return null;
-            int enabled = EnableIndex;
-            pool[enabled].Active = true;
-            if (EnableIndex != endIndex)
-                EnableIndex++;
-            return pool[enabled];
+            int activated = Index;
+            pool[activated].Active = true;
+            if (Index != endIndex)
+                Index++;
+            return pool[activated];
         }
 
 
         /// <summary>
-        /// Index from where to enable a disabled object. If the object is already enabled the pool is full.
+        /// Points to a disabled object. If the pool is at max capacity, the object is enabled.
         /// </summary>
-        public int EnableIndex { get; protected set; }
+        public int Index { get; protected set; }
 
 
         /// <summary>
@@ -183,10 +190,10 @@ namespace WormGame.Pooling
         /// </summary>
         public virtual void Reset()
         {
-            for (int i = EnableIndex; i >= 0; i--)
+            for (int i = Index; i >= 0; i--)
                 if (pool[i].Active)
                     pool[i].Disable(false);
-            EnableIndex = 0;
+            Index = 0;
         }
     }
 }

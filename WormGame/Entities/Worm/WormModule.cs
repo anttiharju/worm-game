@@ -7,7 +7,7 @@ using WormGame.Pooling;
 namespace WormGame.Entities
 {
     /// @author Antti Harju
-    /// @version 28.07.2020
+    /// @version 14.08.2020
     /// <summary>
     /// WormModule. Thanks to modularity worm length can be increased during runtime.
     /// </summary>
@@ -144,7 +144,7 @@ namespace WormGame.Entities
                 Next.Disable();
             Next = null;
             if (collision.Check(target) == collision.worm)
-                collision.Set(null, target);
+                collision.Add(null, target);
             ResetDirection();
             Graphic.X = 0;
             Graphic.Y = 0;

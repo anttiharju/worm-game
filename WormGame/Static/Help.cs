@@ -5,12 +5,15 @@ using WormGame.Core;
 namespace WormGame.Static
 {
     /// @author Antti Harju
-    /// @version 12.08.2020
+    /// @version 14.08.2020
     /// <summary>
     /// Class for static things that don't belong anywhere else.
     /// </summary>
     public static class Help
     {
+#if DEBUG // Debug console message color is alternated between color and gray with this. Is this the rare case where a global variable is okay?
+        public static bool color = true;
+#endif
         public static readonly Color[] colors = { Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Magenta, Color.Cyan, Color.Orange };
         public static readonly Vector2[] directions = { new Vector2(0, -1), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(1, 0) };
 
