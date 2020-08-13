@@ -176,7 +176,7 @@ namespace WormGame
         /// </summary>
         /// <param name="worm">Worm to transform</param>
         /// <returns>Block or null</returns>
-        public Block SpawnBlock(Worm worm)
+        public BlockModule SpawnBlock(Worm worm)
         {
             if (wormAmount > 0)
                 wormAmount--;

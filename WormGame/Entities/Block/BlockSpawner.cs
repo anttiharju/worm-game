@@ -1,50 +1,44 @@
 ﻿using Otter.Graphics;
 using WormGame.Core;
 using WormGame.Static;
-using WormGame.Pooling;
 using System;
 
 namespace WormGame.Entities
 {
     /// @author Antti Harju
-    /// @version 28.07.2020
+    /// @version 14.08.2020
     /// <summary>
-    /// Block class.
+    /// Manages block spawning.
     /// </summary>
-    public class Block : Poolable
+    public class BlockSpawner
     {
 #if DEBUG
         private readonly bool disableBlocks;
 #endif
         private readonly Collision collision;
-        private readonly BlockManager manager;
+        private readonly int[,] optimizationBuffer;
         private readonly int width;
         private readonly int height;
 
         private BlockModule firstModule;
         private BlockModule lastModule;
+        private Color color;
         private int top;
         private int left;
         private int bottom;
         private int right;
-
-        /// <summary>
-        /// Block color.
-        /// </summary>
-        /// TODO: use firstmodule or worm.color?
-        public Color Color { get; private set; }
 
 
         /// <summary>
         /// Default constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public Block(Config config, BlockManager manager)
+        public BlockSpawner(Config config)
         {
             collision = config.collision;
-            this.manager = manager;
             width = config.width;
             height = config.height;
+            optimizationBuffer = new int[width, height];
 #if DEBUG
             disableBlocks = config.disableBlocks;
 #endif
@@ -52,51 +46,52 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Spawns the block and optimizes module usage.
+        /// Spawns a block by spawning as many block modules as needed.
         /// </summary>
         /// <param name="worm">Worm</param>
         /// <param name="manager">Module pooler</param>
         /// <returns>Block</returns>
-        public Block Spawn(Worm worm, BlockManager manager)
+        public BlockModule Spawn(Worm worm, BlockManager manager)
         {
-            Color = worm.Color;
+            color = worm.Color;
             bottom = height;
             left = width;
             top = 0;
             right = 0;
-            if (SetBlockBuffer(worm))
+            if (InitBuffer(worm.firstModule, worm.Length))
             {
-                SetBlockBuffer(worm, 0, false);
-                Disable();
+                ClearBuffer(worm.firstModule, worm.Length);
                 return null;
             }
             for (int y = bottom; y <= top; y++)
                 for (int x = left; x <= right; x++)
-                    if (manager.blockBuffer[x, y] == 1)
+                    if (optimizationBuffer[x, y] == 1)
                     {
                         if (firstModule == null)
                         {
-                            lastModule = manager.modules.Enable().Spawn(x, y);
+                            lastModule = manager.Enable().Initialize(color, x, y);
                             firstModule = lastModule;
                         }
                         else
                         {
-                            lastModule.Next = manager.modules.Enable().Spawn(x, y);
+                            lastModule.Next = manager.Enable().Initialize(color, x, y);
                             lastModule = lastModule.Next;
                         }
+                        lastModule.First = firstModule;
                         if (ExpandBothX(x, y))
                             ExpandY(x, y);
                         else
                             ExpandX(x, y);
-                        lastModule.Set(this);
+                        lastModule.Add();
                     }
-            SetBlockBuffer(worm, 0, false, true);
-            return this;
+            ClearBuffer(worm.firstModule, worm.Length);
+            firstModule = null;
+            return firstModule;
         }
 
 
         /// <summary>
-        /// Scales module recursively in both directions (horizontal part).
+        /// Scales current block module recursively in both directions (horizontal part).
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
@@ -110,7 +105,7 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Scales module recursively in both directions (vertical part).
+        /// Scales current block module recursively in both directions (vertical part).
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
@@ -124,7 +119,7 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Scales module recursively in the horizontal direction.
+        /// Scales current block module recursively in the horizontal direction.
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
@@ -136,7 +131,7 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Scales module recursively in the vertical direction.
+        /// Scales current block module recursively in the vertical direction.
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
@@ -148,7 +143,7 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Scales module horizontally.
+        /// Scales current block module horizontally.
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
@@ -159,17 +154,17 @@ namespace WormGame.Entities
             int xPos = x + lastModule.Width;
             if (xPos >= width) return false;
             for (int yPos = y; yPos < y + yScale; yPos++)
-                if (manager.blockBuffer[xPos, yPos] != 1)
+                if (optimizationBuffer[xPos, yPos] != 1)
                     return false;
             for (int yPos = y; yPos < y + yScale; yPos++)
-                manager.blockBuffer[xPos, yPos] = 2;
+                optimizationBuffer[xPos, yPos] = 2;
             lastModule.Width++;
             return true;
         }
 
 
         /// <summary>
-        /// Scales module vertically.
+        /// Scales current block module vertically.
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
@@ -180,40 +175,38 @@ namespace WormGame.Entities
             int yPos = y + lastModule.Height;
             if (yPos >= height) return false;
             for (int xPos = x; xPos < x + xScale; xPos++)
-                if (manager.blockBuffer[xPos, yPos] != 1)
+                if (optimizationBuffer[xPos, yPos] != 1)
                     return false;
             for (int xPos = x; xPos < x + xScale; xPos++)
-                manager.blockBuffer[xPos, yPos] = 2;
+                optimizationBuffer[xPos, yPos] = 2;
             lastModule.Height++;
             return true;
         }
 
 
         /// <summary>
-        /// Copies worm position data to a buffer which is used to optimize blockModule usage.
+        /// Clears optimization buffer or initializes it and stops spawn process if there's a neighbouring block of the same color.
         /// </summary>
-        /// <param name="worm">Worm</param>
-        /// <param name="n">Keeps track wheter or not that part of worm has been handled</param>
-        /// <param name="initialize">Get for loop edges and destroy neighbours</param>
-        /// <param name="setCollision">Set to collision field</param>
-        /// <returns>To disable or not based on neighbours</returns>
-        private bool SetBlockBuffer(Worm worm, int n = 1, bool initialize = true, bool setCollision = false)
+        /// <param name="wormModule">Worms first module</param>
+        /// <param name="wormLength">Worms length</param>
+        /// <param name="initialize">Initialize or clear</param>
+        /// <returns>Stop spawn process</returns>
+        private bool SetBuffer(WormModule wormModule, int wormLength, bool initialize = false)
         {
-            WormModule wormModule = worm.firstModule;
-            bool disable = false;
-            for (int i = 0; i < worm.Length; i++)
+            bool stop = false;
+            int n = 0;
+            if (initialize) n++;
+            for (int i = 0; i < wormLength; i++)
             {
                 int x = collision.X(wormModule.Target.X);
                 int y = collision.Y(wormModule.Target.Y);
-                manager.blockBuffer[x, y] = n;
-                if (setCollision)
-                    collision.Set(this, x, y);
+                optimizationBuffer[x, y] = n;
                 if (initialize)
                 {
 #if DEBUG
                     if (disableBlocks)
 #endif
-                        if (CheckNeighbours(x, y)) disable = true;
+                        if (CheckNeighbours(x, y)) stop = true;
                     if (x < left) left = x;
                     if (y < bottom) bottom = y;
                     if (x > right) right = x;
@@ -221,22 +214,45 @@ namespace WormGame.Entities
                 }
                 wormModule = wormModule.Next;
             }
-            return disable;
+            return stop;
         }
 
 
         /// <summary>
-        /// Check neighbouring tiles (four).
+        /// Initializes optimization buffer and stops spawning if there's a neighbouring block of the same color.
+        /// </summary>
+        /// <param name="wormModule">Worms first module</param>
+        /// <param name="wormLength">Worms length</param>
+        /// <returns>Stop spawn process</returns>
+        private bool InitBuffer(WormModule wormModule, int wormLength)
+        {
+            return SetBuffer(wormModule, wormLength, true);
+        }
+
+
+        /// <summary>
+        /// Clears optimization buffer.
+        /// </summary>
+        /// <param name="wormModule">Worms first module</param>
+        /// <param name="wormLength">Worms length</param>
+        private void ClearBuffer(WormModule wormModule, int wormLength)
+        {
+            SetBuffer(wormModule, wormLength);
+        }
+
+
+        /// <summary>
+        /// Check adjacent neighbours. (not diagonal ones)
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
-        /// <returns>To disable or not</returns>
+        /// <returns>Stop spawn process</returns>
         private bool CheckNeighbours(int x, int y)
         {
             int[] xPositions = { -1, 1, 0, 0 };
             int[] yPositions = { 0, 0, -1, 1 };
 
-            bool disable = false;
+            bool stop = false;
             for (int i = 0; i < xPositions.Length; i++)
             {
                 int currentX = x + xPositions[i];
@@ -246,14 +262,14 @@ namespace WormGame.Entities
                     currentX < width &&
                     currentY < height)
                     if (CheckNeighbour(currentX, currentY))
-                        disable = true;
+                        stop = true;
             }
-            return disable;
+            return stop;
         }
 
 
         /// <summary>
-        /// Check a neighbouring tile.
+        /// Compares neighbouring blocks' color to current blocks' color
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
@@ -261,27 +277,13 @@ namespace WormGame.Entities
         private bool CheckNeighbour(int x, int y)
         {
             Object cell = collision.Get(x, y);
-            if (cell is Block block)
-                if (!ReferenceEquals(this, block))
-                    if (Help.Equal(block.Color, Color))
-                    {
-                        block.Disable();
-                        return true;
-                    }
+            if (cell is BlockModule module)
+                if (Help.Equal(module.Color, color))
+                {
+                    module.Disable();
+                    return true;
+                }
             return false;
-        }
-
-
-        /// <summary>
-        /// Disable entity.
-        /// </summary>
-        /// <param name="recursive">Disable recursively. False only when disabling is done by pooler.</param>
-        public override void Disable(bool recursive = true)
-        {
-            base.Disable();
-            if (recursive && firstModule != null)
-                firstModule.Disable();
-            firstModule = null;
         }
     }
 }
