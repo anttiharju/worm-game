@@ -2,6 +2,28 @@
 I use changelog as a brain dump where I explain future plans and further explain commit messages. I hope it shows my enthusiasm for programming and the amount of thought and care put into the project.
 
 
+# 14.08.2020
+- Improve BlockManager
+    - BlockModule -> Block
+        - Blocks are made out of multiple modules. First module is added to collision field so disabling works properly.
+    - Block -> BlockSpawner
+        - Blocks were no longer needed to hold modules together
+        - BlockSpawner is not pooled as only one of them are needed
+            - Technically could be inside manager, but I don't want to bloat it.
+        - BlockSpawner configures modules to form blocks.
+    - The benchmark I've been using has become useless. While there might be some optimizations to be done, I either need a less powerful computer to notice differences or a better benchmark
+        - You get (improve) what you measure. Time to invent a new benchmark that measures worm performance.
+        - This was probably a massive memory saver (didn't measure, but I'd say its in the megabytes if not tens of them) and GC seems to be running less frequently.
+    - Renamed some variables in Pooler to make more sense.
+    - ReferenceEquals is no longer needed at all.
+    - Made console messages prettier and applied some UX design to them (bright colors take our attention)
+        - Pooler messages now alternate between color and gray to make long lists readable.
+            - Had to add a global variable to Help to do this. Is this the rare case where it's okay?
+    - Updated Block related documentation.
+    - Future plans
+        - Create a benchmark that measures worm performance
+
+
 # 13.08.2020
 - Add BlockManager
     - Early tilemap benchmark (blocks are still entities) (200x100, worm length 6, field full of blocks)
