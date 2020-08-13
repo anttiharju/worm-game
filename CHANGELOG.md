@@ -2,6 +2,26 @@
 I use changelog as a brain dump where I explain future plans and further explain commit messages. I hope it shows my enthusiasm for programming and the amount of thought and care put into the project.
 
 
+# 13.08.2020
+- Add BlockManager
+    - Early tilemap benchmark (blocks are still entities) (200x100, worm length 6, field full of blocks)
+        - Update 4ms (3705 Entities) Render 2ms (2 Renders) AVG FPS 77
+            - Totally worth the effort.
+    - Quick collision fix (PoolableEntity -> Object, blocks are now just objects) benchmark
+        - Update 1ms (6 Entities) Render 5ms (2 Renders) AVG FPS 96
+            - Vsync and/or RTSS are probably messing up the numbers now but the point is it's measurably better.
+                - Non-entity poolables aren't free but they're way cheaper than entities.
+            - Worms are still kind of expensive to render -> I'll have to invent a new benchmark.
+    - Before we can rework collision to not use Objects (feels like a quick n dirty solution) fruits will have to be migrated to use a tilemap
+        - New collision system would work something of like this:
+            - New struct: CollisionObject that has int layer and Poolable object
+                - Poolable object can be null if it's not relevant to make calls to it (worms only need layer)
+        - Fruits probably won't need separate objects per fruit and just one tilemap will be enough.
+            - I can probably get rid of Block
+                - Every module could know the first one in the chain and scaling etc would be taken care of a middle manager (one object) or manager.
+    - I noticed that GC is running quite frequently if the play area is not small. I hope I can improve this.
+
+
 # 12.08.2020
 - Cleanup
     - Moved leftBorder and topBorder from collision to config

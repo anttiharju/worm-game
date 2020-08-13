@@ -1,5 +1,4 @@
 ﻿using Otter.Core;
-using Otter.Graphics;
 
 namespace WormGame.Pooling
 {

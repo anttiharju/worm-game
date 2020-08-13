@@ -1,4 +1,5 @@
-﻿using WormGame.Static;
+﻿using WormGame.Entities;
+using WormGame.Static;
 
 namespace WormGame.Core
 {
@@ -19,19 +20,19 @@ namespace WormGame.Core
 
         // Window
         public readonly bool fullscreen = false;
-        public readonly int windowWidth = 1024;
+        public readonly int windowWidth = 1280;
         public readonly int windowHeight = 720;
         public readonly int refreshRate = 144;    // See wormSpeed before changing this
 
         // Scene
-        public readonly int width = 20;
-        public readonly int height = 10;
+        public readonly int width = 40;
+        public readonly int height = 20;
         public readonly int margin = 2;
 
         // Worm
         public readonly int wormCap = 0;           // Overrides wormPercentage if > 0.
-        public readonly int wormSpeed = 6;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
-        public readonly int minWormLength = 8;
+        public readonly int wormSpeed = 144;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
+        public readonly int minWormLength = 6;
         public readonly float wormPercentage = 1;
 
         // Fruit
@@ -170,7 +171,6 @@ namespace WormGame.Core
             step = (float)wormSpeed / refreshRate * size;
             collision = new Collision(this);
             scene = new WormScene(this);
-
         }
 
 

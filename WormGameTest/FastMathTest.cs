@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using static WormGame.Static.FastMath;
+using WormGame.Static;
 
 namespace TestWormGame.Static
 {

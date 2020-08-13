@@ -1,8 +1,5 @@
-﻿using Otter.Graphics.Drawables;
-using WormGame.Core;
-using WormGame.Static;
+﻿using WormGame.Core;
 using WormGame.Pooling;
-using Otter.Graphics;
 
 namespace WormGame.Entities
 {
@@ -13,82 +10,45 @@ namespace WormGame.Entities
     /// </summary>
     public class BlockModule : Poolable
     {
+        private readonly BlockManager blockManager;
         private readonly Collision collision;
-        private readonly int size;
-        private readonly int halfSize;
 
-        private int startX;
-        private int startY;
+        public int X { get; set; }
+        public int Y { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
 
-
-        /// <summary>
-        /// Graphic.
-        /// </summary>
-        public Image Graphic { get; private set; }
-
-
-        /// <summary>
-        /// Next module.
-        /// </summary>
         public BlockModule Next { get; set; }
 
 
-        /// <summary>
-        /// Enable the entity.
-        /// </summary>
-        public override bool Active { get { return active; } set { if (value) { active = true; Graphic.Visible = true; } else Disable(); } }
-        private bool active;
-
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="config">Configuration.</param>
-        public BlockModule(Config config)
+        public BlockModule(Config config, BlockManager blockManager)
         {
+            this.blockManager = blockManager;
             collision = config.collision;
-            size = config.size;
-            halfSize = config.halfSize;
-            Graphic = Image.CreateRectangle(config.size);
-            Graphic.SetOrigin(0, config.size);
         }
 
-
-        /// <summary>
-        /// Spawn module.
-        /// </summary>
-        /// <param name="parent">Block</param>
-        /// <param name="x">Relative entity position to firstModule</param>
-        /// <param name="y">Relative vertical entity position to firstModule</param>
-        /// <returns>Module</returns>
-        public BlockModule Spawn(Block parent, float x, float y)
+        public BlockModule Spawn(int x, int y)
         {
-            Graphic.SetPosition(x - halfSize, y + halfSize);
-            Graphic.Color = parent.Color;
-            parent.AddGraphic(Graphic);
-            startX = collision.X(parent.X + x);
-            startY = collision.Y(parent.Y + y);
+            X = x;
+            Y = y;
             return this;
         }
 
+        public void Set(Block parent)
+        {
+            blockManager.Set(parent.Color, X, Y, Width, Height);
+        }
 
-        /// <summary>
-        /// Recursively disables all modules and removes them from collision.
-        /// </summary>
-        /// <param name="recursive">Disable recursively. False only when disabling is done by pooler.</param>
         public override void Disable(bool recursive = true)
         {
             base.Disable();
-            active = false;
             if (recursive && Next != null)
                 Next.Disable();
             Next = null;
-            int endX = startX + FastMath.Round(Graphic.ScaleX);
-            int endY = startY - FastMath.Round(Graphic.ScaleY);
-            for (int x = startX; x < endX; x++)
-                for (int y = startY; y > endY; y--)
-                    collision.Set(null, x, y);
-            Graphic.Scale = 1;
+            collision.Set(null, X, Y, Width, Height);
+            blockManager.Clear(X, Y, Width, Height);
+            Width = 1;
+            Height = 1;
         }
     }
 }
