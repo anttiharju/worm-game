@@ -13,14 +13,13 @@ namespace WormGame.Core
     /// </summary>
     public class Collision
     {
-        public readonly int[,] blockBuffer;
         public readonly int invalid = 0;
         public readonly int worm = 1;
         public readonly int block = 2;
         public readonly int fruit = 3;
         public readonly int empty = 4;
 
-        private readonly PoolableEntity[,] collision;
+        private readonly Object[,] collision;
         private readonly int leftBorder;
         private readonly int topBorder;
         private readonly int size;
@@ -40,8 +39,7 @@ namespace WormGame.Core
             width = config.width;
             height = config.height;
             size = config.size;
-            collision = new PoolableEntity[width, height];
-            blockBuffer = new int[width, height];
+            collision = new Object[width, height];
             leftBorder = config.leftBorder;
             topBorder = config.topBorder;
         }
@@ -53,7 +51,7 @@ namespace WormGame.Core
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
         /// <returns>Poolable entity as reference</returns>
-        public ref PoolableEntity Get(int x, int y)
+        public ref Object Get(int x, int y)
         {
             return ref collision[x, y];
         }
@@ -64,7 +62,7 @@ namespace WormGame.Core
         /// </summary>
         /// <param name="position">Entity position</param>
         /// <returns>Poolable entity as reference</returns>
-        public ref PoolableEntity Get(Vector2 position)
+        public ref Object Get(Vector2 position)
         {
             return ref Get(X(position.X), Y(position.Y));
         }
@@ -84,7 +82,7 @@ namespace WormGame.Core
                 x >= width ||
                 y >= height)
                 return invalid;
-            PoolableEntity current = collision[x, y];
+            Object current = collision[x, y];
             if (current == null)
                 return empty;
             if (current is Block)
@@ -119,7 +117,7 @@ namespace WormGame.Core
         /// <param name="entity">Worm</param>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
-        public void Set(PoolableEntity entity, int x, int y)
+        public void Set(Object entity, int x, int y)
         {
             collision[x, y] = entity;
         }
@@ -130,7 +128,7 @@ namespace WormGame.Core
         /// </summary>
         /// <param name="entity">Entity</param>
         /// <param name="position">Entity position</param>
-        public void Set(PoolableEntity entity, Vector2 position)
+        public void Set(Object entity, Vector2 position)
         {
             Set(entity, X(position.X), Y(position.Y));
         }
@@ -142,11 +140,18 @@ namespace WormGame.Core
         /// <param name="entity">Entity</param>
         /// <param name="x">Horizontal entity position</param>
         /// <param name="y">Vertical entity position</param>
-        public void Set(PoolableEntity entity, float x, float y)
+        public void Set(Object entity, float x, float y)
         {
             Set(entity, X(x), Y(y));
         }
 
+
+        public void Set(Object entity, int startX, int startY, int scaleX, int scaleY)
+        {
+            for (int x = startX; x < startX + scaleX; x++)
+                for (int y = startY; y < startY + scaleY; y++)
+                    Set(entity, x, y);
+        }
 
         /// <summary>
         /// Translates horizontal entity position to a field one.
@@ -211,11 +216,11 @@ namespace WormGame.Core
         {
             for (int y = 0; y < height; y++)
             {
-                Console.CursorTop = y;
+                Console.CursorTop = y + 1;
                 System.Text.StringBuilder line = new System.Text.StringBuilder(width);
                 for (int x = 0; x < width; x++)
                 {
-                    PoolableEntity current = collision[x, y];
+                    Object current = collision[x, y];
                     if (current == null)
                     {
                         line.Append('.');

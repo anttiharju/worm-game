@@ -10,7 +10,7 @@ namespace TestWormGame.Pooling
 	public  class TestPooler
 	{
 		[Test]
-		public  void TestDefragment90()
+		public  void TestDefragment49()
 		{
 			Scene scene = new Scene();
 			Config config = new Config();
@@ -22,27 +22,29 @@ namespace TestWormGame.Pooling
 			Poolable p5 = pooler.Enable();
 			p1.Disable();
 			p3.Disable();
-			Assert.AreEqual( p1, pooler[0] , "in method Defragment, line 101");
-			Assert.AreEqual( p2, pooler[1] , "in method Defragment, line 102");
-			Assert.AreEqual( p3, pooler[2] , "in method Defragment, line 103");
-			Assert.AreEqual( p4, pooler[3] , "in method Defragment, line 104");
-			Assert.AreEqual( p5, pooler[4] , "in method Defragment, line 105");
+			Assert.AreEqual( p1, pooler[0] , "in method Defragment, line 60");
+			Assert.AreEqual( p2, pooler[1] , "in method Defragment, line 61");
+			Assert.AreEqual( p3, pooler[2] , "in method Defragment, line 62");
+			Assert.AreEqual( p4, pooler[3] , "in method Defragment, line 63");
+			Assert.AreEqual( p5, pooler[4] , "in method Defragment, line 64");
 			try
 			{
-			Assert.AreEqual( p5, pooler[5] , "in method Defragment, line 106");
-			Assert.Fail("Did not throw IndexOutOfRangeException in method Defragment on line 105");
+			Assert.AreEqual( p5, pooler[5] , "in method Defragment, line 65");
+			Assert.Fail("Did not throw IndexOutOfRangeException in method Defragment on line 64");
 			}
 			catch (IndexOutOfRangeException)
 			{
 			}
-			Assert.AreEqual( 4, pooler.EnableIndex , "in method Defragment, line 107");
+			Assert.AreEqual( 4, pooler.EnableIndex , "in method Defragment, line 66");
+			Assert.AreEqual( true, pooler[pooler.EnableIndex].Active , "in method Defragment, line 67");
 			pooler.Defragment();
-			Assert.AreEqual( 3, pooler.EnableIndex , "in method Defragment, line 109");
-			Assert.AreEqual( p5, pooler[0] , "in method Defragment, line 110");
-			Assert.AreEqual( p2, pooler[1] , "in method Defragment, line 111");
-			Assert.AreEqual( p4, pooler[2] , "in method Defragment, line 112");
-			Assert.AreEqual( p3, pooler[3] , "in method Defragment, line 113");
-			Assert.AreEqual( p1, pooler[4] , "in method Defragment, line 114");
+			Assert.AreEqual( 3, pooler.EnableIndex , "in method Defragment, line 69");
+			Assert.AreEqual( false, pooler[pooler.EnableIndex].Active , "in method Defragment, line 70");
+			Assert.AreEqual( p5, pooler[0] , "in method Defragment, line 71");
+			Assert.AreEqual( p2, pooler[1] , "in method Defragment, line 72");
+			Assert.AreEqual( p4, pooler[2] , "in method Defragment, line 73");
+			Assert.AreEqual( p3, pooler[3] , "in method Defragment, line 74");
+			Assert.AreEqual( p1, pooler[4] , "in method Defragment, line 75");
 		}
 	}
 }

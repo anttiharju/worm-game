@@ -21,10 +21,8 @@ namespace WormGame
         private readonly Pooler<Player> players;
         private readonly Pooler<Worm> worms;
         private readonly Pooler<Fruit> fruits;
-        private readonly Pooler<Block> blocks;
         private readonly Pooler<WormModule> wormModules;
-        private readonly Pooler<BlockModule> blockModules;
-        private readonly BlockManager blockManager;
+        private readonly BlockManager blocks;
         private readonly float stepAccuracy;
         private readonly int wormCap;
 
@@ -44,12 +42,10 @@ namespace WormGame
             wormFrequency = config.size - config.step;
             CreateBorders(config.width, config.height);
             worms = new Pooler<Worm>(this, config, config.wormAmount);
-            blocks = new Pooler<Block>(this, config, config.moduleAmount);
             fruits = new Pooler<Fruit>(this, config, config.fruitAmount);
             players = new Pooler<Player>(this, config, 5);
             wormModules = new Pooler<WormModule>(this, config, config.moduleAmount);
-            blockModules = new Pooler<BlockModule>(this, config, config.moduleAmount);
-            blockManager = new BlockManager(this, config);
+            blocks = new BlockManager(this, config, config.moduleAmount);
             Start();
         }
 
@@ -78,7 +74,6 @@ namespace WormGame
             blocks.Reset();
             collision.Reset();
             wormModules.Reset();
-            blockModules.Reset();
             wormFrequency = config.size - config.step;
             wormAmount = 0;
             Start();
@@ -183,13 +178,9 @@ namespace WormGame
         /// <returns>Block or null</returns>
         public Block SpawnBlock(Worm worm)
         {
-            Block block = blocks.Enable();
-            if (block == null)
-                return null;
-            block = block.Spawn(worm, blockModules);
             if (wormAmount > 0)
                 wormAmount--;
-            return block;
+            return blocks.SpawnBlock(worm);
         }
 
 
