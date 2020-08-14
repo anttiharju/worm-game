@@ -31,7 +31,7 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Default constructor.
+        /// Initialize spawner.
         /// </summary>
         /// <param name="config">Configuration</param>
         public BlockSpawner(Config config)

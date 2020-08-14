@@ -41,6 +41,20 @@ I use changelog as a brain dump where I explain future plans and further explain
         - Update 7ms (3339 entities) Render 28ms (20 000 Renders) 22,3 AVG FPS
             - This is the unoptimized baseline benchmark against which future benchmarks will be compared against.
 
+- Move fruits to tilemap
+    - FruitManager shares the same tilemap with BlockManager through config.
+    - We are going to need graphics: for now fruits are just white rectangles.
+    - Weighing the choice between surface and tilemap based worms:
+        - Tilemap based worms would take like 1 + 2 * wormAmount renders where surface with autoclear off based worms would take 4 * wormAmount.
+            - One of the main goals is *scalability* tilemap based approach is *almost* twice as performant rendering wise.
+        - Tilemap based one will require textures and figuring out what texture to use for what part of the worm can be kind of difficult.
+        - Surface wouldn't require textures, but as fruits already will require, what the heck.
+            - Okay I *could* make fruits use a surface instead of tilemap, but not sure I want to do it as tilemap is kind of neat.
+    - Next step: make wormModules scalable? Should be doable but I'm not sure how messy it will be.
+        - Worms **will** look weird for a while but this is easier to do before migrating them to a new rendering approach.
+        - Neither one of the new worm rendering approaches will let us keep the worms looking the way they look (many circles: ooooooooooooo) but even in the original idea.svg the worms were rectangular.
+    - Did some documentation updating.
+
 
 # 13.08.2020
 - Add BlockManager

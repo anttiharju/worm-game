@@ -59,7 +59,7 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Constructor.
+        /// Default constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
         public Worm(Config config)

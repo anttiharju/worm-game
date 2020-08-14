@@ -19,7 +19,7 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Default constructor.
+        /// Initialize pool.
         /// </summary>
         /// <param name="config">Configuration</param>
         /// <param name="capacity">Pool length</param>
@@ -188,7 +188,7 @@ namespace WormGame.Pooling
         /// <summary>
         /// Disables all pooler objects.
         /// </summary>
-        public virtual void Reset()
+        public void Reset()
         {
             for (int i = Index; i >= 0; i--)
                 if (pool[i].Active)
