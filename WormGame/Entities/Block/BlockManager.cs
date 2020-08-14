@@ -1,5 +1,4 @@
-﻿using Otter.Core;
-using Otter.Graphics.Drawables;
+﻿using Otter.Graphics.Drawables;
 using WormGame.Core;
 using WormGame.Pooling;
 
@@ -8,7 +7,7 @@ namespace WormGame.Entities
     /// @author Antti Harju
     /// @version 14.08.2020
     /// <summary>
-    /// A custom pooler that can be called to create blocks and also renders them using tilemap.
+    /// A custom pooler that can be called to create blocks. Uses tilemap to render objects.
     /// </summary>
     public class BlockManager : Pooler<BlockModule>
     {
@@ -18,22 +17,15 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Initializes blockBuffer, tilemap and block poolers.
+        /// Initialize manager.
         /// </summary>
-        /// <param name="scene">Scene</param>
         /// <param name="config">Configuration</param>
-        /// <param name="capacity">Pool length</param>
-        public BlockManager(Scene scene, Config config, int capacity)
+        public BlockManager(Config config)
         {
-            tilemap = new Tilemap(config.width * config.size, config.height * config.size, config.size, config.size)
-            {
-                X = config.leftBorder - config.halfSize,
-                Y = config.topBorder - config.halfSize
-            };
-            scene.AddGraphic(tilemap);
-
+            tilemap = config.tilemap;
             blockSpawner = new BlockSpawner(config);
 
+            int capacity = config.moduleAmount;
             pool = new BlockModule[capacity];
             endIndex = capacity - 1;
             for (int i = 0; i < capacity; i++)
@@ -63,16 +55,6 @@ namespace WormGame.Entities
         public void Clear(BlockModule module)
         {
             tilemap.ClearRect(module.X, module.Y, module.Width, module.Height);
-        }
-
-
-        /// <summary>
-        /// Resets module pool and clears tilemap.
-        /// </summary>
-        public override void Reset()
-        {
-            base.Reset();
-            tilemap.ClearAll();
         }
 
 

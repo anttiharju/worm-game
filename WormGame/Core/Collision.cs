@@ -88,11 +88,14 @@ namespace WormGame.Core
                 return block;
             if (current is Worm)
                 return worm;
-            if (current is Fruit fruit)
+            if (current is FruitManager fruits)
             {
                 if (consume)
-                    fruit.Spawn();
-                return this.fruit;
+                {
+                    fruits.Remove(x, y);
+                    fruits.Spawn();
+                }
+                return fruit;
             }
             throw new UnknownEntityException();
         }
@@ -146,18 +149,18 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Adds a rectangular object to collision.
+        /// Add block module to collision.
         /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="startX"></param>
-        /// <param name="startY"></param>
-        /// <param name="scaleX"></param>
-        /// <param name="scaleY"></param>
-        public void Add(Object entity, int startX, int startY, int scaleX, int scaleY)
+        /// <param name="module">Block module or null</param>
+        /// <param name="startX">module.X</param>
+        /// <param name="startY">module.Y</param>
+        /// <param name="width">module.Width</param>
+        /// <param name="height">module.Height</param>
+        public void Add(Object module, int startX, int startY, int width, int height)
         {
-            for (int x = startX; x < startX + scaleX; x++)
-                for (int y = startY; y < startY + scaleY; y++)
-                    Add(entity, x, y);
+            for (int x = startX; x < startX + width; x++)
+                for (int y = startY; y < startY + height; y++)
+                    Add(module, x, y);
         }
 
 
@@ -244,7 +247,7 @@ namespace WormGame.Core
                         line.Append('o');
                         continue;
                     }
-                    if (current is Fruit)
+                    if (current is FruitManager)
                     {
                         line.Append('f');
                         continue;
