@@ -17,7 +17,7 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Constructor for tests.
+        /// Test constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Simplifies pooler generics for testing.")]
