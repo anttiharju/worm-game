@@ -23,6 +23,24 @@ I use changelog as a brain dump where I explain future plans and further explain
     - Future plans
         - Create a benchmark that measures worm performance
 
+- Cleanup
+    - Sometimes there's a mysterious 5 printed to console.
+        - Attempted fix: redownloaded otter
+            - Let the game ran for a good while and no 5 in sight.
+    - Optimize blockSpawner
+    - Future ideas
+        - As more and more entities will be under some kind of mananager, we probably can get rid of defragmenting in favor of calling entitys disable from pooler.
+        - Get rid of as many static functions as possible. It's just not a good practise?
+        - There are two ways to optimize worms
+            - First one: surface with autoclear off. This is the most appealing as I wouldn't have to create any textures to make it look nice. There's just a lot of pitfalls and each worm will take up at least 2, likely 4 renders.
+            - Second one: tilemap + 2x graphics. This would be almost twice as fast to render (little over 2 vs 4 renders per worm) but to make worms look nice I'd probably have to create some kind of a texture and I don't want to do that.
+            - I hope I can get rid of worm like I got rid of blocks in favor of just modules but we'll have to see
+                - Alternatively I hope I can reduce the amount of modules a worm needs
+            - The doubling of wormAmount to wormCap can probably be removed if I just spawn the worm a update later. This is already a massive save.
+    - Worm benchmark (200x100, worm length 6 and blockifyWorms = false and let run until no new worms spawn)
+        - Update 7ms (3339 entities) Render 28ms (20 000 Renders) 22,3 AVG FPS
+            - This is the unoptimized baseline benchmark against which future benchmarks will be compared against.
+
 
 # 13.08.2020
 - Add BlockManager

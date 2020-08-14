@@ -13,8 +13,10 @@ namespace WormGame.Core
         public readonly WormScene scene;
         public readonly Collision collision;
 #if DEBUG
-        public bool visualizeCollision = false;   // 119x29 fits in debug console
-        public bool disableBlocks = true;         // For benchmarking purposes
+        public bool visualizeCollision = false;
+        public readonly bool visualizeBlockifying = false;
+        public readonly bool disableBlocks = true;
+        public readonly bool blockifyWorms = false;
 #endif
 
         // Window
@@ -24,8 +26,8 @@ namespace WormGame.Core
         public readonly int refreshRate = 144;    // See wormSpeed before changing this
 
         // Scene
-        public readonly int width = 40;
-        public readonly int height = 20;
+        public readonly int width = 200;
+        public readonly int height = 100;
         public readonly int margin = 2;
 
         // Worm

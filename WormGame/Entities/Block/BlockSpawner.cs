@@ -14,9 +14,10 @@ namespace WormGame.Entities
     {
 #if DEBUG
         private readonly bool disableBlocks;
+        private readonly bool visualize;
 #endif
         private readonly Collision collision;
-        private readonly int[,] optimizationBuffer;
+        private readonly bool[,] optimizationBuffer;
         private readonly int width;
         private readonly int height;
 
@@ -38,9 +39,10 @@ namespace WormGame.Entities
             collision = config.collision;
             width = config.width;
             height = config.height;
-            optimizationBuffer = new int[width, height];
+            optimizationBuffer = new bool[width, height];
 #if DEBUG
             disableBlocks = config.disableBlocks;
+            visualize = config.visualizeBlockifying;
 #endif
         }
 
@@ -65,8 +67,9 @@ namespace WormGame.Entities
             }
             for (int y = bottom; y <= top; y++)
                 for (int x = left; x <= right; x++)
-                    if (optimizationBuffer[x, y] == 1)
+                    if (optimizationBuffer[x, y] == true)
                     {
+                        optimizationBuffer[x, y] = false;
                         if (firstModule == null)
                         {
                             lastModule = manager.Enable().Initialize(color, x, y);
@@ -84,8 +87,11 @@ namespace WormGame.Entities
                             ExpandX(x, y);
                         lastModule.Add();
                     }
-            ClearBuffer(worm.firstModule, worm.Length);
             firstModule = null;
+#if DEBUG
+            if (visualize)
+                Visualize();
+#endif
             return firstModule;
         }
 
@@ -154,10 +160,10 @@ namespace WormGame.Entities
             int xPos = x + lastModule.Width;
             if (xPos >= width) return false;
             for (int yPos = y; yPos < y + yScale; yPos++)
-                if (optimizationBuffer[xPos, yPos] != 1)
+                if (optimizationBuffer[xPos, yPos] != true)
                     return false;
             for (int yPos = y; yPos < y + yScale; yPos++)
-                optimizationBuffer[xPos, yPos] = 2;
+                optimizationBuffer[xPos, yPos] = false;
             lastModule.Width++;
             return true;
         }
@@ -175,69 +181,51 @@ namespace WormGame.Entities
             int yPos = y + lastModule.Height;
             if (yPos >= height) return false;
             for (int xPos = x; xPos < x + xScale; xPos++)
-                if (optimizationBuffer[xPos, yPos] != 1)
+                if (optimizationBuffer[xPos, yPos] != true)
                     return false;
             for (int xPos = x; xPos < x + xScale; xPos++)
-                optimizationBuffer[xPos, yPos] = 2;
+                optimizationBuffer[xPos, yPos] = false;
             lastModule.Height++;
             return true;
         }
 
 
         /// <summary>
-        /// Clears optimization buffer or initializes it and stops spawn process if there's a neighbouring block of the same color.
+        /// Initializes optimization buffer and checks for neighbours of the same color.
         /// </summary>
-        /// <param name="wormModule">Worms first module</param>
+        /// <param name="wormModule">Worm.firstModule</param>
         /// <param name="wormLength">Worms length</param>
-        /// <param name="initialize">Initialize or clear</param>
-        /// <returns>Stop spawn process</returns>
-        private bool SetBuffer(WormModule wormModule, int wormLength, bool initialize = false)
+        /// <returns>Abort spawn process</returns>
+        private bool InitBuffer(WormModule wormModule, int wormLength)
         {
-            bool stop = false;
-            int n = 0;
-            if (initialize) n++;
             for (int i = 0; i < wormLength; i++)
             {
                 int x = collision.X(wormModule.Target.X);
                 int y = collision.Y(wormModule.Target.Y);
-                optimizationBuffer[x, y] = n;
-                if (initialize)
-                {
-#if DEBUG
-                    if (disableBlocks)
-#endif
-                        if (CheckNeighbours(x, y)) stop = true;
-                    if (x < left) left = x;
-                    if (y < bottom) bottom = y;
-                    if (x > right) right = x;
-                    if (y > top) top = y;
-                }
+                optimizationBuffer[x, y] = true;
+                if (CheckNeighbours(x, y)) return true;
+                if (x < left) left = x;
+                if (y < bottom) bottom = y;
+                if (x > right) right = x;
+                if (y > top) top = y;
                 wormModule = wormModule.Next;
             }
-            return stop;
-        }
-
-
-        /// <summary>
-        /// Initializes optimization buffer and stops spawning if there's a neighbouring block of the same color.
-        /// </summary>
-        /// <param name="wormModule">Worms first module</param>
-        /// <param name="wormLength">Worms length</param>
-        /// <returns>Stop spawn process</returns>
-        private bool InitBuffer(WormModule wormModule, int wormLength)
-        {
-            return SetBuffer(wormModule, wormLength, true);
+            return false;
         }
 
 
         /// <summary>
         /// Clears optimization buffer.
         /// </summary>
-        /// <param name="wormModule">Worms first module</param>
+        /// <param name="wormModule">Worm.firstModule</param>
         /// <param name="wormLength">Worms length</param>
         private void ClearBuffer(WormModule wormModule, int wormLength)
         {
-            SetBuffer(wormModule, wormLength);
+            for (int i = 0; i < wormLength; i++)
+            {
+                optimizationBuffer[collision.X(wormModule.Target.X), collision.Y(wormModule.Target.Y)] = false;
+                wormModule = wormModule.Next;
+            }
         }
 
 
@@ -276,6 +264,10 @@ namespace WormGame.Entities
         /// <returns>Is neighbour the same color</returns>
         private bool CheckNeighbour(int x, int y)
         {
+#if DEBUG
+            if (!disableBlocks)
+                return false;
+#endif
             Object cell = collision.Get(x, y);
             if (cell is BlockModule module)
                 if (Help.Equal(module.Color, color))
@@ -285,5 +277,28 @@ namespace WormGame.Entities
                 }
             return false;
         }
+#if DEBUG
+        /// <summary>
+        /// Visualizes optimization buffer.
+        /// </summary>
+        public void Visualize()
+        {
+            for (int y = 0; y < height; y++)
+            {
+                Console.CursorTop = y + 1;
+                System.Text.StringBuilder line = new System.Text.StringBuilder(width);
+                for (int x = 0; x < width; x++)
+                {
+                    if (optimizationBuffer[x, y])
+                        line.Append('x');
+                    else
+                        line.Append('.');
+                }
+                Console.WriteLine(line.ToString());
+            }
+            Console.CursorLeft = 0;
+            Console.CursorTop = height + 1;
+        }
+#endif
     }
 }
