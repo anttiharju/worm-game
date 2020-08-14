@@ -18,13 +18,15 @@ namespace WormGame
     {
         private readonly Config config;
         private readonly Collision collision;
+        private readonly Tilemap tilemap;
         private readonly Pooler<Player> players;
         private readonly Pooler<Worm> worms;
-        private readonly Pooler<Fruit> fruits;
+        private readonly FruitManager fruits;
         private readonly Pooler<WormModule> wormModules;
         private readonly BlockManager blocks;
         private readonly float stepAccuracy;
         private readonly int wormCap;
+        private readonly int fruitAmount;
 
         private float wormFrequency;
         private int wormAmount;
@@ -36,16 +38,18 @@ namespace WormGame
         public WormScene(Config config)
         {
             this.config = config;
-            wormCap = config.wormCap;
             collision = config.collision;
+            tilemap = config.tilemap;
+            wormCap = config.wormCap;
             stepAccuracy = config.step / 2;
             wormFrequency = config.size - config.step;
+            fruitAmount = config.fruitAmount;
             CreateBorders(config.width, config.height);
             worms = new Pooler<Worm>(this, config, config.wormAmount);
-            fruits = new Pooler<Fruit>(this, config, config.fruitAmount);
-            players = new Pooler<Player>(this, config, 5);
             wormModules = new Pooler<WormModule>(this, config, config.moduleAmount);
-            blocks = new BlockManager(this, config, config.moduleAmount);
+            players = new Pooler<Player>(this, config, 5);
+            fruits = new FruitManager(config);
+            blocks = new BlockManager(config);
             Start();
         }
 
@@ -56,8 +60,8 @@ namespace WormGame
         private void Start()
         {
             if (config.fruits)
-                for (int i = 0; i < fruits.Length; i++)
-                    SpawnFruit();
+                for (int i = 0; i < fruitAmount; i++)
+                    fruits.Spawn();
             for (int i = 0; i < 5; i++)
                 SpawnPlayer(i);
         }
@@ -70,10 +74,10 @@ namespace WormGame
         {
             players.Reset();
             worms.Reset();
-            fruits.Reset();
             blocks.Reset();
             collision.Reset();
             wormModules.Reset();
+            tilemap.ClearAll();
             wormFrequency = config.size - config.step;
             wormAmount = 0;
             Start();
@@ -134,8 +138,7 @@ namespace WormGame
                         random = Random.ValidPosition(collision, config.width, config.height, collision.fruit);
                         if (random.X != -1 && collision.Check(random) == collision.fruit)
                         {
-                            Fruit fruit = (Fruit)collision.Get(random);
-                            fruit.Disable();
+                            fruits.Remove(collision.X(random.X), collision.Y(random.Y));
                             SpawnWorm(collision.X(random.X), collision.Y(random.Y));
                         }
                         else
@@ -192,15 +195,6 @@ namespace WormGame
         public Player SpawnPlayer(int playerNumber)
         {
             return players.Enable().Spawn(playerNumber, config.windowWidth / 2, config.windowHeight / 2);
-        }
-
-
-        /// <summary>
-        /// Spawn a fruit.
-        /// </summary>
-        private void SpawnFruit()
-        {
-            fruits.Enable().Spawn();
         }
 
 

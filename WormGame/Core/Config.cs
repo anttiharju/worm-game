@@ -1,4 +1,5 @@
-﻿using WormGame.Static;
+﻿using Otter.Graphics.Drawables;
+using WormGame.Static;
 
 namespace WormGame.Core
 {
@@ -12,11 +13,12 @@ namespace WormGame.Core
         // Misc
         public readonly WormScene scene;
         public readonly Collision collision;
+        public readonly Tilemap tilemap;
 #if DEBUG
         public bool visualizeCollision = false;
         public readonly bool visualizeBlockifying = false;
         public readonly bool disableBlocks = true;
-        public readonly bool blockifyWorms = false;
+        public readonly bool blockifyWorms = true;
 #endif
 
         // Window
@@ -26,19 +28,19 @@ namespace WormGame.Core
         public readonly int refreshRate = 144;    // See wormSpeed before changing this
 
         // Scene
-        public readonly int width = 200;
-        public readonly int height = 100;
+        public readonly int width = 20;
+        public readonly int height = 10;
         public readonly int margin = 2;
 
         // Worm
-        public readonly int wormCap = 0;           // Overrides wormPercentage if > 0.
-        public readonly int wormSpeed = 144;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
+        public readonly int wormCap = 1;           // Overrides wormPercentage if > 0.
+        public readonly int wormSpeed = 6;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
         public readonly int minWormLength = 6;
         public readonly float wormPercentage = 1;
 
         // Fruit
-        public readonly bool fruits = false;
-        public readonly float fruitPercentage = 0.15f;
+        public readonly bool fruits = true;
+        public readonly float fruitPercentage = 0.015f;
 
         #region Calculated variables
         // Amounts
@@ -171,7 +173,13 @@ namespace WormGame.Core
             if (height % 2 == 0) topBorder += size / 2;
             step = (float)wormSpeed / refreshRate * size;
             collision = new Collision(this);
+            tilemap = new Tilemap(width * size, height * size, size, size)
+            {
+                X = leftBorder - halfSize,
+                Y = topBorder - halfSize
+            };
             scene = new WormScene(this);
+            scene.AddGraphic(tilemap);
         }
 
 
