@@ -147,7 +147,7 @@ namespace WormGame
                 }
 #if DEBUG
                 if (config.visualizeCollision)
-                    collision.VisualizeCollision();
+                    collision.Visualize();
 #endif
             }
         }

@@ -220,7 +220,7 @@ namespace WormGame.Core
         /// <summary>
         /// Visualizes collision field in debug console as ASCII art.
         /// </summary>
-        public void VisualizeCollision()
+        public void Visualize()
         {
             for (int y = 0; y < height; y++)
             {
@@ -234,7 +234,7 @@ namespace WormGame.Core
                         line.Append('.');
                         continue;
                     }
-                    if (current is BlockSpawner)
+                    if (current is BlockModule)
                     {
                         line.Append('x');
                         continue;

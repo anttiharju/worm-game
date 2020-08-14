@@ -13,6 +13,9 @@ namespace WormGame.Entities
     /// </summary>
     public class Worm : PoolableEntity
     {
+#if DEBUG
+        private readonly bool blockifyWorms;
+#endif
         public WormModule firstModule;
 
         private readonly Collision collision;
@@ -61,6 +64,9 @@ namespace WormGame.Entities
         /// <param name="config">Configuration</param>
         public Worm(Config config)
         {
+#if DEBUG
+            blockifyWorms = config.blockifyWorms;
+#endif
             size = config.size;
             step = config.step;
             collision = config.collision;
@@ -148,8 +154,15 @@ namespace WormGame.Entities
             {
                 if (retry) // If stuck, turn into a block.
                 {
-                    scene.SpawnBlock(this);
-                    Disable();
+#if DEBUG
+                    if (blockifyWorms)
+                    {
+#endif
+                        scene.SpawnBlock(this);
+                        Disable();
+#if DEBUG
+                    }
+#endif
                 }
                 else if (Player == null) // Find a new direction if not posessed by player.
                 {
