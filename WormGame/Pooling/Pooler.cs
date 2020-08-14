@@ -146,7 +146,7 @@ namespace WormGame.Pooling
                     return null;
             int activated = Index;
             pool[activated].Active = true;
-            if (Index != endIndex)
+            if (Index < endIndex)
                 Index++;
             return pool[activated];
         }
