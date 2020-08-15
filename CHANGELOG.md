@@ -50,8 +50,8 @@ I use changelog as a brain dump where I explain future plans and further explain
         - Tilemap based one will require textures and figuring out what texture to use for what part of the worm can be kind of difficult.
         - Surface wouldn't require textures, but as fruits already will require, what the heck.
             - Okay I *could* make fruits use a surface instead of tilemap, but not sure I want to do it as tilemap is kind of neat.
-    - Next step: make wormModules scalable? Should be doable but I'm not sure how messy it will be.
-        - Worms **will** look weird for a while but this is easier to do before migrating them to a new rendering approach.
+    - ~~Next step: make wormModules scalable? Should be doable but I'm not sure how messy it will be.~~
+        - ~~Worms **will** look weird for a while but this is easier to do before migrating them to a new rendering approach.~~
         - Neither one of the new worm rendering approaches will let us keep the worms looking the way they look (many circles: ooooooooooooo) but even in the original idea.svg the worms were rectangular.
     - Did some documentation updating.
 

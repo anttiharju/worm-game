@@ -18,7 +18,7 @@ namespace WormGame.Core
         public readonly int fruit = 3;
         public readonly int empty = 4;
 
-        private readonly Object[,] collision;
+        private readonly object[,] collision;
         private readonly int leftBorder;
         private readonly int topBorder;
         private readonly int size;
@@ -38,7 +38,7 @@ namespace WormGame.Core
             width = config.width;
             height = config.height;
             size = config.size;
-            collision = new Object[width, height];
+            collision = new object[width, height];
             leftBorder = config.leftBorder;
             topBorder = config.topBorder;
         }
@@ -50,7 +50,7 @@ namespace WormGame.Core
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
         /// <returns>Poolable entity as reference</returns>
-        public ref Object Get(int x, int y)
+        public ref object Get(int x, int y)
         {
             return ref collision[x, y];
         }
@@ -61,7 +61,7 @@ namespace WormGame.Core
         /// </summary>
         /// <param name="position">Entity position</param>
         /// <returns>Poolable entity as reference</returns>
-        public ref Object Get(Vector2 position)
+        public ref object Get(Vector2 position)
         {
             return ref Get(X(position.X), Y(position.Y));
         }
@@ -81,7 +81,7 @@ namespace WormGame.Core
                 x >= width ||
                 y >= height)
                 return invalid;
-            Object current = collision[x, y];
+            object current = collision[x, y];
             if (current == null)
                 return empty;
             if (current is BlockModule)
@@ -97,7 +97,7 @@ namespace WormGame.Core
                 }
                 return fruit;
             }
-            throw new UnknownEntityException();
+            throw new UnknownCollisionException();
         }
 
 
@@ -119,7 +119,7 @@ namespace WormGame.Core
         /// <param name="entity">Worm</param>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
-        public void Add(Object entity, int x, int y)
+        public void Add(object entity, int x, int y)
         {
             collision[x, y] = entity;
         }
@@ -130,7 +130,7 @@ namespace WormGame.Core
         /// </summary>
         /// <param name="entity">Entity</param>
         /// <param name="position">Entity position</param>
-        public void Add(Object entity, Vector2 position)
+        public void Add(object entity, Vector2 position)
         {
             Add(entity, X(position.X), Y(position.Y));
         }
@@ -142,7 +142,7 @@ namespace WormGame.Core
         /// <param name="entity">Entity</param>
         /// <param name="x">Horizontal entity position</param>
         /// <param name="y">Vertical entity position</param>
-        public void Add(Object entity, float x, float y)
+        public void Add(object entity, float x, float y)
         {
             Add(entity, X(x), Y(y));
         }
@@ -156,7 +156,7 @@ namespace WormGame.Core
         /// <param name="startY">module.Y</param>
         /// <param name="width">module.Width</param>
         /// <param name="height">module.Height</param>
-        public void Add(Object module, int startX, int startY, int width, int height)
+        public void Add(object module, int startX, int startY, int width, int height)
         {
             for (int x = startX; x < startX + width; x++)
                 for (int y = startY; y < startY + height; y++)
@@ -231,7 +231,7 @@ namespace WormGame.Core
                 System.Text.StringBuilder line = new System.Text.StringBuilder(width);
                 for (int x = 0; x < width; x++)
                 {
-                    Object current = collision[x, y];
+                    object current = collision[x, y];
                     if (current == null)
                     {
                         line.Append('.');
@@ -252,7 +252,7 @@ namespace WormGame.Core
                         line.Append('f');
                         continue;
                     }
-                    throw new UnknownEntityException();
+                    throw new UnknownCollisionException();
                 }
                 Console.WriteLine(line.ToString());
             }
@@ -266,11 +266,11 @@ namespace WormGame.Core
     /// <summary>
     /// Exception to use when entity is unknown.
     /// </summary>
-    public class UnknownEntityException : Exception
+    public class UnknownCollisionException : Exception
     {
         /// <summary>
         /// Constructor. Creates custom exception message.
         /// </summary>
-        public UnknownEntityException() : base("Unknown entity.") { }
+        public UnknownCollisionException() : base("Unknown collision object.") { }
     }
 }
