@@ -131,13 +131,13 @@ namespace WormGame.Entities
             Position = Vector2.Zero;
             deadZone = 90;
             if (yMovement < -deadZone)
-                worm.Direction = Help.directions[0]; // UP
+                worm.Direction = Help.directions[0];
             if (xMovement < -deadZone)
-                worm.Direction = Help.directions[1]; // LEFT
+                worm.Direction = Help.directions[1];
             if (yMovement > deadZone)
-                worm.Direction = Help.directions[2]; // DOWN
+                worm.Direction = Help.directions[2];
             if (xMovement > deadZone)
-                worm.Direction = Help.directions[3]; // RIGHT
+                worm.Direction = Help.directions[3];
             Wormskip:;
             #endregion;
         }
