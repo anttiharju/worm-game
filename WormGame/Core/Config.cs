@@ -1,4 +1,6 @@
-﻿using Otter.Graphics.Drawables;
+﻿using Otter.Core;
+using Otter.Graphics;
+using Otter.Graphics.Drawables;
 using WormGame.Static;
 
 namespace WormGame.Core
@@ -14,11 +16,12 @@ namespace WormGame.Core
         public readonly WormScene scene;
         public readonly Collision collision;
         public readonly Tilemap tilemap;
+        public readonly Color backgroundColor = Color.Black;
 #if DEBUG
         public bool visualizeCollision = false;
         public readonly bool visualizeBlockifying = false;
         public readonly bool disableBlocks = true;
-        public readonly bool blockifyWorms = true;
+        public readonly bool blockifyWorms = false;
 #endif
 
         // Window
@@ -30,13 +33,13 @@ namespace WormGame.Core
         // Scene
         public readonly int width = 20;
         public readonly int height = 10;
-        public readonly int margin = 2;
+        public readonly int margin = 1;
 
         // Worm
-        public readonly int wormCap = 1;           // Overrides wormPercentage if > 0.
+        public readonly int wormCap = 0;           // Overrides wormPercentage if > 0.
         public readonly int wormSpeed = 6;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
         public readonly int minWormLength = 6;
-        public readonly float wormPercentage = 1;
+        public readonly float wormPercentage = 0.2f;
 
         // Fruit
         public readonly bool fruits = true;
@@ -162,7 +165,6 @@ namespace WormGame.Core
                 wormAmount = FastMath.Round(moduleAmount / minWormLength * wormPercentage);
                 wormCap = wormAmount;
             }
-            wormAmount *= 2; // Every worm might turn into a block simultaneously
 
             // Other
             size = CalculateSize(windowWidth, windowHeight);

@@ -43,7 +43,7 @@ namespace WormGame.Entities
                 return false;
             int x = collision.X(random.X);
             int y = collision.Y(random.Y);
-            tilemap.SetTile(x, y, Color.White, "");
+            tilemap.SetTile(x, y, 0, "");
             collision.Add(this, x, y);
             return true;
         }
