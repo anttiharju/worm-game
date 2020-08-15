@@ -17,6 +17,7 @@ namespace WormGame.Core
         public readonly Collision collision;
         public readonly Tilemap tilemap;
         public readonly Color backgroundColor = Color.Black;
+        public readonly Color foregroundColor = Color.White;
 #if DEBUG
         public bool visualizeCollision = false;
         public readonly bool visualizeBlockifying = false;
