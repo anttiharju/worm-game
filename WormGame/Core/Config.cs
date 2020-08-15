@@ -15,11 +15,10 @@ namespace WormGame.Core
         public readonly WormScene scene;
         public readonly Collision collision;
         public readonly Tilemap tilemap;
-        public readonly Surface surface;
         public readonly Color backgroundColor = Color.Black;
         public readonly Color foregroundColor = Color.White;
 #if DEBUG
-        public bool visualizeCollision = false;
+        public readonly bool visualizeCollision = false;
         public readonly bool visualizeBlockifying = false;
         public readonly bool disableBlocks = true;
         public readonly bool blockifyWorms = true;
@@ -37,7 +36,7 @@ namespace WormGame.Core
         public readonly int margin = 1;
 
         // Worm
-        public readonly int wormCap = 0;           // Overrides wormPercentage if > 0.
+        public readonly int wormCap = 1;           // Overrides wormPercentage if > 0.
         public readonly int wormSpeed = 6;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
         public readonly int minWormLength = 6;
         public readonly float wormPercentage = 0.2f;
@@ -176,17 +175,12 @@ namespace WormGame.Core
             if (height % 2 == 0) topBorder += size / 2;
             wormStep = (float)wormSpeed / refreshRate * size;
             collision = new Collision(this);
-            surface = new Surface(windowWidth, windowHeight, backgroundColor)
-            {
-                AutoClear = false
-            };
             tilemap = new Tilemap(width * size, height * size, size, size)
             {
                 X = leftBorder - halfSize,
                 Y = topBorder - halfSize
             };
             scene = new WormScene(this);
-            scene.AddGraphic(surface);
             scene.AddGraphic(tilemap);
         }
 
