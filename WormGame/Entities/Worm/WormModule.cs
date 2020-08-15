@@ -1,19 +1,21 @@
 ﻿using Otter.Graphics;
 using Otter.Graphics.Drawables;
 using Otter.Utility.MonoGame;
+using System.Runtime.CompilerServices;
 using WormGame.Core;
 using WormGame.Pooling;
 
 namespace WormGame.Entities
 {
     /// @author Antti Harju
-    /// @version 28.07.2020
+    /// @version 14.08.2020
     /// <summary>
     /// WormModule. Thanks to modularity worm length can be increased during runtime.
     /// </summary>
     public class WormModule : Poolable
     {
         private readonly Collision collision;
+        private readonly float step;
 
 
         /// <summary>
@@ -50,7 +52,7 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Constructor.
+        /// Default constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
         public WormModule(Config config)
@@ -58,6 +60,7 @@ namespace WormGame.Entities
             collision = config.collision;
             Graphic = Image.CreateCircle(config.size / 2);
             Graphic.CenterOrigin();
+            step = config.wormStep;
         }
 
 
@@ -78,13 +81,13 @@ namespace WormGame.Entities
         /// </summary>
         /// <param name="positionDelta">Worm entity position delta</param>
         /// <param name="step">Worm step</param>
-        public void GraphicFollow(Vector2 positionDelta, float step)
+        public void GraphicFollow()
         {
-            Vector2 delta = Direction * step - positionDelta;
+            Vector2 delta = Direction * step;
             Graphic.X += delta.X;
             Graphic.Y += delta.Y;
             if (Next != null)
-                Next.GraphicFollow(positionDelta, step);
+                Next.GraphicFollow();
         }
 
 
@@ -128,9 +131,14 @@ namespace WormGame.Entities
         /// <param name="target">Target</param>
         public void SetTarget(Vector2 target)
         {
-            this.target = target;
+            SetTarget(target.X, target.Y);
         }
 
+        public void SetTarget(float x, float y)
+        {
+            target.X = x;
+            target.Y = y;
+        }
 
         /// <summary>
         /// Recursively disable every one of worms modules.

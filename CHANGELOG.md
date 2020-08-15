@@ -6,6 +6,13 @@ I use changelog as a brain dump where I explain future plans and further explain
 - I tried surface-based approach, but it's a failure.
     - Even though I could probably work out rendering artifacts, I can't clear worms from the surface once they've been disabled without some elaborate eraser system.
     - Switching to tilemap approach.
+- Thoughts on WormModules
+    - I could create a worm system where worm would have head, waypoints, and tail (end). Waypoints would be somewhat analogic to current modules.
+        - It would only need one waypoint per direction change, instead of current one module per length. Also only head and tail are relevant to worms graphics so the modules in between are kind of unnecesary.
+        - The thing is, if I want to be *sure* that waypoint pooler would never run out of waypoints, I'd have to init the same amount of them as modules.
+            - Counterargument: there would be less runtime computation even if disabling was a little bit more complex.
+        - Result: I'll try to implement waypoint system and if that fails, I'll fall back to current modules.
+- Upgrading worms to work under a manager netted me a grand total of 1,7 FPS which is within the margin of error. The game is GPU bound and rendering graphic under many vs single entity doesn't seem to affect performance.
 
 
 # 14.08.2020
@@ -105,7 +112,6 @@ I use changelog as a brain dump where I explain future plans and further explain
                 - Add method is no longer virtual (never should have been)
                     - I always thought override was overwrite but turns out it's not
                         - huh
-
 
 - Fix block crash and faulty object disabling
     - The root cause for the crashes were that I didn't set blocks firstModule to null when disabling it, because of that after every block had been used one they would spawn incorrectly as part of their spawning logic relies on firstModule being null.
