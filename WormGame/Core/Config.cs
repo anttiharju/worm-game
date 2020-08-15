@@ -1,5 +1,4 @@
-﻿using Otter.Core;
-using Otter.Graphics;
+﻿using Otter.Graphics;
 using Otter.Graphics.Drawables;
 using WormGame.Static;
 
@@ -16,13 +15,14 @@ namespace WormGame.Core
         public readonly WormScene scene;
         public readonly Collision collision;
         public readonly Tilemap tilemap;
+        public readonly Surface surface;
         public readonly Color backgroundColor = Color.Black;
         public readonly Color foregroundColor = Color.White;
 #if DEBUG
         public bool visualizeCollision = false;
         public readonly bool visualizeBlockifying = false;
         public readonly bool disableBlocks = true;
-        public readonly bool blockifyWorms = false;
+        public readonly bool blockifyWorms = true;
 #endif
 
         // Window
@@ -43,7 +43,7 @@ namespace WormGame.Core
         public readonly float wormPercentage = 0.2f;
 
         // Fruit
-        public readonly bool fruits = true;
+        public readonly bool spawnFruits = true;
         public readonly float fruitPercentage = 0.015f;
 
         #region Calculated variables
@@ -54,7 +54,7 @@ namespace WormGame.Core
         public readonly int moduleAmount;
 
         // Misc
-        public readonly float step;
+        public readonly float wormStep;
         public readonly int size;
         public readonly int halfSize;
 
@@ -174,14 +174,19 @@ namespace WormGame.Core
             topBorder = windowHeight / 2 - height / 2 * size;
             if (width % 2 == 0) leftBorder += size / 2;
             if (height % 2 == 0) topBorder += size / 2;
-            step = (float)wormSpeed / refreshRate * size;
+            wormStep = (float)wormSpeed / refreshRate * size;
             collision = new Collision(this);
+            surface = new Surface(windowWidth, windowHeight, backgroundColor)
+            {
+                AutoClear = false
+            };
             tilemap = new Tilemap(width * size, height * size, size, size)
             {
                 X = leftBorder - halfSize,
                 Y = topBorder - halfSize
             };
             scene = new WormScene(this);
+            scene.AddGraphic(surface);
             scene.AddGraphic(tilemap);
         }
 

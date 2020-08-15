@@ -60,7 +60,7 @@ namespace WormGame.Entities
             collision = config.collision;
             Graphic = Image.CreateCircle(config.size / 2);
             Graphic.CenterOrigin();
-            step = config.step;
+            step = config.wormStep;
         }
 
 
