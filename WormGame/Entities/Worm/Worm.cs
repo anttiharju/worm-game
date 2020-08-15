@@ -3,6 +3,7 @@ using Otter.Utility.MonoGame;
 using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
+using Otter.Graphics.Drawables;
 
 namespace WormGame.Entities
 {
@@ -19,6 +20,9 @@ namespace WormGame.Entities
         public WormModule firstModule;
 
         private readonly Collision collision;
+        private readonly Image head;
+        private readonly Image tail;
+        private readonly Image eraser;
         private readonly int size;
 
         private Pooler<WormModule> modules;
@@ -68,6 +72,15 @@ namespace WormGame.Entities
 #endif
             size = config.size;
             collision = config.collision;
+            eraser = Image.CreateCircle(config.halfSize, Color.Gold);
+            head = Image.CreateCircle(config.halfSize);
+            tail = Image.CreateCircle(config.halfSize);
+            eraser.CenterOrigin();
+            head.CenterOrigin();
+            tail.CenterOrigin();
+            AddGraphic(eraser);
+            AddGraphic(head);
+            AddGraphic(tail);
         }
 
 
@@ -89,11 +102,14 @@ namespace WormGame.Entities
             Length = 1;
             moving = true;
 
+            head.Color = color;
+            tail.Color = color;
+
             firstModule = wormModules.Enable();
             firstModule.Graphic.SetPosition(collision.EntityX(x), collision.EntityY(y));
             firstModule.SetTarget(collision.EntityX(x), collision.EntityY(y));
             firstModule.Graphic.Color = color;
-            AddGraphic(firstModule.Graphic);
+            //AddGraphic(firstModule.Graphic);
 
             lastModule = firstModule;
             for (int i = 1; i < length; i++)
@@ -115,7 +131,7 @@ namespace WormGame.Entities
             newModule.Graphic.Color = Color;
             newModule.Graphic.SetPosition(lastModule.Graphic.X, lastModule.Graphic.Y);
             newModule.SetTarget(lastModule.Target);
-            AddGraphic(newModule.Graphic);
+            //AddGraphic(newModule.Graphic);
             lastModule.ResetDirection();
             lastModule.Next = newModule;
             lastModule = newModule;
@@ -180,7 +196,10 @@ namespace WormGame.Entities
         {
             if (moving)
             {
+                eraser.SetPosition(lastModule.Graphic.X, lastModule.Graphic.Y);
                 firstModule.GraphicFollow();
+                head.SetPosition(firstModule.Graphic.X, firstModule.Graphic.Y);
+                tail.SetPosition(lastModule.Graphic.X, lastModule.Graphic.Y);
             }
         }
 
@@ -194,7 +213,7 @@ namespace WormGame.Entities
             base.Disable();
             if (recursive)
                 firstModule.Disable();
-            ClearGraphics();
+            //ClearGraphics();
             moving = false;
         }
     }
