@@ -1,10 +1,78 @@
-﻿using Otter.Graphics;
+﻿using System;
+using Otter.Graphics;
+using Otter.Graphics.Drawables;
 using WormGame.Core;
 using WormGame.Static;
-using System;
+using WormGame.Pooling;
 
 namespace WormGame.Entities
 {
+    /// @author Antti Harju
+    /// @version 14.08.2020
+    /// <summary>
+    /// A custom pooler that can be called to create blocks. Uses tilemap to render objects.
+    /// </summary>
+    public class BlockManager : Pooler<BlockModule>
+    {
+        public readonly BlockSpawner blockSpawner;
+
+        private readonly Tilemap tilemap;
+
+
+        /// <summary>
+        /// Initialize manager.
+        /// </summary>
+        /// <param name="config">Configuration</param>
+        public BlockManager(Config config)
+        {
+            tilemap = config.tilemap;
+            blockSpawner = new BlockSpawner(config);
+
+            int capacity = config.moduleAmount;
+            pool = new BlockModule[capacity];
+            endIndex = capacity - 1;
+            for (int i = 0; i < capacity; i++)
+            {
+                BlockModule current = new BlockModule(config, this);
+                current.Disable(false);
+                pool[i] = current;
+            }
+        }
+
+
+        /// <summary>
+        /// Add module to tilemap.
+        /// </summary>
+        /// <param name="module">Module to add</param>
+        public void Add(BlockModule module)
+        {
+            // Replace block.Color with Otter.Graphics.Color.Random to see the modules that form the blocks
+            tilemap.SetRect(module.X, module.Y, module.Width, module.Height, module.Color, "");
+        }
+
+
+        /// <summary>
+        /// Clears module from tilemap.
+        /// </summary>
+        /// <param name="module">Module to clear</param>
+        public void Clear(BlockModule module)
+        {
+            tilemap.ClearRect(module.X, module.Y, module.Width, module.Height);
+        }
+
+
+        /// <summary>
+        /// Spawn a block.
+        /// </summary>
+        /// <param name="worm">Worm to blockify</param>
+        /// <returns>Block or null</returns>
+        public BlockModule SpawnBlock(Worm worm)
+        {
+            return blockSpawner.Spawn(worm, this);
+        }
+    }
+
+
     /// @author Antti Harju
     /// @version 14.08.2020
     /// <summary>
@@ -300,5 +368,115 @@ namespace WormGame.Entities
             Console.CursorTop = height + 1;
         }
 #endif
+    }
+
+
+    /// @author Antti Harju
+    /// @version 14.08.2020
+    /// <summary>
+    /// Block module. BlockSpawner forms blocks out of these.
+    /// </summary>
+    public class BlockModule : Poolable
+    {
+        private readonly BlockManager manager;
+        private readonly Collision collision;
+
+
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        /// <param name="config">Configuration</param>
+        /// <param name="manager">Manager</param>
+        public BlockModule(Config config, BlockManager manager)
+        {
+            this.manager = manager;
+            collision = config.collision;
+        }
+
+
+        /// <summary>
+        /// Adds block to tilemap and collision.
+        /// </summary>
+        public void Add()
+        {
+            manager.Add(this);
+            collision.Add(First, X, Y, Width, Height);
+        }
+
+
+        /// <summary>
+        /// Disables block.
+        /// </summary>
+        /// <param name="recursive">Disable recursively</param>
+        public override void Disable(bool recursive = true)
+        {
+            base.Disable();
+            if (recursive && Next != null)
+                Next.Disable();
+            Next = null;
+            First = null;
+            manager.Clear(this);
+            collision.Add(null, X, Y, Width, Height);
+            Width = 1;
+            Height = 1;
+        }
+
+
+        /// <summary>
+        /// Initializes module. Spawning is done by BlockSpawner.
+        /// </summary>
+        /// <param name="color">Block color</param>
+        /// <param name="x">Horizontal position</param>
+        /// <param name="y">Vertical position</param>
+        /// <returns>Itself</returns>
+        public BlockModule Initialize(Color color, int x, int y)
+        {
+            Color = color;
+            X = x;
+            Y = y;
+            return this;
+        }
+
+
+        /// <summary>
+        /// Module color.
+        /// </summary>
+        public Color Color { get; private set; }
+
+
+        /// <summary>
+        /// First module of the block.
+        /// </summary>
+        public BlockModule First { get; set; }
+
+
+        /// <summary>
+        /// Next module in the block.
+        /// </summary>
+        public BlockModule Next { get; set; }
+
+
+        /// <summary>
+        /// Horizontal position.
+        /// </summary>
+        public int X { get; set; }
+
+
+        /// <summary>
+        /// Vertical position.
+        /// </summary>
+        public int Y { get; set; }
+
+
+        /// <summary>
+        /// Width (ScaleX)
+        /// </summary>
+        public int Width { get; set; }
+
+
+        /// <summary>
+        /// Height (ScaleY)
+        /// </summary>
+        public int Height { get; set; }
     }
 }

@@ -19,7 +19,6 @@ namespace WormGame.Entities
         public WormModule firstModule;
 
         private readonly Collision collision;
-        private readonly float step;
         private readonly int size;
 
         private Pooler<WormModule> modules;
@@ -68,7 +67,6 @@ namespace WormGame.Entities
             blockifyWorms = config.blockifyWorms;
 #endif
             size = config.size;
-            step = config.step;
             collision = config.collision;
         }
 
@@ -86,14 +84,14 @@ namespace WormGame.Entities
         {
             scene = (WormScene)Scene;
             modules = wormModules;
-            SetPosition(collision.EntityX(x), collision.EntityY(y));
             target = Position;
             LengthCap = 1;
             Length = 1;
             moving = true;
 
             firstModule = wormModules.Enable();
-            firstModule.Target = Position;
+            firstModule.Graphic.SetPosition(collision.EntityX(x), collision.EntityY(y));
+            firstModule.SetTarget(collision.EntityX(x), collision.EntityY(y));
             firstModule.Graphic.Color = color;
             AddGraphic(firstModule.Graphic);
 
@@ -182,9 +180,7 @@ namespace WormGame.Entities
         {
             if (moving)
             {
-                Vector2 positionDelta = firstModule.Direction * step;
-                Position += positionDelta;
-                firstModule.GraphicFollow(positionDelta, step);
+                firstModule.GraphicFollow();
             }
         }
 
