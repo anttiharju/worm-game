@@ -16,20 +16,30 @@ namespace WormGame
     /// </summary>
     public class WormScene : Scene
     {
-        private readonly Config config;
-        private readonly Collision collision;
-        private readonly Tilemap tilemap;
         private readonly Pooler<Player> players;
         private readonly Pooler<Worm> worms;
         private readonly FruitManager fruits;
         private readonly Pooler<WormModule> wormModules;
         private readonly BlockManager blocks;
-        private readonly float stepAccuracy;
-        private readonly int wormCap;
-        private readonly int fruitAmount;
+        private float currentStep;
+        private int wormsAlive;
 
-        private float wormFrequency;
-        private int wormAmount;
+        /// Loaded from configuration
+        private readonly Collision collision;
+        private readonly Tilemap tilemap;
+        private readonly Surface surface;
+        private readonly bool spawnFruits;
+        private readonly int fruitAmount;
+        private readonly int minWormLength;
+        private readonly float wormStep;
+        private readonly int wormCap;
+        private readonly int size;
+        private readonly int width;
+        private readonly int height;
+        private readonly int windowWidth;
+        private readonly int windowHeight;
+        private readonly bool visualizeCollision;
+
 
         /// <summary>
         /// Initializes poolers and scene entities.
@@ -37,14 +47,25 @@ namespace WormGame
         /// <param name="config">Configuration</param>
         public WormScene(Config config)
         {
-            this.config = config;
             collision = config.collision;
             tilemap = config.tilemap;
-            wormCap = config.wormCap;
-            stepAccuracy = config.step / 2;
-            wormFrequency = config.size - config.step;
+            surface = config.surface;
+            spawnFruits = config.spawnFruits;
             fruitAmount = config.fruitAmount;
-            CreateBorders(config.width, config.height);
+            minWormLength = config.minWormLength;
+            wormStep = config.wormStep;
+            wormCap = config.wormCap;
+            size = config.size;
+            width = config.width;
+            height = config.height;
+            windowWidth = config.windowWidth;
+            windowHeight = config.windowHeight;
+            visualizeCollision = config.visualizeCollision;
+            // Config load end
+
+            currentStep = config.size - config.wormStep;
+            CreateBorders(config.width, config.height, config.foregroundColor);
+
             worms = new Pooler<Worm>(this, config, config.wormAmount);
             wormModules = new Pooler<WormModule>(this, config, config.moduleAmount);
             players = new Pooler<Player>(this, config, 5);
@@ -59,7 +80,7 @@ namespace WormGame
         /// </summary>
         private void Start()
         {
-            if (config.fruits)
+            if (spawnFruits)
                 for (int i = 0; i < fruitAmount; i++)
                     fruits.Spawn();
             for (int i = 0; i < 5; i++)
@@ -78,8 +99,8 @@ namespace WormGame
             collision.Reset();
             wormModules.Reset();
             tilemap.ClearAll();
-            wormFrequency = config.size - config.step;
-            wormAmount = 0;
+            surface.Clear();
+            wormsAlive = 0;
             Start();
 #if DEBUG
             System.Console.Clear();
@@ -121,35 +142,35 @@ namespace WormGame
         {
             if (Input.KeyPressed(Key.R))
                 Restart();
-            wormFrequency += config.step;
-            if (FastMath.Round(wormFrequency, stepAccuracy) >= config.size)
+            currentStep += wormStep;
+            if (FastMath.Round(currentStep, wormStep / 2) >= size)
             {
                 foreach (Worm worm in worms)
                     if (worm.Active)
                         worm.Move();
-                wormFrequency = 0;
-                if (wormAmount < wormCap)
+                currentStep = 0;
+                if (wormsAlive < wormCap)
                 {
-                    Vector2 random = Random.ValidPosition(collision, config.width, config.height, collision.empty);
+                    Vector2 random = Random.ValidPosition(collision, width, height, collision.empty);
                     if (random.X != -1)
-                        SpawnWorm(collision.X(random.X), collision.Y(random.Y));
+                        SpawnWorm(collision.X(random.X), collision.Y(random.Y), minWormLength);
                     else
                     {
-                        random = Random.ValidPosition(collision, config.width, config.height, collision.fruit);
+                        random = Random.ValidPosition(collision, width, height, collision.fruit);
                         if (random.X != -1 && collision.Check(random) == collision.fruit)
                         {
                             fruits.Remove(collision.X(random.X), collision.Y(random.Y));
-                            SpawnWorm(collision.X(random.X), collision.Y(random.Y));
+                            SpawnWorm(collision.X(random.X), collision.Y(random.Y), minWormLength);
                         }
                         else
                         {
-                            if (wormAmount > 0)
-                                wormAmount--;
+                            if (wormsAlive > 0)
+                                wormsAlive--;
                         }
                     }
                 }
 #if DEBUG
-                if (config.visualizeCollision)
+                if (visualizeCollision)
                     collision.Visualize();
 #endif
             }
@@ -163,14 +184,13 @@ namespace WormGame
         /// <param name="y">Vertical field position</param>
         /// <param name="length">Length, default config.minWormLength</param>
         /// <param name="color">Color, default Random.Color</param>
-        public void SpawnWorm(int x, int y, int length = 0, Color color = null)
+        public void SpawnWorm(int x, int y, int length, Color color = null)
         {
             Worm worm = worms.Enable();
             if (worm == null) return;
             if (color == null) color = Random.Color;
-            if (length < config.minWormLength) length = config.minWormLength;
             worm.Spawn(wormModules, x, y, length, color);
-            wormAmount++;
+            wormsAlive++;
         }
 
 
@@ -181,8 +201,8 @@ namespace WormGame
         /// <returns>Block or null</returns>
         public BlockModule SpawnBlock(Worm worm)
         {
-            if (wormAmount > 0)
-                wormAmount--;
+            if (wormsAlive > 0)
+                wormsAlive--;
             return blocks.SpawnBlock(worm);
         }
 
@@ -194,20 +214,20 @@ namespace WormGame
         /// <returns>Player</returns>
         public Player SpawnPlayer(int playerNumber)
         {
-            return players.Enable().Spawn(playerNumber, config.windowWidth / 2, config.windowHeight / 2);
+            return players.Enable().Spawn(playerNumber, windowWidth / 2, windowHeight / 2);
         }
 
 
         /// <summary>
         /// Creates a visible border for the field.
         /// </summary>
-        private void CreateBorders(int width, int height)
+        private void CreateBorders(int width, int height, Color color)
         {
-            Image backgroundGraphic = Image.CreateRectangle(width * config.size, height * config.size, Color.None);
+            Image backgroundGraphic = Image.CreateRectangle(width * size, height * size, Color.None);
             backgroundGraphic.CenterOrigin();
-            backgroundGraphic.OutlineColor = config.foregroundColor;
-            backgroundGraphic.OutlineThickness = config.size / 6;
-            Entity background = new Entity(config.windowWidth / 2, config.windowHeight / 2, backgroundGraphic)
+            backgroundGraphic.OutlineColor = color;
+            backgroundGraphic.OutlineThickness = size / 6;
+            Entity background = new Entity(windowWidth / 2, windowHeight / 2, backgroundGraphic)
             {
                 Collidable = false
             };

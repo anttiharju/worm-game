@@ -72,12 +72,14 @@ namespace WormGame.Entities
 #endif
             size = config.size;
             collision = config.collision;
-            eraser = Image.CreateCircle(config.halfSize, Color.Gold);
+            eraser = Image.CreateCircle(config.halfSize, config.backgroundColor);
             head = Image.CreateCircle(config.halfSize);
             tail = Image.CreateCircle(config.halfSize);
             eraser.CenterOrigin();
             head.CenterOrigin();
             tail.CenterOrigin();
+            ClearSurfaces();
+            AddSurface(config.surface);
             AddGraphic(eraser);
             AddGraphic(head);
             AddGraphic(tail);
