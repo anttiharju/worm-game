@@ -88,7 +88,7 @@ namespace WormGame.Core
                 return block;
             if (current is Worm)
                 return worm;
-            if (current is FruitManager fruits)
+            if (current is Fruits fruits)
             {
                 if (consume)
                 {
@@ -247,7 +247,7 @@ namespace WormGame.Core
                         line.Append('o');
                         continue;
                     }
-                    if (current is FruitManager)
+                    if (current is Fruits)
                     {
                         line.Append('f');
                         continue;

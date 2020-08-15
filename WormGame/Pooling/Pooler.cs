@@ -188,7 +188,7 @@ namespace WormGame.Pooling
         /// <summary>
         /// Disables all pooler objects.
         /// </summary>
-        public void Reset()
+        public virtual void Reset()
         {
             for (int i = Index; i >= 0; i--)
                 if (pool[i].Active)

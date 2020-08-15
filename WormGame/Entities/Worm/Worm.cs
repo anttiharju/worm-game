@@ -7,16 +7,19 @@ using WormGame.Pooling;
 namespace WormGame.Entities
 {
     /// @author Antti Harju
-    /// @version 28.07.2020
+    /// @version 14.08.2020
     /// <summary>
     /// Worm entity. Worms are modular entities; it consists of one Otter2d entity and several regular objects (modules). This way the worm can grow infinitely.
     /// </summary>
-    public class Worm : PoolableEntity
+    public class Worm : Poolable
     {
+#if DEBUG
+        private readonly bool blockifyWorms;
+#endif
         public WormModule firstModule;
 
         private readonly Collision collision;
-        private readonly float step;
+        private readonly WormManager manager;
         private readonly int size;
 
         private Pooler<WormModule> modules;
@@ -56,14 +59,18 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Constructor.
+        /// Default constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public Worm(Config config)
+        public Worm(WormScene scene, Config config, WormManager manager)
         {
-            size = config.size;
-            step = config.wormStep;
+            this.scene = scene;
+            this.manager = manager;
             collision = config.collision;
+            size = config.size;
+#if DEBUG
+            blockifyWorms = config.blockifyWorms;
+#endif
         }
 
 
@@ -78,24 +85,22 @@ namespace WormGame.Entities
         /// <returns>Worm</returns>
         public Worm Spawn(Pooler<WormModule> wormModules, int x, int y, int length, Color color)
         {
-            scene = (WormScene)Scene;
             modules = wormModules;
-            SetPosition(collision.EntityX(x), collision.EntityY(y));
-            target = Position;
             LengthCap = 1;
             Length = 1;
             moving = true;
 
             firstModule = wormModules.Enable();
-            firstModule.Target = Position;
+            firstModule.Graphic.SetPosition(collision.EntityX(x), collision.EntityY(y));
+            firstModule.SetTarget(collision.EntityX(x), collision.EntityY(y));
             firstModule.Graphic.Color = color;
-            AddGraphic(firstModule.Graphic);
+            manager.AddGraphic(firstModule.Graphic);
 
             lastModule = firstModule;
             for (int i = 1; i < length; i++)
                 Grow();
 
-            direction = Random.ValidDirection(collision, Position, size);
+            direction = Random.ValidDirection(collision, target, size);
             collision.Add(this, x, y);
             return this;
         }
@@ -111,7 +116,7 @@ namespace WormGame.Entities
             newModule.Graphic.Color = Color;
             newModule.Graphic.SetPosition(lastModule.Graphic.X, lastModule.Graphic.Y);
             newModule.SetTarget(lastModule.Target);
-            AddGraphic(newModule.Graphic);
+            manager.AddGraphic(newModule.Graphic);
             lastModule.ResetDirection();
             lastModule.Next = newModule;
             lastModule = newModule;
@@ -148,8 +153,15 @@ namespace WormGame.Entities
             {
                 if (retry) // If stuck, turn into a block.
                 {
-                    scene.SpawnBlock(this);
-                    Disable();
+#if DEBUG
+                    if (blockifyWorms)
+                    {
+#endif
+                        scene.SpawnBlock(this);
+                        Disable();
+#if DEBUG
+                    }
+#endif
                 }
                 else if (Player == null) // Find a new direction if not posessed by player.
                 {
@@ -165,13 +177,11 @@ namespace WormGame.Entities
         /// <summary>
         /// Update entity position and recursively module graphic positions.
         /// </summary>
-        public override void Update()
+        public void Update()
         {
             if (moving)
             {
-                Vector2 positionDelta = firstModule.Direction * step;
-                Position += positionDelta;
-                firstModule.GraphicFollow(positionDelta, step);
+                firstModule.GraphicFollow();
             }
         }
 
@@ -185,7 +195,6 @@ namespace WormGame.Entities
             base.Disable();
             if (recursive)
                 firstModule.Disable();
-            ClearGraphics();
             moving = false;
         }
     }

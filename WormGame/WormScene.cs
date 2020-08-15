@@ -17,9 +17,8 @@ namespace WormGame
     public class WormScene : Scene
     {
         private readonly Pooler<Player> players;
-        private readonly Pooler<Worm> worms;
-        private readonly FruitManager fruits;
-        private readonly Pooler<WormModule> wormModules;
+        private readonly Fruits fruits;
+        private readonly WormManager worms;
         private readonly BlockManager blocks;
         private float currentStep;
         private int wormsAlive;
@@ -64,10 +63,9 @@ namespace WormGame
             currentStep = config.size - config.wormStep;
             CreateBorders(config.width, config.height, config.foregroundColor);
 
-            worms = new Pooler<Worm>(this, config, config.wormAmount);
-            wormModules = new Pooler<WormModule>(this, config, config.moduleAmount);
+            worms = new WormManager(this, config);
             players = new Pooler<Player>(this, config, 5);
-            fruits = new FruitManager(config);
+            fruits = new Fruits(config);
             blocks = new BlockManager(config);
             Start();
         }
@@ -95,7 +93,6 @@ namespace WormGame
             worms.Reset();
             blocks.Reset();
             collision.Reset();
-            wormModules.Reset();
             tilemap.ClearAll();
             wormsAlive = 0;
             Start();
@@ -137,6 +134,7 @@ namespace WormGame
         /// </summary>
         public override void Update()
         {
+            worms.Update();
             if (Input.KeyPressed(Key.R))
                 Restart();
             currentStep += wormStep;
@@ -181,13 +179,10 @@ namespace WormGame
         /// <param name="y">Vertical field position</param>
         /// <param name="length">Length, default config.minWormLength</param>
         /// <param name="color">Color, default Random.Color</param>
-        public void SpawnWorm(int x, int y, int length, Color color = null)
+        public Worm SpawnWorm(int x, int y, int length)
         {
-            Worm worm = worms.Enable();
-            if (worm == null) return;
-            if (color == null) color = Random.Color;
-            worm.Spawn(wormModules, x, y, length, color);
             wormsAlive++;
+            return worms.SpawnWorm(x, y, length, Random.Color);
         }
 
 
