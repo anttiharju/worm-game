@@ -25,7 +25,6 @@ namespace WormGame
 
         /// Loaded from configuration
         private readonly Collision collision;
-        private readonly Tilemap tilemap;
         private readonly bool spawnFruits;
         private readonly int fruitAmount;
         private readonly int minWormLength;
@@ -46,7 +45,7 @@ namespace WormGame
         public WormScene(Config config)
         {
             collision = config.collision;
-            tilemap = config.tilemap;
+            AddGraphic(config.tilemap);
             spawnFruits = config.spawnFruits;
             fruitAmount = config.fruitAmount;
             minWormLength = config.minWormLength;
@@ -93,7 +92,6 @@ namespace WormGame
             worms.Reset();
             blocks.Reset();
             collision.Reset();
-            tilemap.ClearAll();
             wormsAlive = 0;
             Start();
 #if DEBUG
@@ -118,7 +116,7 @@ namespace WormGame
             foreach (Worm worm in worms)
                 if (worm.Active)
                 {
-                    float distance = Vector2.Distance(position, worm.firstModule.Target);
+                    float distance = Vector2.Distance(position, Vector2.Zero);
                     if (distance < nearestDistance)
                     {
                         nearestWorm = worm;
@@ -134,7 +132,6 @@ namespace WormGame
         /// </summary>
         public override void Update()
         {
-            worms.Update();
             if (Input.KeyPressed(Key.R))
                 Restart();
             currentStep += wormStep;

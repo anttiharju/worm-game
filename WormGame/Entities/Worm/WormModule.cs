@@ -1,163 +1,126 @@
 ﻿using Otter.Graphics;
 using Otter.Graphics.Drawables;
 using Otter.Utility.MonoGame;
-using System.Runtime.CompilerServices;
 using WormGame.Core;
 using WormGame.Pooling;
+using WormGame.Static;
 
 namespace WormGame.Entities
 {
-    /// @author Antti Harju
-    /// @version 14.08.2020
-    /// <summary>
-    /// WormModule. Thanks to modularity worm length can be increased during runtime.
-    /// </summary>
-    public class WormModule : Poolable
+    public class WormModule : PoolableEntity
     {
-        private readonly Collision collision;
+        private readonly float size;
+        private readonly float halfSize;
         private readonly float step;
 
-
-        /// <summary>
-        /// Get or set next module.
-        /// </summary>
-        public WormModule Next { get; set; }
-
-
-        /// <summary>
-        /// Get module graphic.
-        /// </summary>
-        public Image Graphic { get; private set; }
-
-
-        /// <summary>
-        /// Get or set worm direction.
-        /// </summary>
-        public Vector2 Direction { get { return direction; } set { direction = value; } }
+        private bool horizontal;
         private Vector2 direction;
-
-
-        /// <summary>
-        /// Get or set target position.
-        /// </summary>
-        public Vector2 Target { get { return target; } set { target = value; } }
         private Vector2 target;
 
+        public Color Color { get { return Graphic.Color; } set { Graphic.Color = value; } }
 
-        /// <summary>
-        /// Get or set wheter or not module is in use.
-        /// </summary>
-        public override bool Active { get { return active; } set { if (value) { active = true; Graphic.Visible = true; } else Disable(); } }
-        private bool active;
-
-
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        /// <param name="config">Configuration</param>
         public WormModule(Config config)
         {
-            collision = config.collision;
             Graphic = Image.CreateRectangle(config.size);
-            Graphic.CenterOrigin();
             step = config.wormStep;
+            size = config.size;
+            halfSize = config.halfSize;
         }
 
-
-        /// <summary>
-        /// Recursively update every worm module direction.
-        /// </summary>
-        /// <param name="previousDirection">Previous direction</param>
-        public void DirectionFollow(Vector2 previousDirection)
+        public WormModule Initialize(Vector2 direction, Vector2 position, Color color)
         {
-            if (Next != null)
-                Next.DirectionFollow(Direction);
-            Direction = previousDirection;
+            this.direction = direction;
+            SetPosition(position);
+            Graphic.Scale = 1;
+            Color = color;
+            if (direction.Y != 0) /// UGLY
+            {
+
+                if (direction.Y > 0)
+                {
+                    Graphic.SetOrigin(halfSize, size);
+                    Y += halfSize;
+                }
+                else
+                {
+                    Graphic.SetOrigin(halfSize, 0);
+                    Y -= halfSize;
+                }
+            }
+            else
+            {
+                if (direction.X > 0)
+                {
+                    Graphic.SetOrigin(size, halfSize);
+                    X += halfSize;
+                }
+                else
+                {
+                    Graphic.SetOrigin(0, halfSize);
+                    X -= halfSize;
+                }
+                horizontal = true;
+            }
+            return this;
         }
 
 
-        /// <summary>
-        /// Recursively update every worm module graphic position.
-        /// </summary>
-        /// <param name="positionDelta">Worm entity position delta</param>
-        /// <param name="step">Worm step</param>
-        public void GraphicFollow()
+        public Vector2 GetEnd()
         {
-            Vector2 delta = Direction * step;
-            Graphic.X += delta.X;
-            Graphic.Y += delta.Y;
-            if (Next != null)
-                Next.GraphicFollow();
+            Vector2 end = Position;
+            if (horizontal)
+                end.X -= halfSize;
+            else
+                end.Y -= halfSize;
+            return end;
         }
 
 
-        /// <summary>
-        /// Recursively update every worm module target.
-        /// </summary>
-        /// <param name="newTarget">New target for worm body</param>
-        public void TargetFollow(Vector2 newTarget)
+        public void Grow()
         {
-            if (Next != null)
-                Next.TargetFollow(Target);
-            Target = newTarget;
+            Position += direction * size;
+            if (horizontal)
+                Graphic.ScaleX++;
+            else
+                Graphic.ScaleY++;
         }
 
 
-        /// <summary>
-        /// Reset module direction.
-        /// </summary>
-        public void ResetDirection()
+        public void Move()
         {
-            direction.X = 0;
-            direction.Y = 0;
+
         }
 
 
-        /// <summary>
-        /// Recursively set worm color.
-        /// </summary>
-        /// <param name="color">Color</param>
-        public void SetColor(Color color)
+        public void Flip()
         {
-            Graphic.Color = color;
-            if (Next != null)
-                Next.SetColor(color);
+
         }
 
-
-        /// <summary>
-        /// Set module target.
-        /// </summary>
-        /// <param name="target">Target</param>
-        public void SetTarget(Vector2 target)
+        public void Shrink()
         {
-            SetTarget(target.X, target.Y);
+
         }
 
-        public void SetTarget(float x, float y)
+
+        public override void Update()
         {
-            target.X = x;
-            target.Y = y;
         }
 
-        /// <summary>
-        /// Recursively disable every one of worms modules.
-        /// </summary>
-        /// <param name="recursive">Disable recursively. False only when disabling is done by pooler.</param>
+
         public override void Disable(bool recursive = true)
         {
             base.Disable();
-            active = false;
-            if (recursive && Next != null)
-                Next.Disable();
-            Next = null;
-            if (collision.Check(target) == collision.worm)
-                collision.Add(null, target);
-            ResetDirection();
-            Graphic.X = 0;
-            Graphic.Y = 0;
-            target.X = 0;
-            target.Y = 0;
+            Graphic.SetOrigin(0, 0);
+            horizontal = false;
+            X = 0;
+            Y = 0;
+        }
+
+        private int Normalize(float number)
+        {
+            if (number < 0) return -1;
+            return 1;
         }
     }
 }
