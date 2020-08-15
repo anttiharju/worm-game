@@ -2,6 +2,12 @@
 I use changelog as a brain dump where I explain future plans and further explain commit messages. I hope it shows my enthusiasm for programming and the amount of thought and care put into the project.
 
 
+# 15.08.2020
+- I tried surface-based approach, but it's a failure.
+    - Even though I could probably work out rendering artifacts, I can't clear worms from the surface once they've been disabled without some elaborate eraser system.
+    - Switching to tilemap approach.
+
+
 # 14.08.2020
 - Improve BlockManager
     - BlockModule -> Block

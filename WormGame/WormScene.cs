@@ -27,7 +27,6 @@ namespace WormGame
         /// Loaded from configuration
         private readonly Collision collision;
         private readonly Tilemap tilemap;
-        private readonly Surface surface;
         private readonly bool spawnFruits;
         private readonly int fruitAmount;
         private readonly int minWormLength;
@@ -49,7 +48,6 @@ namespace WormGame
         {
             collision = config.collision;
             tilemap = config.tilemap;
-            surface = config.surface;
             spawnFruits = config.spawnFruits;
             fruitAmount = config.fruitAmount;
             minWormLength = config.minWormLength;
@@ -99,7 +97,6 @@ namespace WormGame
             collision.Reset();
             wormModules.Reset();
             tilemap.ClearAll();
-            surface.Clear();
             wormsAlive = 0;
             Start();
 #if DEBUG

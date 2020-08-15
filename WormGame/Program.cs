@@ -21,7 +21,8 @@ namespace WormGame
             {
                 WindowResize = false,
                 AlwaysUpdate = true,
-                MouseVisible = true
+                MouseVisible = true,
+                Color = config.backgroundColor
             };
             game.Start(config.scene);
         }
