@@ -205,7 +205,7 @@ namespace WormGame
         {
             Image backgroundGraphic = Image.CreateRectangle(width * config.size, height * config.size, Color.None);
             backgroundGraphic.CenterOrigin();
-            backgroundGraphic.OutlineColor = Color.White;
+            backgroundGraphic.OutlineColor = config.foregroundColor;
             backgroundGraphic.OutlineThickness = config.size / 6;
             Entity background = new Entity(config.windowWidth / 2, config.windowHeight / 2, backgroundGraphic)
             {

@@ -15,6 +15,7 @@ namespace WormGame.Entities
     {
         private readonly Collision collision;
         private readonly Tilemap tilemap;
+        private readonly Color fruitColor;
         private readonly int width;
         private readonly int height;
 
@@ -27,6 +28,7 @@ namespace WormGame.Entities
         {
             collision = config.collision;
             tilemap = config.tilemap;
+            fruitColor = config.foregroundColor;
             width = config.width;
             height = config.height;
         }
@@ -43,7 +45,7 @@ namespace WormGame.Entities
                 return false;
             int x = collision.X(random.X);
             int y = collision.Y(random.Y);
-            tilemap.SetTile(x, y, 0, "");
+            tilemap.SetTile(x, y, fruitColor, "");
             collision.Add(this, x, y);
             return true;
         }
