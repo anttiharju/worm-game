@@ -4,6 +4,7 @@ using Otter.Graphics.Drawables;
 using WormGame.Static;
 using WormGame.Pooling;
 using WormGame.Core;
+using Otter.Utility.MonoGame;
 
 namespace WormGame.Entities
 {
@@ -127,7 +128,7 @@ namespace WormGame.Entities
 
             #region Worm
             if (worm == null) goto Wormskip;
-            Position = worm.Position;
+            Position = Vector2.Zero;
             deadZone = 90;
             if (yMovement < -deadZone)
                 worm.Direction = Help.directions[0]; // UP

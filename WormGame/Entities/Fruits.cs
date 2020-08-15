@@ -11,7 +11,7 @@ namespace WormGame.Entities
     /// <summary>
     /// Fruit manager.
     /// </summary>
-    public class FruitManager
+    public class Fruits
     {
         private readonly Collision collision;
         private readonly Tilemap tilemap;
@@ -24,7 +24,7 @@ namespace WormGame.Entities
         /// Initialize manager.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public FruitManager(Config config)
+        public Fruits(Config config)
         {
             collision = config.collision;
             tilemap = config.tilemap;
