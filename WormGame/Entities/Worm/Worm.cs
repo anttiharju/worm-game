@@ -3,6 +3,7 @@ using Otter.Utility.MonoGame;
 using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
+using Otter.Graphics.Drawables;
 
 namespace WormGame.Entities
 {
@@ -20,6 +21,8 @@ namespace WormGame.Entities
 
         private readonly Collision collision;
         private readonly WormManager manager;
+        private readonly Image head;
+        private readonly Image tail;
         private readonly int size;
 
         private Pooler<WormModule> modules;
@@ -68,6 +71,10 @@ namespace WormGame.Entities
             this.manager = manager;
             collision = config.collision;
             size = config.size;
+            head = Image.CreateRectangle(size);
+            tail = Image.CreateRectangle(size);
+            head.CenterOrigin();
+            tail.CenterOrigin();
 #if DEBUG
             blockifyWorms = config.blockifyWorms;
 #endif
@@ -85,6 +92,10 @@ namespace WormGame.Entities
         /// <returns>Worm</returns>
         public Worm Spawn(Pooler<WormModule> wormModules, int x, int y, int length, Color color)
         {
+            manager.AddGraphic(head);
+            manager.AddGraphic(tail);
+            head.Color = color;
+            tail.Color = color;
             modules = wormModules;
             LengthCap = 1;
             Length = 1;
@@ -94,7 +105,7 @@ namespace WormGame.Entities
             firstModule.Graphic.SetPosition(collision.EntityX(x), collision.EntityY(y));
             firstModule.SetTarget(collision.EntityX(x), collision.EntityY(y));
             firstModule.Graphic.Color = color;
-            manager.AddGraphic(firstModule.Graphic);
+            //manager.AddGraphic(firstModule.Graphic);
 
             lastModule = firstModule;
             for (int i = 1; i < length; i++)
@@ -116,7 +127,7 @@ namespace WormGame.Entities
             newModule.Graphic.Color = Color;
             newModule.Graphic.SetPosition(lastModule.Graphic.X, lastModule.Graphic.Y);
             newModule.SetTarget(lastModule.Target);
-            manager.AddGraphic(newModule.Graphic);
+            //manager.AddGraphic(newModule.Graphic);
             lastModule.ResetDirection();
             lastModule.Next = newModule;
             lastModule = newModule;
@@ -142,12 +153,16 @@ namespace WormGame.Entities
                 if (Length < LengthCap)
                     Length++;
                 else
+                {
                     collision.Add(null, lastModule.Target);
+                    manager.Clear(collision.X(lastModule.Target.X), collision.X(lastModule.Target.Y));
+                }
                 if (nextPosition == collision.fruit)
                     grow = true;
                 firstModule.DirectionFollow(direction);
                 firstModule.TargetFollow(target);
                 collision.Add(this, target);
+                //manager.Add(collision.X(firstModule.Next.Target.X), collision.X(firstModule.Next.Target.Y), Color);
             }
             else
             {
@@ -182,6 +197,8 @@ namespace WormGame.Entities
             if (moving)
             {
                 firstModule.GraphicFollow();
+                head.SetPosition(firstModule.Graphic.X, firstModule.Graphic.Y);
+                tail.SetPosition(lastModule.Graphic.X, lastModule.Graphic.Y);
             }
         }
 

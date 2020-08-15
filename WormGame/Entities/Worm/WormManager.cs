@@ -8,12 +8,14 @@ namespace WormGame.Entities
 {
     public class WormManager : Pooler<Worm>
     {
+        private readonly Tilemap tilemap;
         private readonly Entity graphicRenderer;
         private readonly Pooler<WormModule> modules;
 
         public WormManager(WormScene scene, Config config)
         {
-            graphicRenderer = new Entity(0, 0);
+            tilemap = config.tilemap;
+            graphicRenderer = new Entity();
             scene.Add(graphicRenderer);
             modules = new Pooler<WormModule>(null, config, config.moduleAmount);
 
@@ -26,6 +28,17 @@ namespace WormGame.Entities
                 current.Disable(false);
                 pool[i] = current;
             }
+        }
+
+
+        public void Add(int x, int y, Color color)
+        {
+            tilemap.SetTile(x, y, color, "");
+        }
+
+        public void Clear(int x, int y)
+        {
+            tilemap.ClearTile(x, y, "");
         }
 
         public void Update()

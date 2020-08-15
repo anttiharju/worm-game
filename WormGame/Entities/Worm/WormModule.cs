@@ -58,7 +58,7 @@ namespace WormGame.Entities
         public WormModule(Config config)
         {
             collision = config.collision;
-            Graphic = Image.CreateCircle(config.size / 2);
+            Graphic = Image.CreateRectangle(config.size);
             Graphic.CenterOrigin();
             step = config.wormStep;
         }

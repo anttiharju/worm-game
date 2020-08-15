@@ -14,6 +14,10 @@ I use changelog as a brain dump where I explain future plans and further explain
         - Result: I'll try to implement waypoint system and if that fails, I'll fall back to current modules.
 - Upgrading worms to work under a manager netted me a grand total of 1,7 FPS which is within the margin of error. The game is GPU bound and rendering graphic under many vs single entity doesn't seem to affect performance.
 
+- SURFACE-BASED APPROACH IS BACK ON!
+    - Tilemap rendering was implemented, but it turns out that constantly setting and clearing tiles is quite heavy.
+    - So now the extra eraser system that would make the system work is not unnecessarily complex! It's the only performant approach!
+
 
 # 14.08.2020
 - Improve BlockManager
