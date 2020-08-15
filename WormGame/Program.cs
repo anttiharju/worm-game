@@ -24,7 +24,7 @@ namespace WormGame
                 MouseVisible = true,
                 Color = config.backgroundColor
             };
-            game.Start(config.scene);
+            game.Start(new WormScene(config));
         }
     }
 }

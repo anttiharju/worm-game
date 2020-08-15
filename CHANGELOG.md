@@ -18,6 +18,24 @@ I use changelog as a brain dump where I explain future plans and further explain
     - Tilemap rendering was implemented, but it turns out that constantly setting and clearing tiles is quite heavy.
     - So now the extra eraser system that would make the system work is not unnecessarily complex! It's the only performant approach!
 
+- Begin work on scalable worm modules
+    - Surface based approach abandoned as it's too complex and not as performant as I wished.
+    - Further decouple WormScene and config
+        - WormScene is not created inside config anymore.
+        - Tilemap and surface are resetted by BlockManager and WormManager instead of WormScene
+    - Preliminary (correct render amount, visually broken) benchmark results: 10 000 renders (3 per worm) AVG FPS 34.
+        - Compared to the previous 22,3 it's a nice improvement, but smaller than I'd like.
+        - Now I am wondering if scaled worm modules would be more performant to render.
+            - sigh
+                - at least I know the solution I'll end up with will be the best one.
+    - Scaled modules vs surface
+        - Surface: 34 AVG Performance, lots of extra complexity to make it work properly
+        - Scaled modules: Most likely need to abandon current Worm / Module system in favor of a new one, when a worm is going straight it's more performant, need to reintegrate blocks.
+    - Future plans
+        - Custom module poolers for worms and blocks that don't need to be defragmented from time to time. (Disabling done through them -> defrag swap done during that)
+        - Collision: replace object with struct CollisionObject which has int layer (layers already implemented) and int arrayIndex so we can access objects through their managers (poolers)
+    - Currently too many if elses. Got to reduce them.
+
 
 # 14.08.2020
 - Improve BlockManager

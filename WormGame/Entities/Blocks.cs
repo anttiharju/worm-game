@@ -8,7 +8,7 @@ using WormGame.Pooling;
 namespace WormGame.Entities
 {
     /// @author Antti Harju
-    /// @version 14.08.2020
+    /// @version 15.08.2020
     /// <summary>
     /// A custom pooler that can be called to create blocks. Uses tilemap to render objects.
     /// </summary>
@@ -58,6 +58,16 @@ namespace WormGame.Entities
         public void Clear(BlockModule module)
         {
             tilemap.ClearRect(module.X, module.Y, module.Width, module.Height);
+        }
+
+
+        /// <summary>
+        /// Clears tilemap and resets block module pooler.
+        /// </summary>
+        public override void Reset()
+        {
+            tilemap.ClearAll();
+            base.Reset();
         }
 
 
@@ -123,6 +133,8 @@ namespace WormGame.Entities
         /// <returns>Block</returns>
         public BlockModule Spawn(Worm worm, BlockManager manager)
         {
+            return null;
+            /*
             color = worm.Color;
             bottom = height;
             left = width;
@@ -160,7 +172,7 @@ namespace WormGame.Entities
             if (visualize)
                 Visualize();
 #endif
-            return firstModule;
+            return firstModule;*/
         }
 
 
@@ -265,7 +277,7 @@ namespace WormGame.Entities
         /// <param name="wormLength">Worms length</param>
         /// <returns>Abort spawn process</returns>
         private bool InitBuffer(WormModule wormModule, int wormLength)
-        {
+        {/*
             for (int i = 0; i < wormLength; i++)
             {
                 int x = collision.X(wormModule.Target.X);
@@ -277,7 +289,7 @@ namespace WormGame.Entities
                 if (x > right) right = x;
                 if (y > top) top = y;
                 wormModule = wormModule.Next;
-            }
+            }*/
             return false;
         }
 
@@ -289,11 +301,12 @@ namespace WormGame.Entities
         /// <param name="wormLength">Worms length</param>
         private void ClearBuffer(WormModule wormModule, int wormLength)
         {
+            /*
             for (int i = 0; i < wormLength; i++)
             {
                 optimizationBuffer[collision.X(wormModule.Target.X), collision.Y(wormModule.Target.Y)] = false;
                 wormModule = wormModule.Next;
-            }
+            }*/
         }
 
 
