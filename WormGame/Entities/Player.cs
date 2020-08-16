@@ -128,7 +128,7 @@ namespace WormGame.Entities
 
             #region Worm
             if (worm == null) goto Wormskip;
-            Position = Vector2.Zero;
+            Position = worm.Position;
             deadZone = 90;
             if (yMovement < -deadZone)
                 worm.Direction = Help.directions[0];
