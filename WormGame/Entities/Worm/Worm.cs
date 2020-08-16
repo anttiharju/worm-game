@@ -1,4 +1,5 @@
-﻿using Otter.Graphics;
+﻿using Otter.Core;
+using Otter.Graphics;
 using Otter.Utility.MonoGame;
 using WormGame.Core;
 using WormGame.Pooling;
@@ -11,11 +12,13 @@ namespace WormGame.Entities
         private readonly Collision collision;
         private readonly WormScene scene;
 
-        private WormModule latestModule;
+        private WormModule firstModule;
         private Vector2 position;
         private Vector2 direction;
         private Vector2 previousDirection;
         private Vector2 directionBuffer;
+        private int halfSize;
+        private int size;
 
 
         public Player Player { get; set; }
@@ -35,6 +38,8 @@ namespace WormGame.Entities
             this.scene = scene;
             this.modules = modules;
             collision = config.collision;
+            halfSize = config.halfSize;
+            size = config.size;
         }
 
         public Worm Spawn(int x, int y, int length, Color color)
@@ -51,16 +56,9 @@ namespace WormGame.Entities
             previousDirection = direction;
             direction = directionBuffer;
             if (direction != previousDirection)
-            {
-                if (latestModule != null)
-                    position = latestModule.GetEnd();
-                latestModule = modules.Enable().Initialize(direction, position, Color);
-            }
-            else
-            {
-                if (latestModule != null)
-                    latestModule.Grow();
-            }
+                firstModule = modules.Enable().Initialize(position, direction, Color);
+            firstModule?.Grow();
+            position += direction * size;
         }
 
         /// <summary>
@@ -70,7 +68,7 @@ namespace WormGame.Entities
         public override void Disable(bool recursive = true)
         {
             base.Disable();
-            latestModule = null;
+            firstModule = null;
             Player = null;
             direction.X = 0;
             direction.Y = 0;
