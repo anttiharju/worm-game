@@ -17,6 +17,7 @@ namespace WormGame
         {
             System.Console.ForegroundColor = System.ConsoleColor.DarkGray;
             Config config = new Config();
+            WormScene scene = new WormScene(config);
             Game game = new Game("Worm Blocks", config.windowWidth, config.windowHeight, config.refreshRate, config.fullscreen)
             {
                 WindowResize = false,
@@ -24,7 +25,7 @@ namespace WormGame
                 MouseVisible = true,
                 Color = config.backgroundColor
             };
-            game.Start(new WormScene(config));
+            game.Start(scene);
         }
     }
 }

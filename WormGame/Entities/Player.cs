@@ -4,7 +4,6 @@ using Otter.Graphics.Drawables;
 using WormGame.Static;
 using WormGame.Pooling;
 using WormGame.Core;
-using Otter.Utility.MonoGame;
 
 namespace WormGame.Entities
 {
@@ -131,13 +130,13 @@ namespace WormGame.Entities
             Position = worm.Position;
             deadZone = 90;
             if (yMovement < -deadZone)
-                worm.Direction = Help.directions[0];
+                worm.Direction = Help.directions[0]; // UP
             if (xMovement < -deadZone)
-                worm.Direction = Help.directions[1];
+                worm.Direction = Help.directions[1]; // LEFT
             if (yMovement > deadZone)
-                worm.Direction = Help.directions[2];
+                worm.Direction = Help.directions[2]; // DOWN
             if (xMovement > deadZone)
-                worm.Direction = Help.directions[3];
+                worm.Direction = Help.directions[3]; // RIGHT
             Wormskip:;
             #endregion;
         }
