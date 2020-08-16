@@ -26,7 +26,8 @@ namespace WormGame.Entities
         /// <summary>
         /// Get module graphic.
         /// </summary>
-        public Image Graphic { get; private set; }
+        public Vector2 Position { get { return position; } set { position = value; } }
+        private Vector2 position;
 
 
         /// <summary>
@@ -44,21 +45,12 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Get or set wheter or not module is in use.
-        /// </summary>
-        public override bool Active { get { return active; } set { if (value) { active = true; Graphic.Visible = true; } else Disable(); } }
-        private bool active;
-
-
-        /// <summary>
         /// Default constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
         public WormModule(Config config)
         {
             collision = config.collision;
-            Graphic = Image.CreateCircle(config.size / 2);
-            Graphic.CenterOrigin();
             step = config.wormStep;
         }
 
@@ -82,9 +74,7 @@ namespace WormGame.Entities
         /// <param name="step">Worm step</param>
         public void GraphicFollow()
         {
-            Vector2 delta = Direction * step;
-            Graphic.X += delta.X;
-            Graphic.Y += delta.Y;
+            position += Direction * step;
             if (Next != null)
                 Next.GraphicFollow();
         }
@@ -111,19 +101,6 @@ namespace WormGame.Entities
             direction.Y = 0;
         }
 
-
-        /// <summary>
-        /// Recursively set worm color.
-        /// </summary>
-        /// <param name="color">Color</param>
-        public void SetColor(Color color)
-        {
-            Graphic.Color = color;
-            if (Next != null)
-                Next.SetColor(color);
-        }
-
-
         /// <summary>
         /// Set module target.
         /// </summary>
@@ -146,15 +123,14 @@ namespace WormGame.Entities
         public override void Disable(bool recursive = true)
         {
             base.Disable();
-            active = false;
             if (recursive && Next != null)
                 Next.Disable();
             Next = null;
             if (collision.Check(target) == collision.worm)
                 collision.Add(null, target);
             ResetDirection();
-            Graphic.X = 0;
-            Graphic.Y = 0;
+            position.X = 0;
+            position.Y = 0;
             target.X = 0;
             target.Y = 0;
         }

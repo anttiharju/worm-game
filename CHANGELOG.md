@@ -20,7 +20,12 @@ I use changelog as a brain dump where I explain future plans and further explain
     - Preliminary benchmark: 62,8 AVG FPS, update and render both 5-6ms
         - This is the best approach even though the number will probably get worse.
 
-- Resetted repository back to decouple "Decouple config from wormScene" as that's when surface worm rendering was kind of working. Manually adding any other improvements I've made since then. Why not do a full repository reset? Because I want to be able to go back to scalable worms if need be.
+- *Resetted repository* back to decouple "Decouple config from wormScene" as that's when surface worm rendering was kind of working. Manually adding any other improvements I've made since then. Why not do a full repository reset? Because I want to be able to go back to scalable worms if need be.
+    - Benchmark: although there's some kind of issue with worm module usage that I solved by doubling the moduleAmount, the rendering performance is impressive: AVG 45 FPS. (2500 entities, 7500 renders) 5ms update 11ms render.
+        - Maybe bring back Pooler.HasAvailable?
+            - The culprit was fruits? Strange. Also had worse performance once I disabled them (30 AVG FPS)
+                - There's something wrong with scenes wormsAlive tracking?
+        - Time to go to bed.
 
 
 # 15.08.2020

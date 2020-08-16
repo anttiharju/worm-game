@@ -51,7 +51,7 @@ namespace WormGame.Entities
         /// <summary>
         /// Get worm color.
         /// </summary>
-        public Color Color { get { return firstModule.Graphic.Color ?? null; } }
+        public Color Color { get { return head.Color; } }
 
 
         /// <summary>
@@ -107,10 +107,8 @@ namespace WormGame.Entities
             tail.Color = color;
 
             firstModule = modules.Enable();
-            firstModule.Graphic.SetPosition(collision.EntityX(x), collision.EntityY(y));
+            firstModule.Position = new Vector2(collision.EntityX(x), collision.EntityY(y));
             firstModule.SetTarget(collision.EntityX(x), collision.EntityY(y));
-            firstModule.Graphic.Color = color;
-            //AddGraphic(firstModule.Graphic);
 
             lastModule = firstModule;
             for (int i = 1; i < length; i++)
@@ -129,10 +127,8 @@ namespace WormGame.Entities
         {
             newModule = modules.Enable();
             if (newModule == null) return;
-            newModule.Graphic.Color = Color;
-            newModule.Graphic.SetPosition(lastModule.Graphic.X, lastModule.Graphic.Y);
+            newModule.Position = lastModule.Position;
             newModule.SetTarget(lastModule.Target);
-            //AddGraphic(newModule.Graphic);
             lastModule.ResetDirection();
             lastModule.Next = newModule;
             lastModule = newModule;
@@ -197,10 +193,10 @@ namespace WormGame.Entities
         {
             if (moving)
             {
-                eraser.SetPosition(lastModule.Graphic.X, lastModule.Graphic.Y);
+                eraser.SetPosition(lastModule.Position);
                 firstModule.GraphicFollow();
-                head.SetPosition(firstModule.Graphic.X, firstModule.Graphic.Y);
-                tail.SetPosition(lastModule.Graphic.X, lastModule.Graphic.Y);
+                head.SetPosition(firstModule.Position);
+                tail.SetPosition(lastModule.Position);
             }
         }
 
