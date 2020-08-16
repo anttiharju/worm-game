@@ -19,7 +19,7 @@ namespace WormGame.Pooling
         /// Adds object to scene.
         /// </summary>
         /// <param name="scene">Scene to add the entity to.</param>
-        public abstract void Add(Scene scene);
+        public abstract void AddTo(Scene scene);
 
 
         /// <summary>
