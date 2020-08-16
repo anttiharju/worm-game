@@ -22,7 +22,7 @@ namespace WormGame.Pooling
         /// Add entity to the scene.
         /// </summary>
         /// <param name="scene">Scene</param>
-        public void AddTo(Scene scene)
+        public void Add(Scene scene)
         {
             scene.Add(this);
         }

@@ -31,8 +31,8 @@ namespace WormGame.Pooling
             {
                 T current = (T)Activator.CreateInstance(typeof(T), new object[] { config });
                 current.Disable(false);
+                current.Add(scene);
                 pool[i] = current;
-                current.AddTo(scene);
             }
         }
 

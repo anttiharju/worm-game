@@ -28,7 +28,7 @@ namespace WormGame.Pooling
         /// Only used by PoolableEntity, but by also existing here it simplifies Pooler generics.
         /// </summary>
         /// <param name="scene">Scene to add poolable to</param>
-        public void AddTo(Scene scene) { }
+        public void Add(Scene scene) { }
 
 
         /// <summary>
