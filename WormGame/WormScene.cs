@@ -17,9 +17,8 @@ namespace WormGame
     public class WormScene : Scene
     {
         private readonly Pooler<Player> players;
-        private readonly Pooler<Worm> worms;
+        private readonly Worms worms;
         private readonly Fruits fruits;
-        private readonly Pooler<WormModule> wormModules;
         private readonly Blocks blocks;
         private float currentStep;
         private int wormsAlive;
@@ -68,8 +67,7 @@ namespace WormGame
             currentStep = config.size - config.wormStep;
             CreateBorders(config.width, config.height, config.foregroundColor);
 
-            worms = new Pooler<Worm>(this, config, config.wormAmount);
-            wormModules = new Pooler<WormModule>(this, config, config.moduleAmount);
+            worms = new Worms(config, this);
             players = new Pooler<Player>(this, config, 5);
             fruits = new Fruits(config);
             blocks = new Blocks(config);
@@ -99,8 +97,6 @@ namespace WormGame
             worms.Reset();
             blocks.Reset();
             collision.Reset();
-            wormModules.Reset();
-            surface.Clear();
             wormsAlive = 0;
             Start();
 #if DEBUG
@@ -190,7 +186,7 @@ namespace WormGame
             Worm worm = worms.Enable();
             if (worm == null) return;
             if (color == null) color = Random.Color;
-            worm.Spawn(wormModules, x, y, length, color);
+            worm.Spawn(x, y, length, color);
             wormsAlive++;
         }
 
