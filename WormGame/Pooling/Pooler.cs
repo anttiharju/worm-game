@@ -159,11 +159,11 @@ namespace WormGame.Pooling
             if (pool[Index].Active)
                 if (Defragment())
                     return null;
-            int activeIndex = Index;
-            pool[activeIndex].Active = true;
+            int activated = Index;
+            pool[activated].Active = true;
             if (Index < endIndex)
                 Index++;
-            return pool[activeIndex];
+            return pool[activated];
         }
 
 
