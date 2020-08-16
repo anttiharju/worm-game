@@ -17,14 +17,17 @@ namespace WormGame
     public class WormScene : Scene
     {
         private readonly Pooler<Player> players;
+        private readonly Pooler<Worm> worms;
         private readonly Fruits fruits;
-        private readonly Worms worms;
+        private readonly Pooler<WormModule> wormModules;
         private readonly Blocks blocks;
         private float currentStep;
         private int wormsAlive;
 
         /// Loaded from configuration
         private readonly Collision collision;
+        private readonly Tilemap tilemap;
+        private readonly Surface surface;
         private readonly bool spawnFruits;
         private readonly int fruitAmount;
         private readonly int minWormLength;
@@ -44,8 +47,11 @@ namespace WormGame
         /// <param name="config">Configuration</param>
         public WormScene(Config config)
         {
-            collision = config.collision;
+            AddGraphic(config.surface);
             AddGraphic(config.tilemap);
+            collision = config.collision;
+            tilemap = config.tilemap;
+            surface = config.surface;
             spawnFruits = config.spawnFruits;
             fruitAmount = config.fruitAmount;
             minWormLength = config.minWormLength;
@@ -62,7 +68,8 @@ namespace WormGame
             currentStep = config.size - config.wormStep;
             CreateBorders(config.width, config.height, config.foregroundColor);
 
-            worms = new Worms(config, this);
+            worms = new Pooler<Worm>(this, config, config.wormAmount);
+            wormModules = new Pooler<WormModule>(this, config, config.moduleAmount);
             players = new Pooler<Player>(this, config, 5);
             fruits = new Fruits(config);
             blocks = new Blocks(config);
@@ -92,6 +99,8 @@ namespace WormGame
             worms.Reset();
             blocks.Reset();
             collision.Reset();
+            wormModules.Reset();
+            surface.Clear();
             wormsAlive = 0;
             Start();
 #if DEBUG
@@ -116,7 +125,7 @@ namespace WormGame
             foreach (Worm worm in worms)
                 if (worm.Active)
                 {
-                    float distance = Vector2.Distance(position, worm.Position);
+                    float distance = Vector2.Distance(position, worm.firstModule.Target);
                     if (distance < nearestDistance)
                     {
                         nearestWorm = worm;
@@ -139,7 +148,7 @@ namespace WormGame
             {
                 foreach (Worm worm in worms)
                     if (worm.Active)
-                        worm.Update();
+                        worm.Move();
                 currentStep = 0;
                 if (wormsAlive < wormCap)
                 {
@@ -176,10 +185,13 @@ namespace WormGame
         /// <param name="y">Vertical field position</param>
         /// <param name="length">Length, default config.minWormLength</param>
         /// <param name="color">Color, default Random.Color</param>
-        public Worm SpawnWorm(int x, int y, int length)
+        public void SpawnWorm(int x, int y, int length, Color color = null)
         {
+            Worm worm = worms.Enable();
+            if (worm == null) return;
+            if (color == null) color = Random.Color;
+            worm.Spawn(wormModules, x, y, length, color);
             wormsAlive++;
-            return worms.SpawnWorm(x, y, length, Random.Color);
         }
 
 

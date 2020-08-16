@@ -20,6 +20,8 @@ I use changelog as a brain dump where I explain future plans and further explain
     - Preliminary benchmark: 62,8 AVG FPS, update and render both 5-6ms
         - This is the best approach even though the number will probably get worse.
 
+- Resetted repository back to decouple "Decouple config from wormScene" as that's when surface worm rendering was kind of working. Manually adding any other improvements I've made since then. Why not do a full repository reset? Because I want to be able to go back to scalable worms if need be.
+
 
 # 15.08.2020
 - I tried surface-based approach, but it's a failure.
