@@ -1,8 +1,4 @@
-﻿using Otter.Core;
-using Otter.Graphics.Drawables;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Otter.Graphics.Drawables;
 using WormGame.Core;
 using WormGame.Pooling;
 
