@@ -14,13 +14,14 @@ namespace WormGame.Core
         // Misc
         public readonly Collision collision;
         public readonly Tilemap tilemap;
+        public readonly Surface surface;
         public readonly Color backgroundColor = Color.Black;
         public readonly Color foregroundColor = Color.White;
 #if DEBUG
         public readonly bool visualizeCollision = false;
         public readonly bool visualizeBlockifying = false;
         public readonly bool disableBlocks = true;
-        public readonly bool blockifyWorms = false;
+        public readonly bool blockifyWorms = true;
 #endif
 
         // Window
@@ -30,18 +31,18 @@ namespace WormGame.Core
         public readonly int refreshRate = 144;    // See wormSpeed before changing this
 
         // Scene
-        public readonly int width = 200;
-        public readonly int height = 100;
+        public readonly int width = 20;
+        public readonly int height = 10;
         public readonly int margin = 1;
 
         // Worm
         public readonly int wormCap = 0;           // Overrides wormPercentage if > 0.
-        public readonly int wormSpeed = 144;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
+        public readonly int wormSpeed = 6;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
         public readonly int minWormLength = 6;
-        public readonly float wormPercentage = 1;
+        public readonly float wormPercentage = 0.2f;
 
         // Fruit
-        public readonly bool spawnFruits = false;
+        public readonly bool spawnFruits = true;
         public readonly float fruitPercentage = 0.015f;
 
         #region Calculated variables
@@ -174,6 +175,10 @@ namespace WormGame.Core
             if (height % 2 == 0) topBorder += size / 2;
             wormStep = (float)wormSpeed / refreshRate * size;
             collision = new Collision(this);
+            surface = new Surface(windowWidth, windowHeight, backgroundColor)
+            {
+                AutoClear = false
+            };
             tilemap = new Tilemap(width * size, height * size, size, size)
             {
                 X = leftBorder - halfSize,
