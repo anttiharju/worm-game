@@ -13,76 +13,44 @@ namespace WormGame.Entities
         private readonly float halfSize;
         private readonly float step;
 
-        private bool horizontal;
         private Vector2 direction;
-        private Vector2 target;
 
-        public Color Color { get { return Graphic.Color; } set { Graphic.Color = value; } }
+        public WormModule Next { get; set; }
+
 
         public WormModule(Config config)
         {
             Graphic = Image.CreateRectangle(config.size);
+            Graphic.CenterOrigin();
             step = config.wormStep;
             size = config.size;
             halfSize = config.halfSize;
         }
 
-        public WormModule Initialize(Vector2 direction, Vector2 position, Color color)
+        public WormModule Initialize(Vector2 position, Vector2 direction, Color color)
         {
-            this.direction = direction;
             SetPosition(position);
-            Graphic.Scale = 1;
-            Color = color;
-            if (direction.Y != 0) /// UGLY
-            {
-
-                if (direction.Y > 0)
-                {
-                    Graphic.SetOrigin(halfSize, size);
-                    Y += halfSize;
-                }
-                else
-                {
-                    Graphic.SetOrigin(halfSize, 0);
-                    Y -= halfSize;
-                }
-            }
-            else
-            {
-                if (direction.X > 0)
-                {
-                    Graphic.SetOrigin(size, halfSize);
-                    X += halfSize;
-                }
-                else
-                {
-                    Graphic.SetOrigin(0, halfSize);
-                    X -= halfSize;
-                }
-                horizontal = true;
-            }
+            this.direction = direction;
+            Graphic.Color = color;
             return this;
         }
 
 
         public Vector2 GetEnd()
         {
-            Vector2 end = Position;
-            if (horizontal)
-                end.X -= halfSize;
-            else
-                end.Y -= halfSize;
-            return end;
+            if (direction.X != 0)
+                return Position + Graphic.ScaleX / 2 * direction * size + direction * halfSize;
+            return Position + Graphic.ScaleY / 2 * direction * size + direction * halfSize;
         }
 
 
         public void Grow()
         {
-            Position += direction * size;
-            if (horizontal)
+            if (direction.X != 0)
                 Graphic.ScaleX++;
             else
                 Graphic.ScaleY++;
+            Position += direction * halfSize;
         }
 
 
@@ -111,8 +79,7 @@ namespace WormGame.Entities
         public override void Disable(bool recursive = true)
         {
             base.Disable();
-            Graphic.SetOrigin(0, 0);
-            horizontal = false;
+            Graphic.Scale = 1;
             X = 0;
             Y = 0;
         }
