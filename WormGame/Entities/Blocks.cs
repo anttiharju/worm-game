@@ -12,7 +12,7 @@ namespace WormGame.Entities
     /// <summary>
     /// A custom pooler that can be called to create blocks. Uses tilemap to render objects.
     /// </summary>
-    public class BlockManager : Pooler<BlockModule>
+    public class Blocks : Pooler<BlockModule>
     {
         public readonly BlockSpawner blockSpawner;
 
@@ -23,7 +23,7 @@ namespace WormGame.Entities
         /// Initialize manager.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public BlockManager(Config config)
+        public Blocks(Config config)
         {
             tilemap = config.tilemap;
             blockSpawner = new BlockSpawner(config);
@@ -131,7 +131,7 @@ namespace WormGame.Entities
         /// <param name="worm">Worm</param>
         /// <param name="manager">Module pooler</param>
         /// <returns>Block</returns>
-        public BlockModule Spawn(Worm worm, BlockManager manager)
+        public BlockModule Spawn(Worm worm, Blocks manager)
         {
             return null;
             /*
@@ -391,7 +391,7 @@ namespace WormGame.Entities
     /// </summary>
     public class BlockModule : Poolable
     {
-        private readonly BlockManager manager;
+        private readonly Blocks manager;
         private readonly Collision collision;
 
 
@@ -400,7 +400,7 @@ namespace WormGame.Entities
         /// </summary>
         /// <param name="config">Configuration</param>
         /// <param name="manager">Manager</param>
-        public BlockModule(Config config, BlockManager manager)
+        public BlockModule(Config config, Blocks manager)
         {
             this.manager = manager;
             collision = config.collision;
