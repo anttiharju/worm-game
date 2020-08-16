@@ -19,16 +19,16 @@ namespace WormGame.Entities
 #endif
         public WormModule firstModule;
 
+        private readonly Pooler<WormModule> modules;
         private readonly Collision collision;
+        private readonly WormScene scene;
         private readonly Image head;
         private readonly Image tail;
         private readonly Image eraser;
         private readonly int size;
 
-        private Pooler<WormModule> modules;
         private WormModule lastModule;
         private WormModule newModule;
-        private WormScene scene;
         private Vector2 target;
         private bool moving;
         private bool retry;
@@ -65,13 +65,15 @@ namespace WormGame.Entities
         /// Default constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public Worm(Config config)
+        public Worm(Config config, WormScene scene, Pooler<WormModule> modules)
         {
 #if DEBUG
             blockifyWorms = config.blockifyWorms;
 #endif
-            size = config.size;
+            this.scene = scene;
+            this.modules = modules;
             collision = config.collision;
+            size = config.size;
             eraser = Image.CreateCircle(config.halfSize, config.backgroundColor);
             head = Image.CreateCircle(config.halfSize);
             tail = Image.CreateCircle(config.halfSize);
@@ -89,16 +91,13 @@ namespace WormGame.Entities
         /// <summary>
         /// Spawn the worm.
         /// </summary>
-        /// <param name="wormModules">WormBody pool so the worm can grow.</param>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
         /// <param name="length">Worm length</param>
         /// <param name="color">Worm color</param>
         /// <returns>Worm</returns>
-        public Worm Spawn(Pooler<WormModule> wormModules, int x, int y, int length, Color color)
+        public Worm Spawn(int x, int y, int length, Color color)
         {
-            scene = (WormScene)Scene;
-            modules = wormModules;
             target = Position;
             LengthCap = 1;
             Length = 1;
@@ -107,7 +106,7 @@ namespace WormGame.Entities
             head.Color = color;
             tail.Color = color;
 
-            firstModule = wormModules.Enable();
+            firstModule = modules.Enable();
             firstModule.Graphic.SetPosition(collision.EntityX(x), collision.EntityY(y));
             firstModule.SetTarget(collision.EntityX(x), collision.EntityY(y));
             firstModule.Graphic.Color = color;
