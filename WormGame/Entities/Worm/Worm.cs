@@ -1,5 +1,4 @@
-﻿using Otter.Core;
-using Otter.Graphics;
+﻿using Otter.Graphics;
 using Otter.Utility.MonoGame;
 using WormGame.Core;
 using WormGame.Pooling;
@@ -11,14 +10,12 @@ namespace WormGame.Entities
     {
         private readonly Pooler<WormModule> modules;
         private readonly Collision collision;
-        private readonly WormScene scene;
+        private readonly int size;
 
         private WormModule firstModule;
         private WormModule lastModule;
         private Vector2 position;
         private Vector2 direction;
-        private int halfSize;
-        private int size;
         private int maxLength;
         private bool directionChange;
         private bool moving;
@@ -44,12 +41,10 @@ namespace WormGame.Entities
         public Color Color { get; private set; }
 
 
-        public Worm(Config config, WormScene scene, Pooler<WormModule> modules)
+        public Worm(Config config, Pooler<WormModule> modules)
         {
-            this.scene = scene;
             this.modules = modules;
             collision = config.collision;
-            halfSize = config.halfSize;
             size = config.size;
         }
 
@@ -57,7 +52,6 @@ namespace WormGame.Entities
         {
             position.X = collision.EntityX(x);
             position.Y = collision.EntityY(y);
-            Length = 1;
             maxLength = length;
             Color = color;
             direction = Random.ValidDirection(collision, position, size);
@@ -85,14 +79,14 @@ namespace WormGame.Entities
                 {
                     position = nextPosition;
                     firstModule?.Grow();
-                    //collision.Add(this, position);
+                    collision.Add(this, position);
                     Length++;
                     if (Length > maxLength)
                     {
                         lastModule.Shrink();
-                        //collision.Add(null, lastModule.GetEnd());
+                        collision.Add(null, lastModule.GetEnd());
                         Length--;
-                        if (lastModule.Scale == 1)
+                        if (lastModule.Scale <= 1)
                         {
                             WormModule tmp = lastModule;
                             lastModule = lastModule.Next;
@@ -125,11 +119,16 @@ namespace WormGame.Entities
         {
             base.Disable();
             firstModule = null;
-            Player = null;
+            lastModule = null;
+            position.X = 0;
+            position.Y = 0;
             direction.X = 0;
             direction.Y = 0;
+            Player = null;
+            maxLength = 0;
             directionChange = false;
             moving = true;
+            Length = 1;
         }
     }
 }

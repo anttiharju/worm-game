@@ -18,8 +18,8 @@ namespace WormGame
     {
         private readonly Pooler<Player> players;
         private readonly Fruits fruits;
-        private readonly WormManager worms;
-        private readonly BlockManager blocks;
+        private readonly Worms worms;
+        private readonly Blocks blocks;
         private float currentStep;
         private int wormsAlive;
 
@@ -62,10 +62,10 @@ namespace WormGame
             currentStep = config.size - config.wormStep;
             CreateBorders(config.width, config.height, config.foregroundColor);
 
-            worms = new WormManager(this, config);
+            worms = new Worms(config, this);
             players = new Pooler<Player>(this, config, 5);
             fruits = new Fruits(config);
-            blocks = new BlockManager(config);
+            blocks = new Blocks(config);
             Start();
         }
 

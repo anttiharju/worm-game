@@ -32,7 +32,7 @@ namespace WormGame.Pooling
                 T current = (T)Activator.CreateInstance(typeof(T), new object[] { config });
                 current.Disable(false);
                 pool[i] = current;
-                current.Add(scene);
+                current.AddTo(scene);
             }
         }
 
@@ -136,19 +136,34 @@ namespace WormGame.Pooling
 
 
         /// <summary>
+        /// If all disabling is done through this, defragmentation won't trigger. Not sure if works properly.
+        /// </summary>
+        /// <param name="disableIndex"></param>
+        public void Disable(int disableIndex)
+        {
+            pool[disableIndex].Disable(false);
+            if (!pool[Index].Active)
+                Index--;
+            T swap = pool[disableIndex];
+            pool[disableIndex] = pool[Index];
+            pool[Index] = swap;
+        }
+
+
+        /// <summary>
         /// Enable a disabled object. Use object's Spawn method to configure it.
         /// </summary>
         /// <returns>Enabled object</returns>
         public T Enable()
         {
-            if (Index == endIndex && pool[Index].Active)
+            if (pool[Index].Active)
                 if (Defragment())
                     return null;
-            int activated = Index;
-            pool[activated].Active = true;
+            int activeIndex = Index;
+            pool[activeIndex].Active = true;
             if (Index < endIndex)
                 Index++;
-            return pool[activated];
+            return pool[activeIndex];
         }
 
 

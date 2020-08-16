@@ -3,18 +3,14 @@ using Otter.Graphics.Drawables;
 using Otter.Utility.MonoGame;
 using WormGame.Core;
 using WormGame.Pooling;
-using WormGame.Static;
 
 namespace WormGame.Entities
 {
     public class WormModule : PoolableEntity
     {
-        private readonly float size;
         private readonly float halfSize;
-        private readonly float step;
 
         private Vector2 direction;
-
         public WormModule Next { get; set; }
         public float Scale { get { if (direction.X == 0) return Graphic.ScaleY; else return Graphic.ScaleX; } }
 
@@ -23,8 +19,6 @@ namespace WormGame.Entities
         {
             Graphic = Image.CreateRectangle(config.size);
             Graphic.CenterOrigin();
-            step = config.wormStep;
-            size = config.size;
             halfSize = config.halfSize;
         }
 
@@ -58,6 +52,7 @@ namespace WormGame.Entities
             return Position - halfSize * direction - Scale * halfSize * direction;
         }
 
+
         public void Shrink()
         {
             if (direction.X == 0)
@@ -68,23 +63,14 @@ namespace WormGame.Entities
         }
 
 
-        public override void Update()
-        {
-        }
-
-
         public override void Disable(bool recursive = true)
         {
             base.Disable();
-            Graphic.Scale = 1;
-            X = 0;
-            Y = 0;
-        }
-
-        private int Normalize(float number)
-        {
-            if (number < 0) return -1;
-            return 1;
+            Graphic.ScaleX = 1;
+            Graphic.ScaleY = 1;
+            direction.X = 0;
+            direction.Y = 0;
+            Next = null;
         }
     }
 }
