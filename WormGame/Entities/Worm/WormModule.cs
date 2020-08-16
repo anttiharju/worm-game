@@ -16,6 +16,7 @@ namespace WormGame.Entities
         private Vector2 direction;
 
         public WormModule Next { get; set; }
+        public float Scale { get { if (direction.X == 0) return Graphic.ScaleY; else return Graphic.ScaleX; } }
 
 
         public WormModule(Config config)
@@ -36,38 +37,34 @@ namespace WormGame.Entities
         }
 
 
-        public Vector2 GetEnd()
-        {
-            if (direction.X != 0)
-                return Position + Graphic.ScaleX / 2 * direction * size + direction * halfSize;
-            return Position + Graphic.ScaleY / 2 * direction * size + direction * halfSize;
-        }
-
-
         public void Grow()
         {
-            if (direction.X != 0)
-                Graphic.ScaleX++;
-            else
+            if (direction.X == 0)
                 Graphic.ScaleY++;
-            Position += direction * halfSize;
+            else
+                Graphic.ScaleX++;
+            Move();
         }
 
 
         public void Move()
         {
-
+            Position += direction * halfSize;
         }
 
 
-        public void Flip()
+        public Vector2 GetEnd()
         {
-
+            return Position - halfSize * direction - Scale * halfSize * direction;
         }
 
         public void Shrink()
         {
-
+            if (direction.X == 0)
+                Graphic.ScaleY--;
+            else
+                Graphic.ScaleX--;
+            Move();
         }
 
 
