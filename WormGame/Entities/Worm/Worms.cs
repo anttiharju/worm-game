@@ -4,20 +4,20 @@ using WormGame.Pooling;
 
 namespace WormGame.Entities
 {
-    public class WormManager : Pooler<Worm>
+    public class Worms : Pooler<Worm>
     {
         private readonly Pooler<WormModule> modules;
 
-        public WormManager(WormScene scene, Config config)
+        public Worms(Config config, WormScene scene)
         {
-            modules = new Pooler<WormModule>(scene, config, config.moduleAmount);
+            modules = new WormModulePooler(config, scene);
 
             int capacity = config.wormAmount;
             pool = new Worm[capacity];
             endIndex = capacity - 1;
             for (int i = 0; i < capacity; i++)
             {
-                Worm current = new Worm(config, scene, modules);
+                Worm current = new Worm(config, modules);
                 current.Disable(false);
                 pool[i] = current;
             }
@@ -35,6 +35,24 @@ namespace WormGame.Entities
             Worm worm = Enable();
             if (worm == null) return null;
             return worm.Spawn(x, y, length, color);
+        }
+    }
+
+
+    public class WormModulePooler : Pooler<WormModule>
+    {
+        public WormModulePooler(Config config, WormScene scene)
+        {
+            int capacity = config.moduleAmount;
+            pool = new WormModule[capacity];
+            endIndex = capacity - 1;
+            for (int i = 0; i < capacity; i++)
+            {
+                WormModule current = new WormModule(config);
+                current.Disable(false);
+                pool[i] = current;
+                current.AddTo(scene);
+            }
         }
     }
 }

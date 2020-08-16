@@ -3,6 +3,17 @@ I use changelog as a brain dump where I explain future plans and further explain
 
 
 # 16.08.2020
+- Fix scalable worms (not smooth movement, but works properly)
+    - Proper benchmark: 25,1 AVG FPS. Dun dun duuu. A huge dissapointment, meaning Surface-based approach *was* the best so far~~, but, there's a but:~~
+        - ~~When a worm is going straight, it takes up *just one* render. Each turn requires one extra render during its existence, meaning worms that have made many turns take up more renders: but when that happens, in the actual game, *they turn into blocks* which are like super cheap to render. So even though the benchmark is worse than with surface, I'm sticking with for the following reason:~~
+            - ~~The benchmark doesn't represent real game situations.~~
+            - ~~Scalable worms are sometimes cheaper to render.~~
+            - ~~Surface-based rendering approach would require *tons* of extra systems, such as some kind of a eraser system.~~
+                - ~~While intriguing, I'm not really willing to attempt implementing it as I know it won't be perfect and if we dont want to pool moduleAmount of erasers, there will always be some rendering artifacts.~~
+                - ~~Although I do kind of want to try to move fruits from tilemap to surface, but that's going to be later if ever.~~
+        - Okay so I will probably retract everything I wrote there as I went back and checked the original worm render performance and well I have a maybe two-frame improvement even though I halved the render amount so fuck this I'll bend surface to my will.
+    - Also added disable to poolers, but it's untested so it might be broken.
+
 - Basic scalable worms
     - Collision broken
     - Sometimes worms develop tumors.
