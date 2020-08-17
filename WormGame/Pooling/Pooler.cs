@@ -19,7 +19,17 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Initialize pool.
+        /// Custom pooler constructor.
+        /// </summary>
+        public Pooler(int capacity)
+        {
+            pool = new T[capacity];
+            endIndex = capacity - 1;
+        }
+
+
+        /// <summary>
+        /// Default pooler constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
         /// <param name="capacity">Pool length</param>
@@ -35,12 +45,6 @@ namespace WormGame.Pooling
                 pool[i] = current;
             }
         }
-
-
-        /// <summary>
-        /// Base constructor for custom poolers.
-        /// </summary>
-        public Pooler() { }
 
 
         /// <summary>

@@ -19,7 +19,7 @@ namespace WormGame
     public class WormScene : Scene
     {
         private readonly float updateInterval;
-        private readonly Pooler<Player> players;
+        private readonly Players players;
         private readonly Worms worms;
         private readonly Fruits fruits;
         private readonly Blocks blocks;
@@ -68,7 +68,7 @@ namespace WormGame
             CreateBorders(config.width, config.height, config.foregroundColor);
 
             worms = new Worms(config, this);
-            players = new Pooler<Player>(this, config, 5);
+            players = new Players(config, this);
             fruits = new Fruits(config);
             blocks = new Blocks(config);
             Start();
@@ -93,7 +93,7 @@ namespace WormGame
                 for (int i = 0; i < fruitAmount; i++)
                     fruits.Spawn();
             for (int i = 0; i < 5; i++)
-                SpawnPlayer(i);
+                players.Reset();
         }
 
 
@@ -153,8 +153,6 @@ namespace WormGame
             foreach (Worm worm in worms)
                 if (worm.Active)
                     worm.Update();
-            foreach (Player player in players)
-                player.Move();
             Game.Coroutine.Start(UpdateRoutine());
         }
 
@@ -233,23 +231,14 @@ namespace WormGame
 
 
         /// <summary>
-        /// Spawn a player.
-        /// </summary>
-        /// <param name="playerNumber">Player number</param>
-        /// <returns>Player</returns>
-        public Player SpawnPlayer(int playerNumber)
-        {
-            return players.Enable().Spawn(playerNumber, windowWidth / 2, windowHeight / 2);
-        }
-
-
-        /// <summary>
         /// Creates a visible border for the field.
         /// </summary>
         private void CreateBorders(int width, int height, Color color)
         {
             Image borders = Image.CreateRectangle(width * size, height * size, Color.None);
             borders.OutlineThickness = size / 6;
+            if (borders.OutlineThickness < 1)
+                borders.OutlineThickness = 1;
             borders.OutlineColor = color;
             borders.CenterOrigin();
             borders.X = windowWidth / 2;

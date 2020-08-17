@@ -12,7 +12,8 @@ I use changelog as a brain dump where I explain future plans and further explain
 
 - Improve worm eraser
     - Let the game run (940x500, 1920x1080) and the game could handle over 10 000 worms with AVG FPS of around 15! :D
-        - Big takeaway: THE GAME WAS CPU BOUND, RENDERING IS PRETTY HECKING LIGHTWEIGHT NOW :D
+        - Big takeaway: THE GAME IS CPU BOUND, RENDERING IS PRETTY HECKING LIGHTWEIGHT NOW :D
+            - Or, it's much better than it used to be: My desktop has a i7-4790k and GTX 1080.
     - Scene.CreateBorders() now adds graphic straight to scene instead of using an entity.
     - WormEraser works! Really happy with it.
         - Worms aren't yet eraser on disable, so it's not done.
@@ -21,8 +22,14 @@ I use changelog as a brain dump where I explain future plans and further explain
     - Game suffers from slowdowns if update and render take more than the config.refreshrate allow, but it won't exceed it so I'm willing to live with this.
     - Worm surface rendering benchmark: (200x100, 720p60, worm length 6)
         - 69,8 AVG FPS (3338 Entities, 6670 Renders) 2ms + 10ms
-    - Future ideas:
-        - Players don't have to be entities if graphics can be added straight to scene.
+    - ~~Future ideas:~~
+        - ~~Players don't have to be entities if graphics can be added straight to scene.~~
+            - Yes they do due to input.
+
+ - Update README.md
+    - I realized I could remove game.FixedFramerate = false as I can use custom update loops even if that's set to true.
+        - This way player won't be as buggy and internal framerate counter is more correct
+    - GPU usage issue is back (I can hear coil whine and usage is above 50%)
 
 
 # 16.08.2020
