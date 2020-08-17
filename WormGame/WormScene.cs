@@ -6,6 +6,8 @@ using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
 using WormGame.Entities;
+using System.Collections;
+using Otter.Utility;
 
 namespace WormGame
 {
@@ -16,6 +18,7 @@ namespace WormGame
     /// </summary>
     public class WormScene : Scene
     {
+        private readonly float updateInterval;
         private readonly Pooler<Player> players;
         private readonly Worms worms;
         private readonly Fruits fruits;
@@ -30,7 +33,7 @@ namespace WormGame
         private readonly bool spawnFruits;
         private readonly int fruitAmount;
         private readonly int minWormLength;
-        private readonly float wormStep;
+        private readonly float step;
         private readonly int wormCap;
         private readonly int size;
         private readonly int width;
@@ -46,6 +49,8 @@ namespace WormGame
         /// <param name="config">Configuration</param>
         public WormScene(Config config)
         {
+            updateInterval = 1.0f / config.refreshRate;
+            System.Console.WriteLine(updateInterval);
             AddGraphic(config.surface);
             AddGraphic(config.tilemap);
             collision = config.collision;
@@ -54,7 +59,7 @@ namespace WormGame
             spawnFruits = config.spawnFruits;
             fruitAmount = config.fruitAmount;
             minWormLength = config.minWormLength;
-            wormStep = config.wormStep;
+            step = config.wormStep;
             wormCap = config.wormCap;
             size = config.size;
             width = config.width;
@@ -72,6 +77,15 @@ namespace WormGame
             fruits = new Fruits(config);
             blocks = new Blocks(config);
             Start();
+        }
+
+
+        /// <summary>
+        /// Kicks off the manual update coroutine.
+        /// </summary>
+        public override void Begin()
+        {
+            Game.Coroutine.Start(UpdateRoutine());
         }
 
 
@@ -135,42 +149,56 @@ namespace WormGame
         /// <summary>
         /// Makes the world go round.
         /// </summary>
-        public override void Update()
+        public new void Update()
         {
-            if (Input.KeyPressed(Key.R))
-                Restart();
-            currentStep += wormStep;
-            if (FastMath.Round(currentStep, wormStep / 2) >= size)
+            foreach (Worm worm in worms)
+                if (worm.Active)
+                    worm.Move();
+            currentStep = 0;
+            if (wormsAlive < wormCap)
             {
-                foreach (Worm worm in worms)
-                    if (worm.Active)
-                        worm.Move();
-                currentStep = 0;
-                if (wormsAlive < wormCap)
+                Vector2 random = Random.ValidPosition(collision, width, height, collision.empty);
+                if (random.X != -1)
+                    SpawnWorm(collision.X(random.X), collision.Y(random.Y), minWormLength);
+                else
                 {
-                    Vector2 random = Random.ValidPosition(collision, width, height, collision.empty);
-                    if (random.X != -1)
+                    random = Random.ValidPosition(collision, width, height, collision.fruit);
+                    if (random.X != -1 && collision.Check(random) == collision.fruit)
+                    {
+                        fruits.Remove(collision.X(random.X), collision.Y(random.Y));
                         SpawnWorm(collision.X(random.X), collision.Y(random.Y), minWormLength);
+                    }
                     else
                     {
-                        random = Random.ValidPosition(collision, width, height, collision.fruit);
-                        if (random.X != -1 && collision.Check(random) == collision.fruit)
-                        {
-                            fruits.Remove(collision.X(random.X), collision.Y(random.Y));
-                            SpawnWorm(collision.X(random.X), collision.Y(random.Y), minWormLength);
-                        }
-                        else
-                        {
-                            if (wormsAlive > 0)
-                                wormsAlive--;
-                        }
+                        if (wormsAlive > 0)
+                            wormsAlive--;
                     }
                 }
-#if DEBUG
-                if (visualizeCollision)
-                    collision.Visualize();
-#endif
             }
+#if DEBUG
+            if (visualizeCollision)
+                collision.Visualize();
+#endif
+        }
+
+
+        /// <summary>
+        /// Runs config.refreshRate times per second.
+        /// </summary>
+        private IEnumerator UpdateRoutine()
+        {
+            yield return Coroutine.Instance.WaitForSeconds(updateInterval);
+            foreach (Worm worm in worms)
+                if (worm.Active)
+                    worm.Update();
+            if (Input.KeyPressed(Key.R))
+                Restart();
+            currentStep += step;
+            if (FastMath.Round(currentStep, step / 2) >= size)
+            {
+                Update();
+            }
+            Game.Coroutine.Start(UpdateRoutine());
         }
 
 
@@ -181,13 +209,10 @@ namespace WormGame
         /// <param name="y">Vertical field position</param>
         /// <param name="length">Length, default config.minWormLength</param>
         /// <param name="color">Color, default Random.Color</param>
-        public void SpawnWorm(int x, int y, int length, Color color = null)
+        public Worm SpawnWorm(int x, int y, int length)
         {
-            Worm worm = worms.Enable();
-            if (worm == null) return;
-            if (color == null) color = Random.Color;
-            worm.Spawn(x, y, length, color);
             wormsAlive++;
+            return worms.SpawnWorm(x, y, length, Random.Color);
         }
 
 

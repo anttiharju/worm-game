@@ -1,4 +1,6 @@
-﻿using Otter.Graphics.Drawables;
+﻿using Otter.Graphics;
+using Otter.Graphics.Drawables;
+using System;
 using WormGame.Core;
 using WormGame.Pooling;
 
@@ -31,6 +33,13 @@ namespace WormGame.Entities
             surface.Clear();
             modules.Reset();
             base.Reset();
+        }
+
+        public Worm SpawnWorm(int x, int y, int length, Color color)
+        {
+            Worm worm = Enable();
+            if (worm == null) return null;
+            return worm.Spawn(x, y, length, color);
         }
     }
 }
