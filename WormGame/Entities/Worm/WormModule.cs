@@ -51,7 +51,7 @@ namespace WormGame.Entities
         public WormModule(Config config)
         {
             collision = config.collision;
-            step = config.wormStep;
+            step = config.step;
         }
 
 
