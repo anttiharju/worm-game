@@ -54,7 +54,7 @@ namespace WormGame
             spawnFruits = config.spawnFruits;
             fruitAmount = config.fruitAmount;
             minWormLength = config.minWormLength;
-            step = config.wormStep;
+            step = config.step;
             wormCap = config.wormCap;
             size = config.size;
             width = config.width;
@@ -64,7 +64,7 @@ namespace WormGame
             visualizeCollision = config.visualizeCollision;
             // Config load end
 
-            currentStep = config.size - config.wormStep;
+            currentStep = config.size - config.step;
             CreateBorders(config.width, config.height, config.foregroundColor);
 
             worms = new Worms(config, this);
@@ -147,14 +147,14 @@ namespace WormGame
         private IEnumerator UpdateRoutine()
         {
             yield return Coroutine.Instance.WaitForSeconds(updateInterval);
-            foreach (Player player in players)
-                player.Move();
-            foreach (Worm worm in worms)
-                if (worm.Active)
-                    worm.Update();
             currentStep += step;
             if (FastMath.Round(currentStep, step / 2) >= size)
                 Move();
+            foreach (Worm worm in worms)
+                if (worm.Active)
+                    worm.Update();
+            foreach (Player player in players)
+                player.Move();
             Game.Coroutine.Start(UpdateRoutine());
         }
 
@@ -248,15 +248,13 @@ namespace WormGame
         /// </summary>
         private void CreateBorders(int width, int height, Color color)
         {
-            Image backgroundGraphic = Image.CreateRectangle(width * size, height * size, Color.None);
-            backgroundGraphic.CenterOrigin();
-            backgroundGraphic.OutlineColor = color;
-            backgroundGraphic.OutlineThickness = size / 6;
-            Entity background = new Entity(windowWidth / 2, windowHeight / 2, backgroundGraphic)
-            {
-                Collidable = false
-            };
-            Add(background);
+            Image borders = Image.CreateRectangle(width * size, height * size, Color.None);
+            borders.OutlineThickness = size / 6;
+            borders.OutlineColor = color;
+            borders.CenterOrigin();
+            borders.X = windowWidth / 2;
+            borders.Y = windowHeight / 2;
+            AddGraphic(borders);
         }
     }
 }

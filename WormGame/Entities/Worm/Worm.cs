@@ -24,6 +24,8 @@ namespace WormGame.Entities
         private readonly WormScene scene;
         private readonly Image eraser;
         private readonly Image head;
+        private readonly float step;
+        private readonly int halfSize;
         private readonly int size;
 
         private WormModule lastModule;
@@ -72,7 +74,9 @@ namespace WormGame.Entities
             this.scene = scene;
             this.modules = modules;
             collision = config.collision;
+            halfSize = config.halfSize;
             size = config.size;
+            step = config.step;
             eraser = Image.CreateRectangle(size, config.backgroundColor);
             head = Image.CreateRectangle(size);
             eraser.CenterOrigin();
@@ -179,6 +183,45 @@ namespace WormGame.Entities
                 }
                 moving = false;
             }
+            Eraser();
+        }
+
+
+        /// <summary>
+        /// Setups eraser.
+        /// </summary>
+        private void Eraser()
+        {
+            eraser.SetPosition(lastModule.Position);
+            eraser.Scale = 1;
+            if (lastModule.Direction.X == 0)
+            {
+                if (lastModule.Direction.Y < 0)
+                {
+                    eraser.SetOrigin(halfSize, size);
+                    eraser.Y += halfSize;
+                }
+                else
+                {
+                    eraser.SetOrigin(halfSize, 0);
+                    eraser.Y -= halfSize;
+                }
+                eraser.ScaledHeight = 0;
+            }
+            else
+            {
+                if (lastModule.Direction.X < 0)
+                {
+                    eraser.SetOrigin(size, halfSize);
+                    eraser.X += halfSize;
+                }
+                else
+                {
+                    eraser.SetOrigin(0, halfSize);
+                    eraser.X -= halfSize;
+                }
+                eraser.ScaledWidth = 0;
+            }
         }
 
 
@@ -190,8 +233,9 @@ namespace WormGame.Entities
             if (moving)
             {
                 firstModule.GraphicFollow();
-                eraser.SetPosition(lastModule.Position);
                 head.SetPosition(firstModule.Position);
+                eraser.ScaledHeight += FastMath.Abs(lastModule.Direction.Y) * step;
+                eraser.ScaledWidth += FastMath.Abs(lastModule.Direction.X) * step;
             }
         }
 
