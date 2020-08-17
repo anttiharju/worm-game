@@ -28,17 +28,17 @@ namespace WormGame.Core
         public readonly bool fullscreen = false;
         public readonly int windowWidth = 1280;
         public readonly int windowHeight = 720;
-        public readonly int refreshRate = 144;    // See wormSpeed before changing this
+        public readonly int refreshRate = 60;    // See wormSpeed before changing this
 
         // Scene
-        public readonly int width = 20;
-        public readonly int height = 10;
+        public readonly int width = 200;
+        public readonly int height = 100;
         public readonly int margin = 1;
 
         // Worm
         public readonly int wormCap = 0;           // Overrides wormPercentage if > 0.
-        public readonly int wormSpeed = 6;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
-        public readonly int minWormLength = 7;
+        public readonly int wormSpeed = 144;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
+        public readonly int minWormLength = 6;
         public readonly float wormPercentage = 1;
 
         // Fruit
@@ -53,7 +53,7 @@ namespace WormGame.Core
         public readonly int moduleAmount;
 
         // Misc
-        public readonly float wormStep;
+        public readonly float step;
         public readonly int size;
         public readonly int halfSize;
 
@@ -173,7 +173,7 @@ namespace WormGame.Core
             topBorder = windowHeight / 2 - height / 2 * size;
             if (width % 2 == 0) leftBorder += size / 2;
             if (height % 2 == 0) topBorder += size / 2;
-            wormStep = (float)wormSpeed / refreshRate * size;
+            step = (float)wormSpeed / refreshRate * size;
             collision = new Collision(this);
             surface = new Surface(windowWidth, windowHeight, backgroundColor)
             {

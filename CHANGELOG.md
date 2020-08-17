@@ -10,9 +10,19 @@ I use changelog as a brain dump where I explain future plans and further explain
         - Kind of hacky? But GPU and CPU usage are around 20% so I guess I'll roll with this.
     - I think the rendering artefacts were caused by Otter sometimes skipping an update or doing them twice. Not sure.
 
-- ??????
+- Improve worm eraser
     - Let the game run (940x500, 1920x1080) and the game could handle over 10 000 worms with AVG FPS of around 15! :D
         - Big takeaway: THE GAME WAS CPU BOUND, RENDERING IS PRETTY HECKING LIGHTWEIGHT NOW :D
+    - Scene.CreateBorders() now adds graphic straight to scene instead of using an entity.
+    - WormEraser works! Really happy with it.
+        - Worms aren't yet eraser on disable, so it's not done.
+    - Even though rendering is done with a surface, worm modules would probably greatly benefit from being scalable.
+        - Less of them needed -> less to compute, eraser would be simpler with scaled modules.
+    - Game suffers from slowdowns if update and render take more than the config.refreshrate allow, but it won't exceed it so I'm willing to live with this.
+    - Worm surface rendering benchmark: (200x100, 720p60, worm length 6)
+        - 69,8 AVG FPS (3338 Entities, 6670 Renders) 2ms + 10ms
+    - Future ideas:
+        - Players don't have to be entities if graphics can be added straight to scene.
 
 
 # 16.08.2020
