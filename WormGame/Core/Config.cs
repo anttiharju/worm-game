@@ -20,26 +20,28 @@ namespace WormGame.Core
 #if DEBUG
         public readonly bool visualizeCollision = false;
         public readonly bool visualizeBlockifying = false;
+
+        // Gamerules TODO: Move out of debug land
         public readonly bool disableBlocks = true;
-        public readonly bool blockifyWorms = false;
+        public readonly bool disableWorms = false;
 #endif
 
         // Window
         public readonly bool fullscreen = false;
         public readonly int windowWidth = 1280;
         public readonly int windowHeight = 720;
-        public readonly int refreshRate = 60;    // See wormSpeed before changing this
+        public readonly int refreshRate = 144;    // See wormSpeed before changing this
 
-        // Scene
+        // Field
         public readonly int width = 200;
         public readonly int height = 100;
         public readonly int margin = 1;
 
         // Worm
+        public readonly float wormPercentage = 1;
         public readonly int wormCap = 0;           // Overrides wormPercentage if > 0.
         public readonly int wormSpeed = 144;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
         public readonly int minWormLength = 6;
-        public readonly float wormPercentage = 1;
 
         // Fruit
         public readonly bool spawnFruits = false;
@@ -201,6 +203,7 @@ namespace WormGame.Core
             if (xSize < ySize) size = xSize;
             else size = ySize;
             if (size % 2 != 0) size--;
+            if (size < 2) size = 2;
             return size;
         }
     }

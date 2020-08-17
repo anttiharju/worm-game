@@ -24,15 +24,12 @@ namespace WormGame.Entities
         /// Initialize manager.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public Blocks(Config config)
+        public Blocks(Config config) : base(config.moduleAmount)
         {
             tilemap = config.tilemap;
             blockSpawner = new BlockSpawner(config);
 
-            int capacity = config.moduleAmount;
-            pool = new BlockModule[capacity];
-            endIndex = capacity - 1;
-            for (int i = 0; i < capacity; i++)
+            for (int i = 0; i < config.moduleAmount; i++)
             {
                 BlockModule current = new BlockModule(config, this);
                 current.Disable(false);

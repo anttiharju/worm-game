@@ -18,7 +18,7 @@ namespace WormGame.Core
         public readonly int fruit = 3;
         public readonly int empty = 4;
 
-        private readonly object[,] collision;
+        private readonly object[,] grid;
         private readonly int leftBorder;
         private readonly int topBorder;
         private readonly int size;
@@ -27,18 +27,18 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Initializes the collision field which is a 2d array of poolable entities.
+        /// Initialize collision grid.
         /// </summary>
         /// <param name="game">Required so we know the window dimensions</param>
-        /// <param name="width">Field width</param>
-        /// <param name="height">Field height</param>
-        /// <param name="margin">Field margin</param>
+        /// <param name="width">Grid width</param>
+        /// <param name="height">Grid height</param>
+        /// <param name="margin">Grid margin</param>
         public Collision(Config config)
         {
             width = config.width;
             height = config.height;
             size = config.size;
-            collision = new object[width, height];
+            grid = new object[width, height];
             leftBorder = config.leftBorder;
             topBorder = config.topBorder;
         }
@@ -52,7 +52,7 @@ namespace WormGame.Core
         /// <returns>Poolable entity as reference</returns>
         public ref object Get(int x, int y)
         {
-            return ref collision[x, y];
+            return ref grid[x, y];
         }
 
 
@@ -81,7 +81,7 @@ namespace WormGame.Core
                 x >= width ||
                 y >= height)
                 return invalid;
-            object current = collision[x, y];
+            object current = grid[x, y];
             if (current == null)
                 return empty;
             if (current is BlockModule)
@@ -121,7 +121,7 @@ namespace WormGame.Core
         /// <param name="y">Vertical field position</param>
         public void Add(object entity, int x, int y)
         {
-            collision[x, y] = entity;
+            grid[x, y] = entity;
         }
 
 
@@ -216,7 +216,7 @@ namespace WormGame.Core
             for (int x = 0; x < width; x++)
                 for (int y = 0; y < height; y++)
                 {
-                    collision[x, y] = null;
+                    grid[x, y] = null;
                 }
         }
 #if DEBUG
@@ -231,7 +231,7 @@ namespace WormGame.Core
                 System.Text.StringBuilder line = new System.Text.StringBuilder(width);
                 for (int x = 0; x < width; x++)
                 {
-                    object current = collision[x, y];
+                    object current = grid[x, y];
                     if (current == null)
                     {
                         line.Append('.');
