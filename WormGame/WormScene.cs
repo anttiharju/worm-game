@@ -28,8 +28,6 @@ namespace WormGame
 
         /// Loaded from configuration
         private readonly Collision collision;
-        private readonly Tilemap tilemap;
-        private readonly Surface surface;
         private readonly bool spawnFruits;
         private readonly int fruitAmount;
         private readonly int minWormLength;
@@ -50,12 +48,9 @@ namespace WormGame
         public WormScene(Config config)
         {
             updateInterval = 1.0f / config.refreshRate;
-            System.Console.WriteLine(updateInterval);
             AddGraphic(config.surface);
             AddGraphic(config.tilemap);
             collision = config.collision;
-            tilemap = config.tilemap;
-            surface = config.surface;
             spawnFruits = config.spawnFruits;
             fruitAmount = config.fruitAmount;
             minWormLength = config.minWormLength;
@@ -147,9 +142,35 @@ namespace WormGame
 
 
         /// <summary>
+        /// Runs config.refreshRate times per second.
+        /// </summary>
+        private IEnumerator UpdateRoutine()
+        {
+            yield return Coroutine.Instance.WaitForSeconds(updateInterval);
+            foreach (Worm worm in worms)
+                if (worm.Active)
+                    worm.Update();
+            currentStep += step;
+            if (FastMath.Round(currentStep, step / 2) >= size)
+                Move();
+            Game.Coroutine.Start(UpdateRoutine());
+        }
+
+
+        /// <summary>
+        /// Listens to input for restart.
+        /// </summary>
+        public override void Update()
+        {
+            if (Input.KeyPressed(Key.R))
+                Restart();
+        }
+
+
+        /// <summary>
         /// Makes the world go round.
         /// </summary>
-        public new void Update()
+        public void Move()
         {
             foreach (Worm worm in worms)
                 if (worm.Active)
@@ -179,26 +200,6 @@ namespace WormGame
             if (visualizeCollision)
                 collision.Visualize();
 #endif
-        }
-
-
-        /// <summary>
-        /// Runs config.refreshRate times per second.
-        /// </summary>
-        private IEnumerator UpdateRoutine()
-        {
-            yield return Coroutine.Instance.WaitForSeconds(updateInterval);
-            foreach (Worm worm in worms)
-                if (worm.Active)
-                    worm.Update();
-            if (Input.KeyPressed(Key.R))
-                Restart();
-            currentStep += step;
-            if (FastMath.Round(currentStep, step / 2) >= size)
-            {
-                Update();
-            }
-            Game.Coroutine.Start(UpdateRoutine());
         }
 
 
