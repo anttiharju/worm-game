@@ -23,6 +23,7 @@ namespace WormGame
                 WindowResize = false,
                 AlwaysUpdate = true,
                 MouseVisible = true,
+                FixedFramerate = false,
                 Color = config.backgroundColor
             };
             game.Start(scene);

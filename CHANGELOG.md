@@ -2,6 +2,15 @@
 I use changelog as a brain dump where I explain future plans and further explain commit messages. I hope it shows my enthusiasm for programming and the amount of thought and care put into the project.
 
 
+# 17.08.2020
+- Fix rendering artefacts with manual update loops
+    - For some reason, even though the max framerate is limited with RTSS, setting game.FixedFramerate = false solves surface rendering artefacts
+        - It's not a valid fix as I can't require users to install RTSS.
+    - Somehow I managed to get massive performance gains by setting game.FixedFramerate to false and doing the updates manually. 2.8k worms rendered at 82 AVG FPS.
+        - Kind of hacky? But GPU and CPU usage are around 20% so I guess I'll roll with this.
+    - I think the rendering artefacts were caused by Otter sometimes skipping an update or doing them twice. Not sure.
+
+
 # 16.08.2020
 - Fix scalable worms (not smooth movement, but works properly)
     - Proper benchmark: 25,1 AVG FPS. Dun dun duuu. A huge dissapointment, meaning Surface-based approach *was* the best so far~~, but, there's a but:~~
@@ -9,7 +18,7 @@ I use changelog as a brain dump where I explain future plans and further explain
             - ~~The benchmark doesn't represent real game situations.~~
             - ~~Scalable worms are sometimes cheaper to render.~~
             - ~~Surface-based rendering approach would require *tons* of extra systems, such as some kind of a eraser system.~~
-                - ~~While intriguing, I'm not really willing to attempt implementing it as I know it won't be perfect and if we dont want to pool moduleAmount of erasers, there will always be some rendering artifacts.~~
+                - ~~While intriguing, I'm not really willing to attempt implementing it as I know it won't be perfect and if we dont want to pool moduleAmount of erasers, there will always be some rendering artefacts.~~
                 - ~~Although I do kind of want to try to move fruits from tilemap to surface, but that's going to be later if ever.~~
         - Okay so I will probably retract everything I wrote there as I went back and checked the original worm render performance and well I have a maybe two-frame improvement even though I halved the render amount so fuck this I'll bend surface to my will.
     - Also added disable to poolers, but it's untested so it might be broken.
@@ -30,7 +39,7 @@ I use changelog as a brain dump where I explain future plans and further explain
 
 # 15.08.2020
 - I tried surface-based approach, but it's a failure.
-    - Even though I could probably work out rendering artifacts, I can't clear worms from the surface once they've been disabled without some elaborate eraser system.
+    - Even though I could probably work out rendering artefacts, I can't clear worms from the surface once they've been disabled without some elaborate eraser system.
     - Switching to tilemap approach.
 - Thoughts on WormModules
     - I could create a worm system where worm would have head, waypoints, and tail (end). Waypoints would be somewhat analogic to current modules.

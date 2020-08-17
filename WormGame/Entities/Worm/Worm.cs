@@ -74,8 +74,8 @@ namespace WormGame.Entities
             this.modules = modules;
             collision = config.collision;
             size = config.size;
-            eraser = Image.CreateCircle(config.halfSize, config.backgroundColor);
-            head = Image.CreateCircle(config.halfSize);
+            eraser = Image.CreateRectangle(size, config.backgroundColor);
+            head = Image.CreateRectangle(size);
             tail = Image.CreateCircle(config.halfSize);
             eraser.CenterOrigin();
             head.CenterOrigin();
@@ -84,7 +84,7 @@ namespace WormGame.Entities
             AddSurface(config.surface);
             AddGraphic(eraser);
             AddGraphic(head);
-            AddGraphic(tail);
+            //AddGraphic(tail);
         }
 
 
@@ -189,7 +189,7 @@ namespace WormGame.Entities
         /// <summary>
         /// Update entity position and recursively module graphic positions.
         /// </summary>
-        public override void Update()
+        public new void Update()
         {
             if (moving)
             {
