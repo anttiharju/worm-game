@@ -4,9 +4,45 @@ using Otter.Graphics.Drawables;
 using WormGame.Static;
 using WormGame.Pooling;
 using WormGame.Core;
+using Otter.Utility.MonoGame;
 
 namespace WormGame.Entities
 {
+    /// @author anvemaha
+    /// @version 17.08.2020
+    /// <summary>
+    /// Custom pooler for players. Players are never really disabled, but I just bend the pooler to my will.
+    /// </summary>
+    public class Players : Pooler<Player>
+    {
+        /// <summary>
+        /// Custom constructor.
+        /// </summary>
+        /// <param name="config">Configuration</param>
+        /// <param name="scene">Worm scene</param>
+        public Players(Config config, WormScene scene) : base(5)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                Player player = new Player(config, scene, i);
+                player.Disable(false);
+                player.Add(scene);
+                pool[i] = player;
+                Enable();
+            }
+        }
+
+
+        /// <summary>
+        /// Players aren't reset the same way other entities are, it's kind of hacky, but it works.
+        /// </summary>
+        public override void Reset()
+        {
+            foreach (Player player in pool)
+                player.Disable();
+        }
+    }
+
     /// @author Antti Harju
     /// @version 30.07.2020
     /// <summary>
@@ -14,46 +50,36 @@ namespace WormGame.Entities
     /// </summary>
     public class Player : PoolableEntity
     {
-        private readonly float playerSpeed = 0.05f;
+        public readonly int playerNumber;
+
+        private readonly WormScene scene;
+        private readonly Vector2 spawnPosition;
+        private readonly float playerSpeed;
 
         private Worm worm;
         private float xMovement;
         private float yMovement;
-        private int playerNumber;
 
-        public WormScene scene;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public Player(Config config)
+        public Player(Config config, WormScene scene, int playerNumber)
         {
+            this.scene = scene;
+            this.playerNumber = playerNumber;
+            spawnPosition = new Vector2(config.windowWidth / 2, config.windowHeight / 2);
+            playerSpeed = 144.0f / config.refreshRate * 0.05f;
             Image image = Image.CreateCircle(config.size / 3);
             image.OutlineThickness = config.size / 15;
             image.OutlineColor = Color.Black;
             image.CenterOrigin();
             AddGraphic(image);
-        }
-
-
-        /// <summary>
-        /// Spawns player.
-        /// </summary>
-        /// <param name="x">Horizontal entity position.</param>
-        /// <param name="y">Vertical entity position</param>
-        /// <returns>Player</returns>
-        public Player Spawn(int playerNumber, float x, float y)
-        {
-            scene = (WormScene)Scene;
-            this.playerNumber = playerNumber;
             int color = playerNumber;
             if (color >= Help.colors.Length)
                 color = Help.colors.Length - 1;
             Graphic.Color = Help.colors[color];
-            SetPosition(x, y);
-            Visible = false;
-            return this;
         }
 
 
@@ -70,8 +96,8 @@ namespace WormGame.Entities
             else
             {
                 worm = scene.NearestWorm(Position, 250);
-                if (worm == null) return;
-                worm.Player = this;
+                if (worm != null)
+                    worm.Player = this;
             }
         }
 
@@ -88,40 +114,34 @@ namespace WormGame.Entities
                 Visible = true;
                 return;
             }
-            if (!Visible) return;
-
-            if (playerNumber == 4) // Keyboard
+            else
             {
-                xMovement = 0;
-                yMovement = 0;
-                if (Input.KeyDown(Key.W))
-                    yMovement -= 100;
-                if (Input.KeyDown(Key.A))
-                    xMovement -= 100;
-                if (Input.KeyDown(Key.S))
-                    yMovement += 100;
-                if (Input.KeyDown(Key.D))
-                    xMovement += 100;
-                if (Input.KeyPressed(Key.Space))
-                    Posess();
-            }
-            else // Gamepad
-            {
-                xMovement = Input.GetAxis(JoyAxis.X, playerNumber);
-                yMovement = Input.GetAxis(JoyAxis.Y, playerNumber);
+                if (playerNumber == 4) // Keyboard
+                {
+                    xMovement = 0;
+                    yMovement = 0;
+                    if (Input.KeyDown(Key.W))
+                        yMovement -= 100;
+                    if (Input.KeyDown(Key.A))
+                        xMovement -= 100;
+                    if (Input.KeyDown(Key.S))
+                        yMovement += 100;
+                    if (Input.KeyDown(Key.D))
+                        xMovement += 100;
+                    if (Input.KeyPressed(Key.Space))
+                        Posess();
+                }
+                else // Gamepad
+                {
+                    xMovement = Input.GetAxis(JoyAxis.X, playerNumber);
+                    yMovement = Input.GetAxis(JoyAxis.Y, playerNumber);
 
-                if (Input.ButtonPressed(5, playerNumber)) // RB
-                    Posess();
+                    if (Input.ButtonPressed(5, playerNumber)) // RB
+                        Posess();
+                }
             }
             #endregion
-        }
 
-
-        /// <summary>
-        /// Applies movement.
-        /// </summary>
-        public void Move()
-        {
             #region Player
             if (worm != null) goto Playerskip;
             float deadZone = 10;
@@ -155,7 +175,10 @@ namespace WormGame.Entities
         /// <param name="recursive">Disable recursively. False only when disabling is done by pooler.</param>
         public override void Disable(bool recursive = true)
         {
-            base.Disable();
+            SetPosition(spawnPosition);
+            Visible = false;
+            if (worm != null)
+                worm.Player = null;
             worm = null;
         }
     }
