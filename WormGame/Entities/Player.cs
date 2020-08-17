@@ -77,7 +77,7 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Controls.
+        /// Listens to input.
         /// </summary>
         public override void Update()
         {
@@ -114,7 +114,14 @@ namespace WormGame.Entities
                     Posess();
             }
             #endregion
+        }
 
+
+        /// <summary>
+        /// Applies movement.
+        /// </summary>
+        public void Move()
+        {
             #region Player
             if (worm != null) goto Playerskip;
             float deadZone = 10;
