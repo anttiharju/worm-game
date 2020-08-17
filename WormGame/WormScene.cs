@@ -147,6 +147,8 @@ namespace WormGame
         private IEnumerator UpdateRoutine()
         {
             yield return Coroutine.Instance.WaitForSeconds(updateInterval);
+            foreach (Player player in players)
+                player.Move();
             foreach (Worm worm in worms)
                 if (worm.Active)
                     worm.Update();

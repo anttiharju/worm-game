@@ -60,17 +60,6 @@ namespace WormGame.Entities
         private Vector2 direction;
 
 
-        public override bool Active
-        {
-            get => base.Active; set
-            {
-                base.Active = value;
-                head.Visible = value;
-                eraser.Visible = value;
-            }
-        }
-
-
         /// <summary>
         /// Default constructor.
         /// </summary>
@@ -104,7 +93,6 @@ namespace WormGame.Entities
         /// <returns>Worm</returns>
         public Worm Spawn(int x, int y, int length, Color color)
         {
-            target = Position;
             LengthCap = 1;
             Length = 1;
             moving = true;
@@ -114,6 +102,9 @@ namespace WormGame.Entities
             firstModule = modules.Enable();
             firstModule.Position = new Vector2(collision.EntityX(x), collision.EntityY(y));
             firstModule.SetTarget(collision.EntityX(x), collision.EntityY(y));
+            eraser.X = -size;
+            eraser.Y = -size;
+            head.SetPosition(firstModule.Position);
 
             lastModule = firstModule;
             for (int i = 1; i < length; i++)
@@ -198,8 +189,8 @@ namespace WormGame.Entities
         {
             if (moving)
             {
-                eraser.SetPosition(lastModule.Position);
                 firstModule.GraphicFollow();
+                eraser.SetPosition(lastModule.Position);
                 head.SetPosition(firstModule.Position);
             }
         }
@@ -214,8 +205,9 @@ namespace WormGame.Entities
             base.Disable();
             if (recursive)
                 firstModule.Disable();
-            //ClearGraphics();
             moving = false;
+            target.X = 0;
+            target.Y = 0;
         }
     }
 }
