@@ -22,9 +22,8 @@ namespace WormGame.Entities
         private readonly Pooler<WormModule> modules;
         private readonly Collision collision;
         private readonly WormScene scene;
-        private readonly Image head;
-        private readonly Image tail;
         private readonly Image eraser;
+        private readonly Image head;
         private readonly int size;
 
         private WormModule lastModule;
@@ -61,6 +60,17 @@ namespace WormGame.Entities
         private Vector2 direction;
 
 
+        public override bool Active
+        {
+            get => base.Active; set
+            {
+                base.Active = value;
+                head.Visible = value;
+                eraser.Visible = value;
+            }
+        }
+
+
         /// <summary>
         /// Default constructor.
         /// </summary>
@@ -76,15 +86,11 @@ namespace WormGame.Entities
             size = config.size;
             eraser = Image.CreateRectangle(size, config.backgroundColor);
             head = Image.CreateRectangle(size);
-            tail = Image.CreateCircle(config.halfSize);
             eraser.CenterOrigin();
             head.CenterOrigin();
-            tail.CenterOrigin();
-            ClearSurfaces();
-            AddSurface(config.surface);
+            Surface = config.surface;
             AddGraphic(eraser);
             AddGraphic(head);
-            //AddGraphic(tail);
         }
 
 
@@ -104,7 +110,6 @@ namespace WormGame.Entities
             moving = true;
 
             head.Color = color;
-            tail.Color = color;
 
             firstModule = modules.Enable();
             firstModule.Position = new Vector2(collision.EntityX(x), collision.EntityY(y));
@@ -196,7 +201,6 @@ namespace WormGame.Entities
                 eraser.SetPosition(lastModule.Position);
                 firstModule.GraphicFollow();
                 head.SetPosition(firstModule.Position);
-                tail.SetPosition(lastModule.Position);
             }
         }
 

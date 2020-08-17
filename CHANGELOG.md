@@ -10,6 +10,10 @@ I use changelog as a brain dump where I explain future plans and further explain
         - Kind of hacky? But GPU and CPU usage are around 20% so I guess I'll roll with this.
     - I think the rendering artefacts were caused by Otter sometimes skipping an update or doing them twice. Not sure.
 
+- ??????
+    - Let the game run (940x500, 1920x1080) and the game could handle over 10 000 worms with AVG FPS of around 15! :D
+        - Big takeaway: THE GAME WAS CPU BOUND, RENDERING IS PRETTY HECKING LIGHTWEIGHT NOW :D
+
 
 # 16.08.2020
 - Fix scalable worms (not smooth movement, but works properly)
