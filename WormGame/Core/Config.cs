@@ -38,7 +38,7 @@ namespace WormGame.Core
 
         // Worm
         public readonly float wormPercentage = 1;
-        public readonly int wormCap = 3;           // Overrides wormPercentage if >= 0.
+        public readonly int wormCap = 1;           // Overrides wormPercentage if >= 0.
         public readonly int wormSpeed = 6;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
         public readonly int minWormLength = 6;
 
