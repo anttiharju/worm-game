@@ -71,17 +71,18 @@ namespace WormGame.Entities
     /// <summary>
     /// Worm entity. Worms are modular entities; it consists of one Otter2d entity and several regular objects (modules). This way the worm can grow infinitely.
     /// </summary>
-    public class Worm : Poolable
+    public class Worm : PoolableEntity
     {
         public WormModule firstModule;
 
         private readonly Pooler<WormModule> modules;
         private readonly Collision collision;
         private readonly WormScene scene;
+        private readonly Image eraser;
+        private readonly Image head;
         private readonly int size;
 
         private WormModule lastModule;
-        private Vector2 position;
         private Vector2 direction;
         private int maxLength;
         private bool directionChange;
@@ -96,10 +97,9 @@ namespace WormGame.Entities
             get { return direction; }
             set
             {
-                if (Help.ValidateDirection(collision, position, size, value)) { if (value != direction) directionChange = true; direction = value; }
+                if (Help.ValidateDirection(collision, Position, size, value)) { if (value != direction) directionChange = true; direction = value; }
             }
         }
-        public Vector2 Position { get { return position; } }
 
 
         public int Length { get; private set; }
@@ -114,16 +114,23 @@ namespace WormGame.Entities
             this.scene = scene;
             collision = config.collision;
             size = config.size;
+            eraser = Image.CreateRectangle(size, Color.White);
+            head = Image.CreateRectangle(size, Color.Gold);
+            eraser.CenterOrigin();
+            head.CenterOrigin();
+            Surface = config.surface;
+            AddGraphic(eraser);
+            AddGraphic(head);
         }
 
         public Worm Spawn(int x, int y, int length, Color color)
         {
-            position.X = collision.EntityX(x);
-            position.Y = collision.EntityY(y);
+            X = collision.EntityX(x);
+            Y = collision.EntityY(y);
             maxLength = length;
             Color = color;
-            direction = Random.ValidDirection(collision, position, size);
-            firstModule = modules.Enable().Initialize(position, direction, Color);
+            direction = Random.ValidDirection(collision, Position, size);
+            firstModule = modules.Enable().Initialize(Position, direction, Color);
             lastModule = firstModule;
             directionChange = false;
             return null;
@@ -138,16 +145,16 @@ namespace WormGame.Entities
             {
                 if (directionChange)
                 {
-                    firstModule.Next = modules.Enable().Initialize(position, direction, Color);
+                    firstModule.Next = modules.Enable().Initialize(Position, direction, Color);
                     firstModule = firstModule.Next;
                     directionChange = false;
                 }
-                Vector2 nextPosition = position + direction * size;
+                Vector2 nextPosition = Position + direction * size;
                 if (collision.Check(nextPosition) == collision.empty)
                 {
-                    position = nextPosition;
+                    Position = nextPosition;
                     firstModule?.Grow();
-                    collision.Add(this, position);
+                    collision.Add(this, Position);
                     Length++;
                     if (Length > maxLength)
                     {
@@ -170,13 +177,15 @@ namespace WormGame.Entities
                     }
                     else if (Player == null)
                     {
-                        direction = Random.ValidDirection(collision, position, size);
+                        direction = Random.ValidDirection(collision, Position, size);
                         directionChange = true;
                         retry = true;
                         goto Retry;
                     }
                 }
             }
+            head.SetPosition(collision.X(Position.X), collision.Y(Position.Y));
+            eraser.SetPosition(lastModule.GetEnd());
         }
 
 
@@ -195,8 +204,8 @@ namespace WormGame.Entities
             base.Disable();
             firstModule = null;
             lastModule = null;
-            position.X = 0;
-            position.Y = 0;
+            X = 0;
+            Y = 0;
             direction.X = 0;
             direction.Y = 0;
             Player = null;
