@@ -74,9 +74,6 @@ namespace WormGame.Entities
     /// TODO: Erase on disable
     public class Worm : PoolableEntity
     {
-#if DEBUG
-        private readonly bool blockifyWorms;
-#endif
         public WormModule firstModule;
 
         private readonly Pooler<WormModule> modules;
@@ -87,6 +84,7 @@ namespace WormGame.Entities
         private readonly float step;
         private readonly int halfSize;
         private readonly int size;
+        private readonly bool blockifyWorms;
 
         private WormModule lastModule;
         private WormModule newModule;
@@ -128,9 +126,7 @@ namespace WormGame.Entities
         /// <param name="config">Configuration</param>
         public Worm(Config config, WormScene scene, Pooler<WormModule> modules)
         {
-#if DEBUG
             blockifyWorms = config.disableWorms;
-#endif
             this.scene = scene;
             this.modules = modules;
             collision = config.collision;
