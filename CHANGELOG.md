@@ -5,6 +5,18 @@ I use changelog as a brain dump where I explain future plans and further explain
 - Add eraser
     - Performance seems to be kind of spiky, but the game is fully functional!
 
+- Reset
+    - Okay there are two bugs with the current erasing system:
+        - Sometimes worms flicker while moving
+        - Sometimes 1x1 part of worm is left unerased
+        - Worms are kind of a unholy mess of ifs and elses. I'd like to improve this.
+        - There were nasty stackoverflow crashes due to blocks - eraser integration.
+    - There's also another problem: eraser is all over the place, it's called from blocks, but erases worms and requires coroutines which might cause some issues.
+        - Solution: make the underlying worm modules scalable, use surface for rendering and make worms erase themselves upon disable.
+    - Scaled worm modules seem surprisingly stable! I thought re-integrating it would be a pain. huh
+        - Blocks need to be reintegrated to to scaled modules, but first I want worms working properly.
+
+
 
 # 17.08.2020
 - Fix rendering artefacts with manual update loops
