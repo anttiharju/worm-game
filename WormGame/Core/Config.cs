@@ -19,12 +19,11 @@ namespace WormGame.Core
         public readonly Color foregroundColor = Color.White;
 #if DEBUG
         public readonly bool visualizeCollision = false;
-        public readonly bool visualizeBlockifying = false;
-
-        // Gamerules TODO: Move out of debug land
-        public readonly bool disableBlocks = true;
-        public readonly bool disableWorms = false;
+        public readonly bool visualizeBlockSpawner = false;
 #endif
+        // Gamerules
+        public readonly bool disableBlocks = true;
+        public readonly bool disableWorms = true;
 
         // Window
         public readonly bool fullscreen = false;
@@ -39,7 +38,7 @@ namespace WormGame.Core
 
         // Worm
         public readonly float wormPercentage = 1;
-        public readonly int wormCap = 0;           // Overrides wormPercentage if > 0.
+        public readonly int wormCap = -1;           // Overrides wormPercentage if >= 0.
         public readonly int wormSpeed = 144;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
         public readonly int minWormLength = 6;
 
@@ -132,7 +131,7 @@ namespace WormGame.Core
                         break;
                     // Fruits
                     case "fruits":
-                        fruits = bool.Parse(value);
+                        spawnFruits = bool.Parse(value);
                         break;
                     case "fruitPercentage":
                         fruitPercentage = float.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
@@ -160,7 +159,7 @@ namespace WormGame.Core
 
             moduleAmount = width * height;
 
-            if (wormCap > 0)
+            if (wormCap >= 0)
                 wormAmount = wormCap;
             else
             {

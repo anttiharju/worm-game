@@ -43,6 +43,6 @@ namespace WormGame.Pooling
         /// <summary>
         /// Is entity active.
         /// </summary>
-        public virtual bool Active { get { return Visible; } set { if (value) { AutoRender = true; AutoUpdate = true; Visible = true; } else Disable(); } }
+        public bool Active { get { return Visible; } set { if (value) { AutoRender = true; AutoUpdate = true; Visible = true; } else Disable(); } }
     }
 }

@@ -28,25 +28,30 @@ namespace WormGame
 
         /// Loaded from configuration
         private readonly Collision collision;
-        private readonly bool spawnFruits;
+        private readonly float step;
         private readonly int fruitAmount;
         private readonly int minWormLength;
-        private readonly float step;
         private readonly int wormCap;
         private readonly int size;
         private readonly int width;
         private readonly int height;
         private readonly int windowWidth;
         private readonly int windowHeight;
+        private readonly bool spawnFruits;
+#if DEBUG
         private readonly bool visualizeCollision;
+#endif
 
 
         /// <summary>
         /// Initializes poolers and scene entities.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public WormScene(Config config)
+        public WormScene(Config config, Game game)
         {
+#if DEBUG
+            visualizeCollision = config.visualizeCollision;
+#endif
             updateInterval = 1.0f / config.refreshRate;
             AddGraphic(config.surface);
             AddGraphic(config.tilemap);
@@ -61,7 +66,6 @@ namespace WormGame
             height = config.height;
             windowWidth = config.windowWidth;
             windowHeight = config.windowHeight;
-            visualizeCollision = config.visualizeCollision;
             // Config load end
 
             currentStep = config.size - config.step;
@@ -70,7 +74,7 @@ namespace WormGame
             worms = new Worms(config, this);
             players = new Players(config, this);
             fruits = new Fruits(config);
-            blocks = new Blocks(config);
+            blocks = new Blocks(config, game, this);
             Start();
         }
 
