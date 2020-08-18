@@ -280,8 +280,8 @@ namespace WormGame.Entities
             bool spawn = true;
             for (int i = 0; i < wormLength; i++)
             {
-                int x = collision.X(wormModule.Target.X);
-                int y = collision.Y(wormModule.Target.Y);
+                int x = collision.X(wormModule.Position.X);
+                int y = collision.Y(wormModule.Position.Y);
                 optimizationBuffer[x, y] = true;
                 if (CheckNeighbours(x, y)) spawn = false;
                 if (x < left) left = x;
