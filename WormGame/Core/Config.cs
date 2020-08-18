@@ -32,14 +32,14 @@ namespace WormGame.Core
         public readonly int refreshRate = 144;    // See wormSpeed before changing this
 
         // Field
-        public readonly int width = 200;
-        public readonly int height = 100;
+        public readonly int width = 20;
+        public readonly int height = 10;
         public readonly int margin = 1;
 
         // Worm
         public readonly float wormPercentage = 1;
-        public readonly int wormCap = -1;           // Overrides wormPercentage if >= 0.
-        public readonly int wormSpeed = 144;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
+        public readonly int wormCap = 3;           // Overrides wormPercentage if >= 0.
+        public readonly int wormSpeed = 6;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
         public readonly int minWormLength = 6;
 
         // Fruit
