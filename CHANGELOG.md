@@ -1,6 +1,10 @@
 # Changelog
 I use changelog as a brain dump where I explain future plans and further explain commit messages. I hope it shows my enthusiasm for programming and the amount of thought and care put into the project.
 
+# 18.08.2020
+- Add eraser
+    - Performance seems to be kind of spiky, but the game is fully functional!
+
 
 # 17.08.2020
 - Fix rendering artefacts with manual update loops
