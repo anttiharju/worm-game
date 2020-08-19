@@ -1,13 +1,12 @@
-﻿using Otter.Core;
-using Otter.Graphics;
+﻿using System.Collections;
+using Otter.Core;
+using Otter.Utility;
 using Otter.Utility.MonoGame;
+using Otter.Graphics;
 using Otter.Graphics.Drawables;
 using WormGame.Core;
 using WormGame.Static;
-using WormGame.Pooling;
 using WormGame.Entities;
-using System.Collections;
-using Otter.Utility;
 
 namespace WormGame
 {
@@ -74,7 +73,7 @@ namespace WormGame
             worms = new Worms(config, this);
             players = new Players(config, this);
             fruits = new Fruits(config);
-            blocks = new Blocks(config, game, this);
+            blocks = new Blocks(config);
             Start();
         }
 

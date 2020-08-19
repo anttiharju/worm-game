@@ -1,6 +1,11 @@
 # Changelog
 I use changelog as a brain dump where I explain future plans and further explain commit messages. I hope it shows my enthusiasm for programming and the amount of thought and care put into the project.
 
+# 19.08.2020
+- ?????
+    - Watched a video on ECS (http://gameprogrammingpatterns.com/) and apparently using inheritance for game programming is bad and older than me. I'd like to redo the entire project using components (WHICH OTTER HAS), but I'll just try to finish it with the current design and be smarter on my next one.
+
+
 # 18.08.2020
 - Add eraser
     - Performance seems to be kind of spiky, but the game is fully functional!

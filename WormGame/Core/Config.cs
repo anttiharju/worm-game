@@ -18,7 +18,7 @@ namespace WormGame.Core
         public readonly Color backgroundColor = Color.Black;
         public readonly Color foregroundColor = Color.White;
 #if DEBUG
-        public readonly bool visualizeCollision = false;
+        public readonly bool visualizeCollision = true;
         public readonly bool visualizeBlockSpawner = false;
 #endif
         // Gamerules
