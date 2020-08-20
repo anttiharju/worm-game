@@ -7,9 +7,9 @@ using WormGame.Static;
 namespace WormGame.Entities
 {
     /// @author Antti Harju
-    /// @version 14.08.2020
+    /// @version v0.5
     /// <summary>
-    /// Fruit manager.
+    /// Fruit system.
     /// </summary>
     public class Fruits
     {
@@ -21,23 +21,23 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Initialize manager.
+        /// Constructor.
         /// </summary>
-        /// <param name="config">Configuration</param>
-        public Fruits(Config config)
+        /// <param name="settings">Settings</param>
+        public Fruits(Settings settings)
         {
-            collision = config.collision;
-            tilemap = config.tilemap;
-            fruitColor = config.foregroundColor;
-            width = config.width;
-            height = config.height;
+            collision = settings.collision;
+            tilemap = settings.tilemap;
+            fruitColor = Colors.foreground;
+            width = settings.width;
+            height = settings.height;
         }
 
 
         /// <summary>
-        /// Spawns a fruit to a random position.
+        /// Spawn a fruit to a random position.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Success</returns>
         public bool Spawn()
         {
             Vector2 random = Random.ValidPosition(collision, width, height, collision.empty);
@@ -46,17 +46,17 @@ namespace WormGame.Entities
             int x = collision.X(random.X);
             int y = collision.Y(random.Y);
             tilemap.SetTile(x, y, fruitColor, "");
-            collision.Add(this, x, y);
+            collision.Set(this, x, y);
             return true;
         }
 
 
         /// <summary>
-        /// Removes fruit from tilemap.
+        /// Disable a fruit. Collision doesn't need to be cleared as it's overridden by worm.
         /// </summary>
         /// <param name="x">Horizontal position</param>
         /// <param name="y">Vertical position</param>
-        public void Remove(int x, int y)
+        public void Disable(int x, int y)
         {
             tilemap.ClearTile(x, y);
         }
