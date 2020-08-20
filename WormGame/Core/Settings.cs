@@ -20,24 +20,24 @@ namespace WormGame.Core
         public readonly bool visualizeBlockSpawner = false; // Shouldn't print anything else than dots.
 #endif
         // Gamerules
-        public readonly bool disableBlocks = false;
+        public readonly bool disableBlocks = true;
         public readonly bool disableWorms = true;          // If false, set spawnFruits to false.
 
         // Window
         public readonly int windowWidth = 1280;
         public readonly int windowHeight = 720;
-        public readonly int refreshRate = 144;              // See wormSpeed before changing this
+        public readonly int refreshRate = 60;              // See wormSpeed before changing this
         public readonly bool fullscreen = false;
 
         // Grid
-        public readonly int width = 200;
-        public readonly int height = 100;
+        public readonly int width = 64;
+        public readonly int height = 36;
         public readonly int margin = 3;
 
         // Worm
         public readonly float wormPercentage = 1;
         public readonly int wormCap = -1;                   // Overrides wormPercentage if positive.
-        public readonly int wormSpeed = 144;                 // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
+        public readonly int wormSpeed = 12;                 // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
         public readonly int minWormLength = 6;
 
         // Fruit
