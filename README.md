@@ -1,17 +1,17 @@
 # Worm Blocks (2D game)
 Educational project. It's more of a simulation you can interact with rather than a game. The project had three goals: scalability, learn git by using it frequently and practise C#.
-
-[short youtube video here]
-
 - Scalable, thousands of worms can be simulated on-screen (depending on hardware, settings and desired framerate).
 - Benchmarks (200x100 grid, worm length 6, fruits off for worms and on for blocks):
     - i7-4790k and GTX 1080, 144Hz: 3333 simultaneous worms 37,6 AVG FPS, all worms turned into blocks: 90,9 AVG FPS
-    - Surface Laptop 3, 60Hz: 3333 simultaneous worms XX,X AVG FPS, all worms turned into blocks: XX,X AVG FPS
+    - Surface Laptop 3, 60Hz: 3333 simultaneous worms 12,4 AVG FPS, all worms turned into blocks: 52,6 AVG FPS
+        - If played as a game the field wouldn't be anywhere near as large and the worst case scenario of thousands of worms would never happen.
 - [Pooler.cs](WormGame/Pooling/Pooler.cs) has generics, [Blocks.cs](WormGame/Entities/Blocks.cs) BlockSpawner has recursion and there's also [tests.](WormGameTest/)
 - See [CHANGELOG.md](CHANGELOG.md) for a more in-depth look on the development process.
 - Over 2 500 lines of code (documentation included).
 
-## Game mechanics
+[![YouTube video](https://img.youtube.com/vi/uT2ksDR-LbQ/0.jpg)](https://www.youtube.com/watch?v=uT2ksDR-LbQ "Worm Blocks v0.5")
+
+# Game mechanics
 - Field
     - Fruits and worms spawn on it
 - Players
