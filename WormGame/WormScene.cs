@@ -133,7 +133,7 @@ namespace WormGame
             foreach (Worm worm in worms)
                 if (worm.Active)
                 {
-                    float distance = Vector2.Distance(position, worm.Position);
+                    float distance = Vector2.Distance(position, worm.Target);
                     if (distance < nearestDistance)
                     {
                         nearestWorm = worm;
