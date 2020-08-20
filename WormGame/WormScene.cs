@@ -1,18 +1,17 @@
-﻿using Otter.Core;
-using Otter.Graphics;
+﻿using System.Collections;
+using Otter.Core;
+using Otter.Utility;
 using Otter.Utility.MonoGame;
+using Otter.Graphics;
 using Otter.Graphics.Drawables;
 using WormGame.Core;
 using WormGame.Static;
-using WormGame.Pooling;
 using WormGame.Entities;
-using System.Collections;
-using Otter.Utility;
 
 namespace WormGame
 {
     /// @author Antti Harju
-    /// @version 30.07.2020
+    /// @version v0.5
     /// <summary>
     /// Main scene for Worm Blocks.
     /// </summary>
@@ -44,10 +43,10 @@ namespace WormGame
 
 
         /// <summary>
-        /// Initializes poolers and scene entities.
+        /// Loads settings, initializes poolers and scene entities.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public WormScene(Config config, Game game)
+        public WormScene(Settings config, Game game)
         {
 #if DEBUG
             visualizeCollision = config.visualizeCollision;
@@ -69,7 +68,7 @@ namespace WormGame
             // Config load end
 
             currentStep = config.size - config.step;
-            CreateBorders(config.width, config.height, config.foregroundColor);
+            CreateBorders(config.width, config.height, Colors.foreground);
 
             worms = new Worms(config, this);
             players = new Players(config, this);
@@ -80,7 +79,7 @@ namespace WormGame
 
 
         /// <summary>
-        /// Kicks off the manual update coroutine.
+        /// Starts the manual update loop.
         /// </summary>
         public override void Begin()
         {
@@ -89,7 +88,7 @@ namespace WormGame
 
 
         /// <summary>
-        /// Spawns initial entities. Worm spawning is handled in Update().
+        /// Spawn initial entities. Worm spawning is handled in Update().
         /// </summary>
         private void Start()
         {
@@ -102,7 +101,7 @@ namespace WormGame
 
 
         /// <summary>
-        /// Restarts the game by resetting poolers and calling Start().
+        /// Restart the game: reset poolers, collision and call Start().
         /// </summary>
         private void Restart()
         {
@@ -121,12 +120,11 @@ namespace WormGame
 
 
         /// <summary>
-        /// Finds the nearest worm. Used by player to posess worms.
+        /// Find nearest worm. Used by player to posess worms.
         /// </summary>
         /// <param name="position">Player position</param>
         /// <param name="range">Maximum distance from position to worm</param>
         /// <returns>Worm or null</returns>
-        /// TODO: Optimize using collision.
         public Worm NearestWorm(Vector2 position, float range)
         {
             Worm nearestWorm = null;
@@ -146,7 +144,7 @@ namespace WormGame
 
 
         /// <summary>
-        /// Runs config.refreshRate times per second.
+        /// Updates graphic positions.
         /// </summary>
         private IEnumerator UpdateRoutine()
         {
@@ -162,7 +160,7 @@ namespace WormGame
 
 
         /// <summary>
-        /// Listens to input for restart.
+        /// Listen to input for restart.
         /// </summary>
         public override void Update()
         {
@@ -172,7 +170,7 @@ namespace WormGame
 
 
         /// <summary>
-        /// Makes the world go round.
+        /// Make the world go round.
         /// </summary>
         public void Move()
         {
@@ -188,9 +186,9 @@ namespace WormGame
                 else
                 {
                     random = Random.ValidPosition(collision, width, height, collision.fruit);
-                    if (random.X != -1 && collision.Check(random) == collision.fruit)
+                    if (random.X != -1 && collision.GetType(random) == collision.fruit)
                     {
-                        fruits.Remove(collision.X(random.X), collision.Y(random.Y));
+                        fruits.Disable(collision.X(random.X), collision.Y(random.Y));
                         SpawnWorm(collision.X(random.X), collision.Y(random.Y), minWormLength);
                     }
                     else
@@ -208,7 +206,7 @@ namespace WormGame
 
 
         /// <summary>
-        /// Spawns a worm.
+        /// Spawn a worm.
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
@@ -230,12 +228,12 @@ namespace WormGame
         {
             if (wormsAlive > 0)
                 wormsAlive--;
-            return blocks.SpawnBlock(worm);
+            return blocks.SpawnBLock(worm);
         }
 
 
         /// <summary>
-        /// Creates a visible border for the field.
+        /// Create a border around the play area.
         /// </summary>
         private void CreateBorders(int width, int height, Color color)
         {

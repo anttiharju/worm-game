@@ -1,50 +1,48 @@
-﻿using Otter.Graphics;
-using Otter.Graphics.Drawables;
+﻿using Otter.Graphics.Drawables;
 using WormGame.Static;
 
 namespace WormGame.Core
 {
     /// @author Antti Harju
-    /// @version 14.08.2020
+    /// @version v0.5
     /// <summary>
-    /// Configuration.
+    /// Settings.
     /// </summary>
-    public class Config
+    public class Settings
     {
         // Misc
         public readonly Collision collision;
-        public readonly Tilemap tilemap;
         public readonly Surface surface;
-        public readonly Color backgroundColor = Color.Black;
-        public readonly Color foregroundColor = Color.White;
+        public readonly Tilemap tilemap;
 #if DEBUG
+        // Debug
         public readonly bool visualizeCollision = false;
-        public readonly bool visualizeBlockSpawner = false;
+        public readonly bool visualizeBlockSpawner = false; // Shouldn't print anything else than dots.
 #endif
         // Gamerules
-        public readonly bool disableBlocks = true;
-        public readonly bool disableWorms = true;
+        public readonly bool disableBlocks = false;
+        public readonly bool disableWorms = true;          // If false, set spawnFruits to false.
 
         // Window
-        public readonly bool fullscreen = false;
         public readonly int windowWidth = 1280;
         public readonly int windowHeight = 720;
-        public readonly int refreshRate = 60;    // See wormSpeed before changing this
+        public readonly int refreshRate = 144;              // See wormSpeed before changing this
+        public readonly bool fullscreen = false;
 
-        // Field
-        public readonly int width = 40;
-        public readonly int height = 20;
-        public readonly int margin = 1;
+        // Grid
+        public readonly int width = 200;
+        public readonly int height = 100;
+        public readonly int margin = 3;
 
         // Worm
         public readonly float wormPercentage = 1;
-        public readonly int wormCap = -1;           // Overrides wormPercentage if >= 0.
-        public readonly int wormSpeed = 60;         // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
+        public readonly int wormCap = -1;                   // Overrides wormPercentage if positive.
+        public readonly int wormSpeed = 144;                 // wormSpeed has to divide refreshRate evenly. (6 supports 144, 120, 60 and 30).
         public readonly int minWormLength = 6;
 
         // Fruit
-        public readonly bool spawnFruits = false;
         public readonly float fruitPercentage = 0.015f;
+        public readonly bool spawnFruits = true;
 
         #region Calculated variables
         // Amounts
@@ -64,9 +62,9 @@ namespace WormGame.Core
         #endregion
 
         /// <summary>
-        /// Calculates dynamic values and initializes collision field.
+        /// Read values from settings.cfg, sanitize them, calculate pooler capacities and calculate dynamic values.
         /// </summary>
-        public Config()
+        public Settings()
         {
             #region File reading
 #if !DEBUG
@@ -93,10 +91,14 @@ namespace WormGame.Core
                 string value = line.Substring(endStartIndex, endIndex - endStartIndex).Trim();
                 switch (name)
                 {
-                    // Window
-                    case "fullscreen":
-                        fullscreen = bool.Parse(value);
+                    // Gamerules
+                    case "disableBlocks":
+                        disableBlocks = bool.Parse(value);
                         break;
+                    case "disableWorms":
+                        disableWorms = bool.Parse(value);
+                        break;
+                    // Window
                     case "windowWidth":
                         windowWidth = int.Parse(value);
                         break;
@@ -105,6 +107,9 @@ namespace WormGame.Core
                         break;
                     case "refreshRate":
                         refreshRate = int.Parse(value);
+                        break;
+                    case "fullscreen":
+                        fullscreen = bool.Parse(value);
                         break;
                     // Scene
                     case "width":
@@ -117,24 +122,24 @@ namespace WormGame.Core
                         margin = int.Parse(value);
                         break;
                     // Worm
-                    case "wormSpeed":
-                        wormSpeed = int.Parse(value);
-                        break;
-                    case "minWormLength":
-                        minWormLength = int.Parse(value);
-                        break;
                     case "wormPercentage":
                         wormPercentage = float.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
                         break;
                     case "wormCap":
                         wormCap = int.Parse(value);
                         break;
-                    // Fruits
-                    case "fruits":
-                        spawnFruits = bool.Parse(value);
+                    case "wormSpeed":
+                        wormSpeed = int.Parse(value);
                         break;
+                    case "minWormLength":
+                        minWormLength = int.Parse(value);
+                        break;
+                    // Fruits
                     case "fruitPercentage":
                         fruitPercentage = float.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
+                        break;
+                    case "spawnFruits":
+                        spawnFruits = bool.Parse(value);
                         break;
                 }
             }
@@ -142,7 +147,7 @@ namespace WormGame.Core
 #endif
             #endregion
 
-            // Safeguards
+            // Input sanitization
             if (windowWidth < 800) windowWidth = 800;
             if (windowHeight < 600) windowHeight = 600;
             if (width < 2) width = 2;
@@ -176,7 +181,7 @@ namespace WormGame.Core
             if (height % 2 == 0) topBorder += size / 2;
             step = (float)wormSpeed / refreshRate * size;
             collision = new Collision(this);
-            surface = new Surface(windowWidth, windowHeight, backgroundColor)
+            surface = new Surface(windowWidth, windowHeight, Colors.background)
             {
                 AutoClear = false
             };
@@ -189,7 +194,7 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Calculates a entity size so that the whole field fits in the window.
+        /// Calculates entity size so that the whole field fits in the window. Minimum size is 2 so fields too large will just expand outside display.
         /// </summary>
         /// <param name="windowWidth">Window width</param>
         /// <param name="windowHeight">Window height</param>

@@ -1,52 +1,42 @@
 ﻿using Otter.Core;
 using Otter.Graphics;
 using Otter.Graphics.Drawables;
+using Otter.Utility.MonoGame;
 using WormGame.Static;
 using WormGame.Pooling;
 using WormGame.Core;
-using Otter.Utility.MonoGame;
 
 namespace WormGame.Entities
 {
-    /// @author anvemaha
-    /// @version 17.08.2020
+    /// @author Antti Harju
+    /// @version v0.5
     /// <summary>
-    /// Custom pooler for players. Players are never really disabled, but I just bend the pooler to my will.
+    /// Custom pooler for players.
     /// </summary>
     public class Players : Pooler<Player>
     {
         /// <summary>
-        /// Custom constructor.
+        /// Constructor.
         /// </summary>
-        /// <param name="config">Configuration</param>
-        /// <param name="scene">Worm scene</param>
-        public Players(Config config, WormScene scene) : base(5)
+        /// <param name="settings">Settings</param>
+        /// <param name="scene">Scene</param>
+        public Players(Settings settings, WormScene scene) : base(5)
         {
             for (int i = 0; i < 5; i++)
             {
-                Player player = new Player(config, scene, i);
+                Player player = new Player(settings, scene, i + 1);
                 player.Disable(false);
                 player.Add(scene);
                 pool[i] = player;
                 Enable();
             }
         }
-
-
-        /// <summary>
-        /// Players aren't reset the same way other entities are, it's kind of hacky, but it works.
-        /// </summary>
-        public override void Reset()
-        {
-            foreach (Player player in pool)
-                player.Disable();
-        }
     }
 
     /// @author Antti Harju
-    /// @version 30.07.2020
+    /// @version v0.5
     /// <summary>
-    /// Player class.
+    /// Player. Sort of a hacky pooled object as it's never really disabled outside of resets.
     /// </summary>
     public class Player : PoolableEntity
     {
@@ -64,22 +54,25 @@ namespace WormGame.Entities
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="config">Configuration</param>
-        public Player(Config config, WormScene scene, int playerNumber)
+        /// <param name="settings">Settings</param>
+        /// <param name="scene">Scene</param>
+        /// <param name="playerNumber">Player number (1-5)</param>
+        public Player(Settings settings, WormScene scene, int playerNumber)
         {
             this.scene = scene;
             this.playerNumber = playerNumber;
-            spawnPosition = new Vector2(config.windowWidth / 2, config.windowHeight / 2);
-            playerSpeed = 144.0f / config.refreshRate * 0.05f;
-            Image image = Image.CreateCircle(config.size / 3);
-            image.OutlineThickness = config.size / 15;
-            image.OutlineColor = Color.Black;
+            spawnPosition = new Vector2(settings.windowWidth / 2, settings.windowHeight / 2);
+            playerSpeed = 144.0f / settings.refreshRate * 0.05f;
+            int outlineThickness = settings.size / 7;
+            Image image = Image.CreateCircle(settings.size / 2 - outlineThickness - 2);
+            image.OutlineThickness = outlineThickness;
+            image.OutlineColor = Colors.background; // or foregroundColor, depending on color palette
             image.CenterOrigin();
             AddGraphic(image);
             int color = playerNumber;
-            if (color >= Help.colors.Length)
-                color = Help.colors.Length - 1;
-            Graphic.Color = Help.colors[color];
+            if (color >= Colors.palette.Length)
+                color = Colors.palette.Length - 1;
+            Graphic.Color = Colors.palette[color];
         }
 
 
@@ -103,20 +96,20 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Listens to input.
+        /// Listens to input and applies it to either player or worm.
         /// </summary>
         public override void Update()
         {
             #region Input
             if (!Visible && ((Input.ButtonPressed(5, playerNumber)) || // Join game
-                (playerNumber == 4 && Input.KeyPressed(Key.Space))))
+                (playerNumber == 5 && Input.KeyPressed(Key.Space))))
             {
                 Visible = true;
                 return;
             }
             else
             {
-                if (playerNumber == 4) // Keyboard
+                if (playerNumber == 5) // Keyboard
                 {
                     xMovement = 0;
                     yMovement = 0;
@@ -157,13 +150,13 @@ namespace WormGame.Entities
             Position = worm.firstModule.Position;
             deadZone = 90;
             if (yMovement < -deadZone)
-                worm.Direction = Help.directions[0]; // UP
+                worm.Direction = Colors.directions[0]; // UP
             if (xMovement < -deadZone)
-                worm.Direction = Help.directions[1]; // LEFT
+                worm.Direction = Colors.directions[1]; // LEFT
             if (yMovement > deadZone)
-                worm.Direction = Help.directions[2]; // DOWN
+                worm.Direction = Colors.directions[2]; // DOWN
             if (xMovement > deadZone)
-                worm.Direction = Help.directions[3]; // RIGHT
+                worm.Direction = Colors.directions[3]; // RIGHT
             Wormskip:;
             #endregion;
         }
@@ -172,7 +165,7 @@ namespace WormGame.Entities
         /// <summary>
         /// Disable player.
         /// </summary>
-        /// <param name="recursive">Disable recursively. False only when disabling is done by pooler.</param>
+        /// <param name="recursive">Disable recursively. Not relevant here.</param>
         public override void Disable(bool recursive = true)
         {
             SetPosition(spawnPosition);
