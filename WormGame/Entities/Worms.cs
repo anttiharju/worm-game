@@ -7,10 +7,10 @@ using WormGame.Pooling;
 
 namespace WormGame.Entities
 {
-    /// @author anvemaha
-    /// @version 17.08.2020
+    /// @author Antti Harju
+    /// @version v0.5
     /// <summary>
-    /// Custom pooler for worms that also has a WormModule pooler.
+    /// Custom pooler, manages worms. Uses a surface with autoclear off for efficient rendering.
     /// </summary>
     public class Worms : Pooler<Worm>
     {
@@ -19,18 +19,18 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Initialize poolers.
+        /// Constructor.
         /// </summary>
-        /// <param name="config">Configuration</param>
-        /// <param name="scene">Worm scene</param>
-        public Worms(Config config, WormScene scene) : base(config.wormAmount)
+        /// <param name="settings">Settings</param>
+        /// <param name="scene">WormScene</param>
+        public Worms(Settings settings, WormScene scene) : base(settings.wormAmount)
         {
-            surface = config.surface;
-            modules = new Pooler<WormModule>(scene, config, config.moduleAmount);
+            surface = settings.surface;
+            modules = new Pooler<WormModule>(settings, scene, settings.moduleAmount);
 
-            for (int i = 0; i < config.wormAmount; i++)
+            for (int i = 0; i < settings.wormAmount; i++)
             {
-                Worm worm = new Worm(config, scene, modules);
+                Worm worm = new Worm(settings, scene, modules);
                 worm.Disable(false);
                 worm.Add(scene);
                 pool[i] = worm;
@@ -39,7 +39,7 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Reset poolers and clear surface.
+        /// Clear surface and reset poolers.
         /// </summary>
         public override void Reset()
         {
@@ -66,12 +66,11 @@ namespace WormGame.Entities
     }
 
 
-    /// @author anvemaha
-    /// @version 14.08.2020
+    /// @author Antti Harju
+    /// @version v0.5
     /// <summary>
-    /// Worm entity. Worms are modular entities; it consists of one Otter2d entity and several regular objects (modules). This way the worm can grow infinitely.
+    /// Worm entity. Worms are modular entities; it consists of one Otter2d entity and several regular objects (modules). This way it can grow almost infinitely.
     /// </summary>
-    /// TODO: Erase on disable
     public class Worm : PoolableEntity
     {
         public WormModule firstModule;
@@ -84,73 +83,75 @@ namespace WormGame.Entities
         private readonly float step;
         private readonly int halfSize;
         private readonly int size;
-        private readonly bool blockifyWorms;
+        private readonly bool disableWorms;
 
         private WormModule lastModule;
         private WormModule newModule;
+        private Vector2 direction;
         private Vector2 target;
+        private int LengthCap;
         private bool moving;
         private bool retry;
         private bool grow;
-        private int LengthCap;
 
 
         /// <summary>
-        /// Get or set player. Wheter or not this is null tells us wheter or not worm is posessed.
+        /// Player. If this is null the worm is controlled by a simple AI.
         /// </summary>
         public Player Player { get; set; }
 
 
         /// <summary>
-        /// Get worm length.
+        /// Worm length.
         /// </summary>
         public int Length { get; private set; }
 
 
         /// <summary>
-        /// Get worm color.
+        /// Worm color.
         /// </summary>
         public Color Color { get { return head.Color; } }
 
 
         /// <summary>
-        /// Get or set worm direction.
+        /// Worm direction.
         /// </summary>
-        public Vector2 Direction { get { return direction; } set { if (Help.ValidateDirection(collision, firstModule.Target, size, value)) direction = value; } }
-        private Vector2 direction;
+        public Vector2 Direction { get { return direction; } set { if (Random.ValidateDirection(collision, firstModule.Target, size, value)) direction = value; } }
 
 
         /// <summary>
-        /// Default constructor.
+        /// Constructor.
         /// </summary>
-        /// <param name="config">Configuration</param>
-        public Worm(Config config, WormScene scene, Pooler<WormModule> modules)
+        /// <param name="settings">Settings</param>
+        /// <param name="scene">WormScene</param>
+        /// <param name="modules">Worm module pooler</param>
+        public Worm(Settings settings, WormScene scene, Pooler<WormModule> modules)
         {
-            blockifyWorms = config.disableWorms;
+            disableWorms = settings.disableWorms;
             this.scene = scene;
             this.modules = modules;
-            collision = config.collision;
-            halfSize = config.halfSize;
-            size = config.size;
-            step = config.step;
-            eraser = Image.CreateRectangle(size, config.backgroundColor);
+            collision = settings.collision;
+            halfSize = settings.halfSize;
+            size = settings.size;
+            step = settings.step;
+            eraser = Image.CreateRectangle(size, Colors.background);
             head = Image.CreateRectangle(size);
             eraser.CenterOrigin();
             head.CenterOrigin();
-            Surface = config.surface;
+            Surface = settings.surface;
             AddGraphic(eraser);
             AddGraphic(head);
         }
 
 
         /// <summary>
-        /// Spawn the worm.
+        /// Spawn worm.
         /// </summary>
         /// <param name="x">Horizontal field position</param>
         /// <param name="y">Vertical field position</param>
         /// <param name="length">Worm length</param>
         /// <param name="color">Worm color</param>
-        /// <returns>Worm</returns>
+        /// <returns>Worm or null</returns>
         public Worm Spawn(int x, int y, int length, Color color)
         {
             LengthCap = 1;
@@ -160,6 +161,11 @@ namespace WormGame.Entities
             head.Color = color;
 
             firstModule = modules.Enable();
+            if (firstModule == null)
+            {
+                Disable(false);
+                return null;
+            }
             firstModule.Position = new Vector2(collision.EntityX(x), collision.EntityY(y));
             firstModule.SetTarget(collision.EntityX(x), collision.EntityY(y));
             eraser.X = -size;
@@ -171,13 +177,13 @@ namespace WormGame.Entities
                 Grow();
 
             direction = Random.ValidDirection(collision, Position, size);
-            collision.Add(this, x, y);
+            collision.Set(this, x, y);
             return this;
         }
 
 
         /// <summary>
-        /// Grow worm by one module.
+        /// Grow worm by adding one module to it.
         /// </summary>
         private void Grow()
         {
@@ -193,7 +199,7 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Update worm directions, targets and collision.
+        /// Update worm and its modules. Kind of messy.
         /// </summary>
         public void Move()
         {
@@ -204,32 +210,28 @@ namespace WormGame.Entities
             retry = false;
         Retry:
             target = firstModule.Target + Direction * size;
-            int nextPosition = collision.Check(target, true);
+            int nextPosition = collision.GetType(target, true);
             if (nextPosition >= collision.fruit) // Move if next position is empty (4) or fruit (3).
             {
                 if (Length < LengthCap)
                     Length++;
                 else
-                    collision.Add(null, lastModule.Target);
+                    collision.Set(null, lastModule.Target);
                 if (nextPosition == collision.fruit)
                     grow = true;
                 firstModule.DirectionFollow(direction);
                 firstModule.TargetFollow(target);
-                collision.Add(this, target);
+                collision.Set(this, target);
             }
             else
             {
                 if (retry) // If stuck, turn into a block.
                 {
-#if DEBUG
-                    if (blockifyWorms)
+                    if (disableWorms)
                     {
-#endif
                         scene.SpawnBlock(this);
                         Disable();
-#if DEBUG
                     }
-#endif
                 }
                 else if (Player == null) // Find a new direction if not posessed by player.
                 {
@@ -244,7 +246,7 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Setups eraser.
+        /// Setup eraser.
         /// </summary>
         private void Eraser()
         {
@@ -282,13 +284,13 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Update entity position and recursively module graphic positions.
+        /// Update graphics.
         /// </summary>
         public new void Update()
         {
             if (moving)
             {
-                firstModule.GraphicFollow();
+                firstModule.PositionFollow();
                 head.SetPosition(firstModule.Position);
                 eraser.ScaledHeight += FastMath.Abs(lastModule.Direction.Y) * step;
                 eraser.ScaledWidth += FastMath.Abs(lastModule.Direction.X) * step;
@@ -312,10 +314,10 @@ namespace WormGame.Entities
     }
 
 
-    /// @author anvemaha
+    /// @author Antti Harju
     /// @version 14.08.2020
     /// <summary>
-    /// WormModule. Thanks to modularity worm length can be increased during runtime.
+    /// WormModule. Worm has one these per length.
     /// </summary>
     public class WormModule : Poolable
     {
@@ -324,70 +326,68 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Get or set next module.
+        /// Next worm module.
         /// </summary>
         public WormModule Next { get; set; }
 
 
         /// <summary>
-        /// Get module graphic.
+        /// Worm module position.
         /// </summary>
         public Vector2 Position { get { return position; } set { position = value; } }
         private Vector2 position;
 
 
         /// <summary>
-        /// Get or set worm direction.
+        /// Worm module direction.
         /// </summary>
         public Vector2 Direction { get { return direction; } set { direction = value; } }
         private Vector2 direction;
 
 
         /// <summary>
-        /// Get or set target position.
+        /// Worm module target.
         /// </summary>
         public Vector2 Target { get { return target; } set { target = value; } }
         private Vector2 target;
 
 
         /// <summary>
-        /// Default constructor.
+        /// Constructor.
         /// </summary>
-        /// <param name="config">Configuration</param>
-        public WormModule(Config config)
+        /// <param name="settings">Settings</param>
+        public WormModule(Settings settings)
         {
-            collision = config.collision;
-            step = config.step;
+            collision = settings.collision;
+            step = settings.step;
         }
 
 
         /// <summary>
-        /// Recursively update every worm module direction.
+        /// Recursively update worms every modules direction.
         /// </summary>
-        /// <param name="previousDirection">Previous direction</param>
-        public void DirectionFollow(Vector2 previousDirection)
+        /// <param name="newDirection">New direction</param>
+        public void DirectionFollow(Vector2 newDirection)
         {
             if (Next != null)
                 Next.DirectionFollow(Direction);
-            Direction = previousDirection;
+            Direction = newDirection;
         }
 
 
         /// <summary>
-        /// Recursively update every worm module graphic position.
+        /// Recursively update worms every modules position.
         /// </summary>
-        /// <param name="positionDelta">Worm entity position delta</param>
-        /// <param name="step">Worm step</param>
-        public void GraphicFollow()
+        public void PositionFollow()
         {
             position += Direction * step;
             if (Next != null)
-                Next.GraphicFollow();
+                Next.PositionFollow();
         }
 
 
         /// <summary>
-        /// Recursively update every worm module target.
+        /// Recursively update worm every modules target.
         /// </summary>
         /// <param name="newTarget">New target for worm body</param>
         public void TargetFollow(Vector2 newTarget)
@@ -399,7 +399,7 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Reset module direction.
+        /// Reset worm module direction.
         /// </summary>
         public void ResetDirection()
         {
@@ -407,8 +407,9 @@ namespace WormGame.Entities
             direction.Y = 0;
         }
 
+
         /// <summary>
-        /// Set module target.
+        /// Set worm module target.
         /// </summary>
         /// <param name="target">Target</param>
         public void SetTarget(Vector2 target)
@@ -416,14 +417,21 @@ namespace WormGame.Entities
             SetTarget(target.X, target.Y);
         }
 
+
+        /// <summary>
+        /// Set worm module target.
+        /// </summary>
+        /// <param name="x">Horizontal target</param>
+        /// <param name="y">Vertical target</param>
         public void SetTarget(float x, float y)
         {
             target.X = x;
             target.Y = y;
         }
 
+
         /// <summary>
-        /// Recursively disable every one of worms modules.
+        /// Disable module.
         /// </summary>
         /// <param name="recursive">Disable recursively. False only when disabling is done by pooler.</param>
         public override void Disable(bool recursive = true)
@@ -432,8 +440,8 @@ namespace WormGame.Entities
             if (recursive && Next != null)
                 Next.Disable();
             Next = null;
-            if (collision.Check(target) == collision.worm)
-                collision.Add(null, target);
+            if (collision.GetType(target) == collision.worm)
+                collision.Set(null, target);
             ResetDirection();
             position.X = 0;
             position.Y = 0;

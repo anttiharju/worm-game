@@ -5,6 +5,41 @@ I use changelog as a brain dump where I explain future plans and further explain
 - Reset, start finalizing
     - Returned to previous erasersystem and non-scalable worm modules, managed to fix it (no more crashes).
     - Time to start finalizing the project: update documentation, variable names, etc. and call it done for now.
+    - I know I could've just undone the previous two days, but I like to keep everything in store just in case.
+
+- Update documentation
+    - Instead of using dates for @version I'll start to use the tag version. I didn't update frequently enough to be accurate and dates can be found on the github repo.
+    - I've decided to use my name instead of handle for @author because I like it. If some future committor doesn't want to use their name, handle is just as valid.
+    - I try to write documentation the way commit messages should be written. Imperative, and to the point. Sometimes I'll explain more.
+    - WormGame/Static/Random.cs moved from System.Random to Otter.Utility.Rand. I thought I already had done this but I guess it got lost in some reset.
+    - Renamed idea.svg -> concept.svg (original name). It's not up to date, but I think it's fun to see what the project was supposed to be.
+    - Updated tests. Should probably write more, but it is what it is. The project has architectural problems (not using components, me being an inexperienced programmer) so I'm unwilling to pour more effort to it than I already have.
+    - Grabbed a color palette from https://coolors.co/1a535c-4ecdc4-f7fff7-ff6b6b-ffe66d. (Some UX principle says that what is beautiful is also functional)
+    - Renamed WormGame/Static/Help.cs to Colors.cs as it had accidentally gathered all kinds of stuff related to colors.
+    - Figured out where the mysterious 5 comes from: when I write showfps 5 to ingame debug console, 5 gets printed.
+    - **STUFF I WOULD STILL KIND OF LIKE TO DO, BUT DON'T HAVE THE TIME:**
+        - Eliminate the need for defragmenting by disabling objects through their respective poolers. The manager system probably makes this rather easy.
+            - So instead of checking for swaps when the pool full, just do the swap during a disable. Call it Repair() or something like that.
+        - Replace object 2d array in WormGame/Core/Collision.cs with collisionobject. This would tie into collision system / pooler update: collisionObject would be a struct with two ints: type and arrayPosition.
+        - Remove recursive parameter from every Disable()
+        - Separate erasing system (WormGame/Entities/Eraser.cs) might not be needed and worms could erase themselves. Kind of tried something like this just before reset, but I got tired.
+        - Fruit system (WormGame/Entities/Fruits.cs) could use surface instead of tilemap? This would allow using circles as graphics, but would require some kind of a queueuing system. So possibly not a good idea.
+            - Alternatively implement texture packs and make fruits use textures. At some point I attempted this, but I couldn't scale textures and decided it was not worth the effort.
+        - Create a separate poolable object just for testing.
+        - Poolable.Add could be used for grabbing WormScene instead of passing it as a parameter from scene, but custom poolers / managers kind of break this.
+        - Additional Pooler methods: Disable(), Repair() (DRY between Defragment() and Disable()) and IsFull() or something similar.
+        - Contribute Help.Equal (Color check) or something similar to Otter?
+        - WormScene.NearestWorm() could be optimized by using collision grid to find nearby worms and only looping through them instead of every worm.
+        - Make it possible to configure the game in a way that no worms spawn and that it's easy to spawn worms to be able to reproduce bugs.
+        - I'm not sure if combining Blocks, BlockSpawner and BlockModules classes under Blocks.cs was a good idea. The folder structure is cleaner and easier to navigate on github the they're kind of long.
+            - Following this logic, everything inside WormGame/Pooling could be combined to Pooling.cs and moved to WormGame/Core. But I'm kind of proud of the pooling system so I want to keep it where it is.
+        - Redesign everything using compontents, but that's so much effort that I'd rather just start a new project.
+        - Load colors from settings.cfg as hex codes instead of defining them at WormGame/Static/Help 
+        - Figure out if during debugging settings could be loaded from repo root folder instead of executable root folder.
+        - Figure out how to properly release a binary and what the user has to have installed.
+        - Research if it's possible to reduce GC frequency by not creating as much garbage in the first place.
+        - Figure out an actual name for the project. Originally it was Worm Bricks, now it's Worm Blocks and neither of those is a good name.
+            - The new color theme makes me want to call it worm blobs just for the lols but that's too much effort for a joke.
 
 
 # 19.08.2020

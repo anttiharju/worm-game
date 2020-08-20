@@ -1,12 +1,13 @@
 ﻿using Otter.Core;
 using WormGame.Core;
+using WormGame.Static;
 
 namespace WormGame
 {
     /// @author Antti Harju
-    /// @version 14.08.2020
+    /// @version v0.5
     /// <summary>
-    /// See README.md for an explanation of game mechanics.
+    /// See README.md.
     /// </summary>
     public class Program
     {
@@ -16,13 +17,13 @@ namespace WormGame
         public static void Main()
         {
             System.Console.ForegroundColor = System.ConsoleColor.DarkGray;
-            Config config = new Config();
+            Settings config = new Settings();
             Game game = new Game("Worm Blocks", config.windowWidth, config.windowHeight, config.refreshRate, config.fullscreen)
             {
                 WindowResize = false,
                 AlwaysUpdate = true,
                 MouseVisible = true,
-                Color = config.backgroundColor
+                Color = Colors.background
             };
             WormScene scene = new WormScene(config, game);
             game.Start(scene);
