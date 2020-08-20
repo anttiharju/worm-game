@@ -9,7 +9,7 @@ Educational project. It's more of a simulation you can interact with rather than
 - See [CHANGELOG.md](CHANGELOG.md) for a more in-depth look on the development process.
 - Over 2 500 lines of code (documentation included).
 
-[![YouTube video](https://img.youtube.com/vi/uT2ksDR-LbQ/0.jpg)](https://www.youtube.com/watch?v=uT2ksDR-LbQ "Worm Blocks v0.5")
+[![YouTube video](https://img.youtube.com/vi/QqxTP1VZjGs/0.jpg)](https://www.youtube.com/watch?v=QqxTP1VZjGs "Worm Blocks v0.5")
 
 # Game mechanics
 - Field
