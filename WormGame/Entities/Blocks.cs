@@ -4,7 +4,7 @@ using Otter.Graphics.Drawables;
 using WormGame.Core;
 using WormGame.Static;
 using WormGame.Pooling;
-using WormGame.Entities;
+using Otter.Core;
 
 namespace WormGame.Entities
 {
@@ -17,6 +17,7 @@ namespace WormGame.Entities
     {
         public readonly BlockSpawner blockSpawner;
 
+        private readonly Eraser eraser;
         private readonly Tilemap tilemap;
 
 
@@ -24,10 +25,11 @@ namespace WormGame.Entities
         /// Initialize manager.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public Blocks(Config config) : base(config.moduleAmount)
+        public Blocks(Config config, Game game, WormScene scene) : base(config.moduleAmount)
         {
             tilemap = config.tilemap;
-            blockSpawner = new BlockSpawner(config);
+            eraser = new Eraser(config, game, scene);
+            blockSpawner = new BlockSpawner(config, eraser);
 
             for (int i = 0; i < config.moduleAmount; i++)
             {
@@ -44,13 +46,13 @@ namespace WormGame.Entities
         /// <param name="module">Module to add</param>
         public void Add(BlockModule module)
         {
-            // Replace block.Color with Otter.Graphics.Color.Random to see the modules that form the blocks
+            // Replace module.Color with Color.Random to see the modules that form the blocks
             tilemap.SetRect(module.X, module.Y, module.Width, module.Height, module.Color, "");
         }
 
 
         /// <summary>
-        /// Clears module from tilemap.
+        /// Clear module from tilemap.
         /// </summary>
         /// <param name="module">Module to clear</param>
         public void Clear(BlockModule module)
@@ -60,11 +62,12 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Reset pooler and clear tilemap.
+        /// Reset pooler, eraser and clear tilemap.
         /// </summary>
         public override void Reset()
         {
             tilemap.ClearAll();
+            eraser.Reset();
             base.Reset();
         }
 
@@ -89,11 +92,12 @@ namespace WormGame.Entities
     public class BlockSpawner
     {
 #if DEBUG
-        private readonly bool disableBlocks;
         private readonly bool visualize;
 #endif
         private readonly Collision collision;
+        private readonly Eraser eraser;
         private readonly bool[,] optimizationBuffer;
+        private readonly bool disableBlocks;
         private readonly int width;
         private readonly int height;
 
@@ -110,15 +114,16 @@ namespace WormGame.Entities
         /// Initialize spawner.
         /// </summary>
         /// <param name="config">Configuration</param>
-        public BlockSpawner(Config config)
+        public BlockSpawner(Config config, Eraser eraser)
         {
+            this.eraser = eraser;
             collision = config.collision;
             width = config.width;
             height = config.height;
             optimizationBuffer = new bool[width, height];
-#if DEBUG
             disableBlocks = config.disableBlocks;
-            visualize = config.disableBlocks;
+#if DEBUG
+            visualize = config.visualizeBlockSpawner;
 #endif
         }
 
@@ -136,11 +141,7 @@ namespace WormGame.Entities
             left = width;
             top = 0;
             right = 0;
-            if (InitBuffer(worm.firstModule, worm.Length))
-            {
-                ClearBuffer(worm.firstModule, worm.Length);
-                return null;
-            }
+            bool spawn = InitBuffer(worm.firstModule, worm.Length);
             for (int y = bottom; y <= top; y++)
                 for (int x = left; x <= right; x++)
                     if (optimizationBuffer[x, y] == true)
@@ -161,8 +162,12 @@ namespace WormGame.Entities
                             ExpandY(x, y);
                         else
                             ExpandX(x, y);
-                        lastModule.Add();
+                        eraser.Erase(lastModule);
+                        if (spawn)
+                            lastModule.Spawn();
                     }
+            if (!spawn)
+                firstModule.Disable();
             firstModule = null;
 #if DEBUG
             if (visualize)
@@ -271,37 +276,23 @@ namespace WormGame.Entities
         /// </summary>
         /// <param name="wormModule">Worm.firstModule</param>
         /// <param name="wormLength">Worms length</param>
-        /// <returns>Abort spawn process</returns>
+        /// <returns>Spawn modules</returns>
         private bool InitBuffer(WormModule wormModule, int wormLength)
-        {/*
+        {
+            bool spawn = true;
             for (int i = 0; i < wormLength; i++)
             {
                 int x = collision.X(wormModule.Target.X);
                 int y = collision.Y(wormModule.Target.Y);
                 optimizationBuffer[x, y] = true;
-                if (CheckNeighbours(x, y)) return true;
+                if (CheckNeighbours(x, y)) spawn = false;
                 if (x < left) left = x;
                 if (y < bottom) bottom = y;
                 if (x > right) right = x;
                 if (y > top) top = y;
                 wormModule = wormModule.Next;
-            }*/
-            return false;
-        }
-
-
-        /// <summary>
-        /// Clears optimization buffer.
-        /// </summary>
-        /// <param name="wormModule">Worm.firstModule</param>
-        /// <param name="wormLength">Worms length</param>
-        private void ClearBuffer(WormModule wormModule, int wormLength)
-        {/*
-            for (int i = 0; i < wormLength; i++)
-            {
-                optimizationBuffer[collision.X(wormModule.Target.X), collision.Y(wormModule.Target.Y)] = false;
-                wormModule = wormModule.Next;
-            }*/
+            }
+            return spawn;
         }
 
 
@@ -340,10 +331,8 @@ namespace WormGame.Entities
         /// <returns>Is neighbour the same color</returns>
         private bool CheckNeighbour(int x, int y)
         {
-#if DEBUG
             if (!disableBlocks)
                 return false;
-#endif
             Object cell = collision.Get(x, y);
             if (cell is BlockModule module)
                 if (Help.Equal(module.Color, color))
@@ -403,9 +392,9 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Adds block to tilemap and collision.
+        /// Spawns block module.
         /// </summary>
-        public void Add()
+        public void Spawn()
         {
             manager.Add(this);
             collision.Add(First, X, Y, Width, Height);

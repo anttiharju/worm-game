@@ -225,38 +225,38 @@ namespace WormGame.Core
         /// </summary>
         public void Visualize()
         {
-            System.Text.StringBuilder visualization = new System.Text.StringBuilder((width + 1) * height);
-            Console.CursorTop = 1;
             for (int y = 0; y < height; y++)
             {
+                Console.CursorTop = y + 1;
+                System.Text.StringBuilder line = new System.Text.StringBuilder(width);
                 for (int x = 0; x < width; x++)
                 {
                     object current = grid[x, y];
                     if (current == null)
                     {
-                        visualization.Append('.');
+                        line.Append('.');
                         continue;
                     }
                     if (current is BlockModule)
                     {
-                        visualization.Append('x');
+                        line.Append('x');
                         continue;
                     }
                     if (current is Worm)
                     {
-                        visualization.Append('o');
+                        line.Append('o');
                         continue;
                     }
                     if (current is Fruits)
                     {
-                        visualization.Append('f');
+                        line.Append('f');
                         continue;
                     }
                     throw new UnknownCollisionException();
                 }
-                visualization.Append("\n");
+                Console.WriteLine(line.ToString());
             }
-            Console.WriteLine(visualization.ToString());
+            Console.CursorLeft = 0;
             Console.CursorTop = height + 1;
         }
 #endif
