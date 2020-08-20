@@ -6,12 +6,13 @@ using WormGame.Entities;
 namespace WormGame.Core
 {
     /// @author Antti Harju
-    /// @version 14.08.2020
+    /// @version v0.5
     /// <summary>
     /// Collision system.
     /// </summary>
     public class Collision
     {
+        /// Collision types. Use these instead of raw ints.
         public readonly int invalid = 0;
         public readonly int worm = 1;
         public readonly int block = 2;
@@ -27,29 +28,26 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Initialize collision grid.
+        /// Constructor, ínitializes grid.
         /// </summary>
-        /// <param name="game">Required so we know the window dimensions</param>
-        /// <param name="width">Grid width</param>
-        /// <param name="height">Grid height</param>
-        /// <param name="margin">Grid margin</param>
-        public Collision(Config config)
+        /// <param name="settings">Settings</param>
+        public Collision(Settings settings)
         {
-            width = config.width;
-            height = config.height;
-            size = config.size;
+            width = settings.width;
+            height = settings.height;
+            size = settings.size;
             grid = new object[width, height];
-            leftBorder = config.leftBorder;
-            topBorder = config.topBorder;
+            leftBorder = settings.leftBorder;
+            topBorder = settings.topBorder;
         }
 
 
         /// <summary>
-        /// Returns a poolable entity as reference.
+        /// Get object from grid.
         /// </summary>
-        /// <param name="x">Horizontal field position</param>
-        /// <param name="y">Vertical field position</param>
-        /// <returns>Poolable entity as reference</returns>
+        /// <param name="x">Horizontal grid position</param>
+        /// <param name="y">Vertical grid position</param>
+        /// <returns>Object</returns>
         public ref object Get(int x, int y)
         {
             return ref grid[x, y];
@@ -57,10 +55,10 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Returns a poolable entity as reference.
+        /// Get object from grid.
         /// </summary>
         /// <param name="position">Entity position</param>
-        /// <returns>Poolable entity as reference</returns>
+        /// <returns>Object</returns>
         public ref object Get(Vector2 position)
         {
             return ref Get(X(position.X), Y(position.Y));
@@ -68,13 +66,13 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Check a cell from field. Returns numbers instead of strings so we can use > < operators.
+        /// Get object type from grid.
         /// </summary>
-        /// <param name="x">Horizontal field position</param>
-        /// <param name="y">Vertical field position</param>
+        /// <param name="x">Horizontal grid position</param>
+        /// <param name="y">Vertical grid position</param>
         /// <param name="consume">Consume fruit</param>
-        /// <returns>invalid 0, worm 1, block 2, fruit 3, empty 4</returns>
-        public int Check(int x, int y, bool consume = false)
+        /// <returns>Object type</returns>
+        public int GetType(int x, int y, bool consume = false)
         {
             if (x < 0 ||
                 y < 0 ||
@@ -92,83 +90,85 @@ namespace WormGame.Core
             {
                 if (consume)
                 {
-                    fruits.Remove(x, y);
+                    fruits.Disable(x, y);
                     fruits.Spawn();
                 }
                 return fruit;
             }
-            throw new UnknownCollisionException();
+            throw new CollisionException();
         }
 
 
         /// <summary>
-        /// Check a cell from field. Returns numbers instead of strings so we can use > < operators.
+        /// Get object type from grid.
         /// </summary>
-        /// <param name="target">Entity position</param>
-        /// <param name="consume">Consume fruit</param>
-        /// <returns>out of bounds is 0, worm is 1, block is 2, fruit is 3, empty is 4</returns>
-        public int Check(Vector2 target, bool consume = false)
-        {
-            return Check(X(target.X), Y(target.Y), consume);
-        }
-
-
-        /// <summary>
-        /// Set entity to field.
-        /// </summary>
-        /// <param name="entity">Worm</param>
-        /// <param name="x">Horizontal field position</param>
-        /// <param name="y">Vertical field position</param>
-        public void Add(object entity, int x, int y)
-        {
-            grid[x, y] = entity;
-        }
-
-
-        /// <summary>
-        /// Set entity to field.
-        /// </summary>
-        /// <param name="entity">Entity</param>
         /// <param name="position">Entity position</param>
-        public void Add(object entity, Vector2 position)
+        /// <param name="consume">Consume fruit</param>
+        /// <returns>Object type</returns>
+        public int GetType(Vector2 position, bool consume = false)
         {
-            Add(entity, X(position.X), Y(position.Y));
+            return GetType(X(position.X), Y(position.Y), consume);
+        }
+
+
+
+        /// <summary>
+        /// Set object to grid.
+        /// </summary>
+        /// <param name="obj">Object</param>
+        /// <param name="x">Horizontal grid position</param>
+        /// <param name="y">Vertical grid position</param>
+        public void Set(object obj, int x, int y)
+        {
+            grid[x, y] = obj;
+        }
+
+
+
+        /// <summary>
+        /// Set object to grid.
+        /// </summary>
+        /// <param name="obj">Object</param>
+        /// <param name="position">Entity position</param>
+        public void Set(object obj, Vector2 position)
+        {
+            Set(obj, X(position.X), Y(position.Y));
         }
 
 
         /// <summary>
-        /// Set entity to field.
+        /// Set entity to grid.
         /// </summary>
-        /// <param name="entity">Entity</param>
+        /// <param name="obj">Object</param>
         /// <param name="x">Horizontal entity position</param>
         /// <param name="y">Vertical entity position</param>
-        public void Add(object entity, float x, float y)
+        public void Set(object obj, float x, float y)
         {
-            Add(entity, X(x), Y(y));
+            Set(obj, X(x), Y(y));
         }
 
 
         /// <summary>
-        /// Add block module to collision.
+        /// Set block module to grid.
         /// </summary>
         /// <param name="module">Block module or null</param>
         /// <param name="startX">module.X</param>
         /// <param name="startY">module.Y</param>
         /// <param name="width">module.Width</param>
         /// <param name="height">module.Height</param>
-        public void Add(object module, int startX, int startY, int width, int height)
+        public void Set(object module, int startX, int startY, int width, int height)
         {
             for (int x = startX; x < startX + width; x++)
                 for (int y = startY; y < startY + height; y++)
-                    Add(module, x, y);
+                    Set(module, x, y);
         }
 
 
         /// <summary>
-        /// Translates horizontal entity position to a field one.
+        /// Translate horizontal entity position to a grid one.
         /// </summary>
         /// <param name="x">Horizontal entity position</param>
-        /// <returns>Horizontal field position</returns>
+        /// <returns>Horizontal grid position</returns>
         public int X(float x)
         {
             return (FastMath.Round(x) - leftBorder) / size;
@@ -176,10 +176,10 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Translates vertical entity position to a field one.
+        /// Translate vertical entity position to a grid one.
         /// </summary>
         /// <param name="y">Vertical entity position</param>
-        /// <returns>Vertical field position</returns>
+        /// <returns>Vertical grid position</returns>
         public int Y(float y)
         {
             return (FastMath.Round(y) - topBorder) / size;
@@ -187,9 +187,9 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Translates horizontal field position to an entity one.
+        /// Translate horizontal grid position to an entity one.
         /// </summary>
-        /// <param name="x">Horizontal field position</param>
+        /// <param name="x">Horizontal grid position</param>
         /// <returns>Horizontal entity position</returns>
         public int EntityX(int x)
         {
@@ -198,9 +198,9 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Translates vertical field position to an entity one.
+        /// Translates vertical grid position to an entity one.
         /// </summary>
-        /// <param name="y">Vertical field position</param>
+        /// <param name="y">Vertical grid position</param>
         /// <returns>Vertical entity position</returns>
         public int EntityY(int y)
         {
@@ -209,7 +209,7 @@ namespace WormGame.Core
 
 
         /// <summary>
-        /// Reset collision.
+        /// Clear grid.
         /// </summary>
         public void Reset()
         {
@@ -221,56 +221,57 @@ namespace WormGame.Core
         }
 #if DEBUG
         /// <summary>
-        /// Visualizes collision field in debug console as ASCII art.
+        /// Visualize collision grid in debug console as ASCII.
         /// </summary>
         public void Visualize()
         {
+            System.Text.StringBuilder visualization = new System.Text.StringBuilder((width + 1) * height);
             for (int y = 0; y < height; y++)
             {
-                Console.CursorTop = y + 1;
-                System.Text.StringBuilder line = new System.Text.StringBuilder(width);
+                visualization.Append("\n");
                 for (int x = 0; x < width; x++)
                 {
                     object current = grid[x, y];
                     if (current == null)
                     {
-                        line.Append('.');
+                        visualization.Append('.');
                         continue;
                     }
                     if (current is BlockModule)
                     {
-                        line.Append('x');
+                        visualization.Append('x');
                         continue;
                     }
                     if (current is Worm)
                     {
-                        line.Append('o');
+                        visualization.Append('o');
                         continue;
                     }
                     if (current is Fruits)
                     {
-                        line.Append('f');
+                        visualization.Append('f');
                         continue;
                     }
-                    throw new UnknownCollisionException();
+                    throw new CollisionException();
                 }
-                Console.WriteLine(line.ToString());
             }
-            Console.CursorLeft = 0;
-            Console.CursorTop = height + 1;
+            Console.CursorTop = 0;
+            Console.WriteLine(visualization.ToString());
         }
 #endif
     }
 
 
+    /// @author Antti Harju
+    /// @version v0.5
     /// <summary>
-    /// Exception to use when entity is unknown.
+    /// Exception for collision.
     /// </summary>
-    public class UnknownCollisionException : Exception
+    public class CollisionException : Exception
     {
         /// <summary>
-        /// Constructor. Creates custom exception message.
+        /// Add custom exception message.
         /// </summary>
-        public UnknownCollisionException() : base("Unknown collision object.") { }
+        public CollisionException() : base("Unknown collision object.") { }
     }
 }

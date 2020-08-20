@@ -1,9 +1,9 @@
 ﻿namespace WormGame.Static
 {
     /// @author Antti Harju
-    /// @version 12.08.2020
+    /// @version v0.5
     /// <summary>
-    /// Custom math library.
+    /// Fast math library.
     /// </summary>
     public static class FastMath
     {

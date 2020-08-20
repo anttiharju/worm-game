@@ -3,7 +3,7 @@
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 12.08.2020
+    /// @version v0.5
     /// <summary>
     /// Base class for poolable entities.
     /// </summary>

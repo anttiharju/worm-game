@@ -3,7 +3,7 @@
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 12.08.2020
+    /// @version v0.5
     /// <summary>
     /// Interface for all poolables.
     /// </summary>
@@ -16,7 +16,7 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Adds object to scene.
+        /// Add object to scene.
         /// </summary>
         /// <param name="scene">Scene to add the entity to.</param>
         public abstract void Add(Scene scene);

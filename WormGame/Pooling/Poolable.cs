@@ -4,7 +4,7 @@ using WormGame.Core;
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 12.08.2020
+    /// @version v0.5
     /// <summary>
     /// Base class for poolable non-entity objects.
     /// </summary>
@@ -21,7 +21,7 @@ namespace WormGame.Pooling
         /// </summary>
         /// <param name="config">Configuration</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Simplifies pooler generics for testing.")]
-        public Poolable(Config config) { }
+        public Poolable(Settings config) { }
 
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Disables poolable.
+        /// Disables object.
         /// </summary>
         /// <param name="recursive">Disable recursively. False only when disabling is done by pooler.</param>
         public virtual void Disable(bool recursive = true)

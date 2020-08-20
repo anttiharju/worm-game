@@ -7,9 +7,9 @@ using WormGame.Static;
 namespace WormGame.Pooling
 {
     /// @author Antti Harju
-    /// @version 14.08.2020
+    /// @version v0.5
     /// <summary>
-    /// Object pooler. It's computationally cheaper to recycle objects by resetting their variables instead of destroying and creating a new ones.
+    /// Pooler. It's computationally cheaper to recycle objects by resetting their variables instead of destroying and creating a new ones.
     /// </summary>
     /// <typeparam name="T">Object type</typeparam>
     public class Pooler<T> : IEnumerable where T : class, IPoolable
@@ -19,7 +19,7 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Custom pooler constructor.
+        /// Constructor for custom poolers.
         /// </summary>
         public Pooler(int capacity)
         {
@@ -29,17 +29,18 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Default pooler constructor.
+        /// Default constructor.
         /// </summary>
-        /// <param name="config">Configuration</param>
-        /// <param name="capacity">Pool length</param>
-        public Pooler(Scene scene, Config config, int capacity)
+        /// <param name="settings">Configuration</param>
+        /// <param name="scene">WormScene</param>
+        /// <param name="capacity">Pool capacity</param>
+        public Pooler(Settings settings, Scene scene, int capacity)
         {
             pool = new T[capacity];
             endIndex = capacity - 1;
             for (int i = 0; i < capacity; i++)
             {
-                T current = (T)Activator.CreateInstance(typeof(T), new object[] { config });
+                T current = (T)Activator.CreateInstance(typeof(T), new object[] { settings });
                 current.Disable(false);
                 current.Add(scene);
                 pool[i] = current;
@@ -59,8 +60,8 @@ namespace WormGame.Pooling
         /// . = disabled, [number] = enabled, ^ = EnablingIndex
         /// <pre name="test">
         ///  Scene scene = new Scene();
-        ///  Config config = new Config();
-        ///  Pooler<Poolable> pooler = new Pooler<Poolable>(scene, config, 5);
+        ///  Settings settings = new Settings();
+        ///  Pooler<Poolable> pooler = new Pooler<Poolable>(settings, scene, 5);
         ///  Poolable p1 = pooler.Enable();
         ///  Poolable p2 = pooler.Enable();
         ///  Poolable p3 = pooler.Enable();
@@ -74,11 +75,11 @@ namespace WormGame.Pooling
         ///  pooler[3] === p4;
         ///  pooler[4] === p5;
         ///  pooler[5] === p5; #THROWS IndexOutOfRangeException
-        ///  pooler.EnableIndex === 4;
-        ///  pooler[pooler.EnableIndex].Active === true;
+        ///  pooler.Index === 4;
+        ///  pooler[pooler.Index].Active === true;
         ///  pooler.Defragment();
-        ///  pooler.EnableIndex === 3;
-        ///  pooler[pooler.EnableIndex].Active === false;
+        ///  pooler.Index === 3;
+        ///  pooler[pooler.Index].Active === false;
         ///  pooler[0] === p5;
         ///  pooler[1] === p2;
         ///  pooler[2] === p4;
@@ -112,10 +113,10 @@ namespace WormGame.Pooling
 #if DEBUG
             ConsoleColor defaultColor = Console.ForegroundColor;
             if (pool[Index].Active)
-            {   // Pool is full. This can be intentional, but in this project it shouldn't happen.
+            {   // Pool is full. This can be intentional, but in this project it shouldn't really happen.
                 Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.Write("[Pooling] ");
-                if (Help.color)
+                if (Colors.colorfulMessage)
                     Console.ForegroundColor = ConsoleColor.Red;
                 else
                     Console.ForegroundColor = ConsoleColor.Gray;
@@ -125,7 +126,7 @@ namespace WormGame.Pooling
             {   // Tells how many objects pooler has available.
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
                 Console.Write($"[Pooling] ");
-                if (Help.color)
+                if (Colors.colorfulMessage)
                     Console.ForegroundColor = ConsoleColor.Green;
                 else
                     Console.ForegroundColor = ConsoleColor.Gray;
@@ -133,24 +134,9 @@ namespace WormGame.Pooling
                 Console.WriteLine($"{pool.Length - Index,5}");
             }
             Console.ForegroundColor = defaultColor;
-            Help.color = !Help.color;
+            Colors.colorfulMessage = !Colors.colorfulMessage;
 #endif
             return pool[Index].Active;
-        }
-
-
-        /// <summary>
-        /// If all disabling is done through this, defragmentation won't trigger. Not sure if works properly.
-        /// </summary>
-        /// <param name="disableIndex"></param>
-        public void Disable(int disableIndex)
-        {
-            pool[disableIndex].Disable(false);
-            if (!pool[Index].Active)
-                Index--;
-            T swap = pool[disableIndex];
-            pool[disableIndex] = pool[Index];
-            pool[Index] = swap;
         }
 
 
@@ -199,13 +185,13 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Returns pool capacity.
+        /// Return pool capacity.
         /// </summary>
         public int Length { get { return pool.Length; } }
 
 
         /// <summary>
-        /// Disables all pooler objects.
+        /// Disable all pooled objects.
         /// </summary>
         public virtual void Reset()
         {
