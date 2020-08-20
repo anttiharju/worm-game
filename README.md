@@ -4,12 +4,12 @@ Educational project. It's more of a simulation you can interact with rather than
 - [Pooler.cs](WormGame/Pooling/Pooler.cs) has generics, [Blocks.cs](WormGame/Entities/Blocks.cs) BlockSpawner has recursion and there's also [tests.](WormGameTest/)
 - See [CHANGELOG.md](CHANGELOG.md) for a more in-depth look on the development process.
 - Over 2 500 lines of code (documentation included).
-### Benchmarks
+## Benchmarks
 | 200x100 grid, worm length 6  | 3333 worms   | Filled with blocks |
 |------------------------------|--------------|--------------------|
 | i7-4790k and GTX 1080, 144Hz | 37,6 AVG FPS | 90,9 AVG FPS       |
 | Surface Laptop 3, 60Hz       | 12,4 AVG FPS | 52,6 AVG FPS       |
-
+## Video
 [![YouTube video](https://img.youtube.com/vi/QqxTP1VZjGs/0.jpg)](https://www.youtube.com/watch?v=QqxTP1VZjGs "Worm Blocks v0.5")
 
 # Game mechanics
