@@ -1,6 +1,6 @@
 # Worm Blocks (2D game)
-Educational project. It's more of a simulation you can interact with rather than a game. The project had three goals: scalability, learn git by using it frequently and practise C#.
-- Scalable, thousands of worms can be simulated on-screen (depending on hardware, settings and desired framerate).| Benchmark (200x100, worm length 6) | 3333 worms   | Full of blocks |
+Educational project. It's more of a simulation you can interact with rather than a game.
+- It's scalable, thousands of worms can be simulated on-screen (depending on hardware, settings and desired framerate).
 - [Pooler.cs](WormGame/Pooling/Pooler.cs) has generics, [Blocks.cs](WormGame/Entities/Blocks.cs) BlockSpawner has recursion and there's also [tests.](WormGameTest/)
 - See [CHANGELOG.md](CHANGELOG.md) for a more in-depth look on the development process.
 - Over 2 500 lines of code (documentation included).
