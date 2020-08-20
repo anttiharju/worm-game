@@ -84,6 +84,7 @@ namespace WormGame.Entities
 
         private WormModule lastModule;
         private Vector2 direction;
+        private Vector2 target;
         private int maxLength;
         private bool directionChange;
         private bool moving;
@@ -97,7 +98,7 @@ namespace WormGame.Entities
             get { return direction; }
             set
             {
-                if (Help.ValidateDirection(collision, Position, size, value)) { if (value != direction) directionChange = true; direction = value; }
+                if (Help.ValidateDirection(collision, target, size, value)) { if (value != direction) directionChange = true; direction = value; }
             }
         }
 
@@ -105,7 +106,10 @@ namespace WormGame.Entities
         public int Length { get; private set; }
 
 
-        public Color Color { get; private set; }
+        public Color Color { get { return head.Color; } }
+
+
+        public Vector2 Target { get { return target; } }
 
 
         public Worm(Config config, WormScene scene, Pooler<WormModule> modules)
@@ -114,8 +118,8 @@ namespace WormGame.Entities
             this.scene = scene;
             collision = config.collision;
             size = config.size;
-            eraser = Image.CreateRectangle(size, Color.White);
-            head = Image.CreateRectangle(size, Color.Gold);
+            eraser = Image.CreateRectangle(size, config.backgroundColor);
+            head = Image.CreateRectangle(size);
             eraser.CenterOrigin();
             head.CenterOrigin();
             Surface = config.surface;
@@ -125,12 +129,13 @@ namespace WormGame.Entities
 
         public Worm Spawn(int x, int y, int length, Color color)
         {
-            X = collision.EntityX(x);
-            Y = collision.EntityY(y);
+            target.X = collision.EntityX(x);
+            target.Y = collision.EntityY(y);
+            head.SetPosition(target);
             maxLength = length;
-            Color = color;
-            direction = Random.ValidDirection(collision, Position, size);
-            firstModule = modules.Enable().Initialize(Position, direction, Color);
+            head.Color = color;
+            direction = Random.ValidDirection(collision, target, size);
+            firstModule = modules.Enable().Initialize(target, direction);
             lastModule = firstModule;
             directionChange = false;
             return null;
@@ -145,16 +150,16 @@ namespace WormGame.Entities
             {
                 if (directionChange)
                 {
-                    firstModule.Next = modules.Enable().Initialize(Position, direction, Color);
+                    firstModule.Next = modules.Enable().Initialize(target, direction);
                     firstModule = firstModule.Next;
                     directionChange = false;
                 }
-                Vector2 nextPosition = Position + direction * size;
-                if (collision.Check(nextPosition) == collision.empty)
+                Vector2 nextTarget = target + direction * size;
+                if (collision.Check(nextTarget) == collision.empty)
                 {
-                    Position = nextPosition;
+                    target = nextTarget;
                     firstModule?.Grow();
-                    collision.Add(this, Position);
+                    collision.Add(this, target);
                     Length++;
                     if (Length > maxLength)
                     {
@@ -177,19 +182,19 @@ namespace WormGame.Entities
                     }
                     else if (Player == null)
                     {
-                        direction = Random.ValidDirection(collision, Position, size);
+                        direction = Random.ValidDirection(collision, target, size);
                         directionChange = true;
                         retry = true;
                         goto Retry;
                     }
                 }
             }
-            head.SetPosition(collision.X(Position.X), collision.Y(Position.Y));
+            head.SetPosition(target);
             eraser.SetPosition(lastModule.GetEnd());
         }
 
 
-        public void Update()
+        public new void Update()
         {
 
         }
@@ -204,8 +209,8 @@ namespace WormGame.Entities
             base.Disable();
             firstModule = null;
             lastModule = null;
-            X = 0;
-            Y = 0;
+            target.X = 0;
+            target.Y = 0;
             direction.X = 0;
             direction.Y = 0;
             Player = null;
@@ -217,76 +222,95 @@ namespace WormGame.Entities
     }
 
 
-    /// @author anvemaha
-    /// @version 14.08.2020
+    /// @author Antti Harju
+    /// @version 20.08.2020
     /// <summary>
-    /// WormModule. Thanks to modularity worm length can be increased during runtime.
+    /// Worm module. Scaled as needed by Worm.
     /// </summary>
-    public class WormModule : PoolableEntity
+    public class WormModule : Poolable
     {
         private readonly float halfSize;
 
+        private Vector2 scale;
+        private Vector2 position;
         private Vector2 direction;
         public WormModule Next { get; set; }
-        public float Scale { get { if (direction.X == 0) return Graphic.ScaleY; else return Graphic.ScaleX; } }
+        public float Scale { get { if (direction.X == 0) return scale.Y; else return scale.X; } set { if (direction.X == 0) scale.Y = value; else scale.X = value; } }
 
 
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        /// <param name="config"></param>
         public WormModule(Config config)
         {
-            Graphic = Image.CreateRectangle(config.size);
-            Graphic.CenterOrigin();
             halfSize = config.halfSize;
         }
 
-        public WormModule Initialize(Vector2 position, Vector2 direction, Color color)
+
+        /// <summary>
+        /// Disable module.
+        /// </summary>
+        /// <param name="recursive"></param>
+        public override void Disable(bool recursive = true)
         {
-            SetPosition(position);
+            base.Disable();
+            scale.X = 1;
+            scale.Y = 1;
+            Next = null;
+        }
+
+
+        /// <summary>
+        /// Get module end position.
+        /// </summary>
+        /// <returns>Module end position</returns>
+        public Vector2 GetEnd()
+        {
+            return position - Scale * halfSize * direction + halfSize * direction;
+        }
+
+
+        /// <summary>
+        /// Grow module and update position.
+        /// </summary>
+        public void Grow()
+        {
+            Scale++;
+            Move();
+        }
+
+
+        /// <summary>
+        /// Initialize module.
+        /// </summary>
+        /// <param name="position">Start entity position</param>
+        /// <param name="direction">Worm direction</param>
+        /// <returns>Itself</returns>
+        public WormModule Initialize(Vector2 position, Vector2 direction)
+        {
+            this.position = position;
             this.direction = direction;
-            Graphic.Color = color;
             return this;
         }
 
 
-        public void Grow()
-        {
-            if (direction.X == 0)
-                Graphic.ScaleY++;
-            else
-                Graphic.ScaleX++;
-            Move();
-        }
-
-
+        /// <summary>
+        /// Update position.
+        /// </summary>
         public void Move()
         {
-            Position += direction * halfSize;
+            position += direction * halfSize;
         }
 
 
-        public Vector2 GetEnd()
-        {
-            return Position - halfSize * direction - Scale * halfSize * direction;
-        }
-
-
+        /// <summary>
+        /// Shrink module and update position.
+        /// </summary>
         public void Shrink()
         {
-            if (direction.X == 0)
-                Graphic.ScaleY--;
-            else
-                Graphic.ScaleX--;
+            Scale--;
             Move();
-        }
-
-
-        public override void Disable(bool recursive = true)
-        {
-            base.Disable();
-            Graphic.ScaleX = 1;
-            Graphic.ScaleY = 1;
-            direction.X = 0;
-            direction.Y = 0;
-            Next = null;
         }
     }
 }
