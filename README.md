@@ -1,5 +1,5 @@
-# Worm Blocks (2D game)
-Educational project. It's more of a simulation you can interact with rather than a game.
+# Worm Game
+Educational project. I learned a lot about what to avoid when making a game. It's more of a simulation you can interact with rather than an actual game.
 - It's scalable, thousands of worms can be simulated on-screen (depending on hardware, settings and desired framerate).
 - [Pooler.cs](WormGame/Pooling/Pooler.cs) has generics, [Blocks.cs](WormGame/Entities/Blocks.cs) BlockSpawner has recursion and there's also [tests.](WormGameTest/)
 - See [CHANGELOG.md](CHANGELOG.md) for a more in-depth look on the development process.
