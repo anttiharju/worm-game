@@ -42,7 +42,7 @@ namespace WormGame.Pooling
 
 
         /// <summary>
-        /// Is object active.
+        /// Is object active?
         /// </summary>
         public bool Active { get { return active; } set { if (value) active = true; else Disable(); } }
         private bool active;

@@ -1,6 +1,29 @@
 # Changelog
 I use changelog as a brain dump where I explain future plans and further explain commit messages. I hope it shows my enthusiasm for programming and the amount of thought and care put into the project.
 
+# 06.11.2020
+- Cleanup
+    - Ran Visual Studio's automatic code cleanup
+    - Fixed a typo in README.md
+    - Renamed a fruits -> currentfruit in Collision.cs as it's more accurate
+    - Fixed a typo in eraser documentation (exists -> exist)
+    - Added unit to WormModule documentation as it's a little bit better grammatically
+    - Added ? to Poolable and PoolableEntity.Active for the same reason
+    - Added the word Function to Colors.Equal documentation too
+    - Renamed FastMath to SimpleMath as I never measured if they are actually faster.
+        - Also lite -> Simple
+        - Rebuilt tests due to name change
+    - Added code metrics below
+    - Updated to Static/Colors.cs documentation (it wasn't updated during the name change from Help.cs -> Colors.cs)
+    - About the coil whine issue mentioned several times: for some reason Otter sometimes uses nearly 100% of my GTX 1080, but the GPU whine is also present when playing Doom. I only noticed it during this project because I didn't have headphones on all the time.
+
+## Project [code metrics](https://docs.microsoft.com/en-us/visualstudio/code-quality/code-metrics-values?view=vs-2019):
+    
+| Maintainability Index | Cyclomatic Complexity | Depth of Inheritance | Class Coupling | Lines of Source code | Lines of Executable code |
+|-----------------------|-----------------------|----------------------|----------------|----------------------|--------------------------|
+| 74                    | 320                   | 3                    | 48             | 2 531                | 594                      |
+
+
 # 20.08.2020
 - Reset, start finalizing
     - Returned to previous erasersystem and non-scalable worm modules, managed to fix it (no more crashes).

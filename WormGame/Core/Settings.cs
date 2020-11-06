@@ -168,7 +168,7 @@ namespace WormGame.Core
                 wormAmount = wormCap;
             else
             {
-                wormAmount = FastMath.Round(moduleAmount / minWormLength * wormPercentage);
+                wormAmount = SimpleMath.Round(moduleAmount / minWormLength * wormPercentage);
                 wormCap = wormAmount;
             }
 
