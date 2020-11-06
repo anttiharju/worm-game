@@ -1,11 +1,10 @@
 using NUnit.Framework;
-using static WormGame.Static.FastMath;
-using WormGame.Static;
+using static WormGame.Static.SimpleMath;
 
 namespace TestWormGame.Static
 {
 	[TestFixture]
-	public  class TestFastMath
+	public  class TestSimpleMath
 	{
 		[Test]
 		public  void TestAbs16()

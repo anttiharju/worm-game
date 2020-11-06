@@ -1,10 +1,9 @@
 ﻿using Otter.Core;
-using Otter.Graphics;
 using Otter.Graphics.Drawables;
 using Otter.Utility.MonoGame;
-using WormGame.Static;
-using WormGame.Pooling;
 using WormGame.Core;
+using WormGame.Pooling;
+using WormGame.Static;
 
 namespace WormGame.Entities
 {
@@ -138,9 +137,9 @@ namespace WormGame.Entities
             #region Player
             if (worm != null) goto Playerskip;
             float deadZone = 10;
-            if (FastMath.Abs(xMovement) > deadZone)
+            if (SimpleMath.Abs(xMovement) > deadZone)
                 X += xMovement * playerSpeed;
-            if (FastMath.Abs(yMovement) > deadZone)
+            if (SimpleMath.Abs(yMovement) > deadZone)
                 Y += yMovement * playerSpeed;
             Playerskip:;
             #endregion

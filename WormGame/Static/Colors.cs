@@ -6,7 +6,7 @@ namespace WormGame.Static
     /// @author Antti Harju
     /// @version v0.5
     /// <summary>
-    /// Class for static things that don't belong anywhere else.
+    /// Static class for color related things.
     /// </summary>
     public static class Colors
     {
@@ -21,7 +21,7 @@ namespace WormGame.Static
 
 
         /// <summary>
-        /// Check if two colors are the same. Otter didn't seem to have one so I made this.
+        /// Function to check if two colors are the same. Otter didn't seem to have one so I made this.
         /// </summary>
         /// <param name="a">Color a</param>
         /// <param name="b">Color b</param>

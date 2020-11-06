@@ -1,5 +1,5 @@
-using System;
 using Otter.Core;
+using System;
 using WormGame.Core;
 using NUnit.Framework;
 using WormGame.Pooling;

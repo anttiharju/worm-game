@@ -1,7 +1,7 @@
-﻿using System;
-using Otter.Utility.MonoGame;
-using WormGame.Static;
+﻿using Otter.Utility.MonoGame;
+using System;
 using WormGame.Entities;
+using WormGame.Static;
 
 namespace WormGame.Core
 {
@@ -86,12 +86,12 @@ namespace WormGame.Core
                 return block;
             if (current is Worm)
                 return worm;
-            if (current is Fruits fruits)
+            if (current is Fruits currentFruit)
             {
                 if (consume)
                 {
-                    fruits.Disable(x, y);
-                    fruits.Spawn();
+                    currentFruit.Disable(x, y);
+                    currentFruit.Spawn(); // The number or fruits stays constant
                 }
                 return fruit;
             }
@@ -171,7 +171,7 @@ namespace WormGame.Core
         /// <returns>Horizontal grid position</returns>
         public int X(float x)
         {
-            return (FastMath.Round(x) - leftBorder) / size;
+            return (SimpleMath.Round(x) - leftBorder) / size;
         }
 
 
@@ -182,7 +182,7 @@ namespace WormGame.Core
         /// <returns>Vertical grid position</returns>
         public int Y(float y)
         {
-            return (FastMath.Round(y) - topBorder) / size;
+            return (SimpleMath.Round(y) - topBorder) / size;
         }
 
 

@@ -1,10 +1,10 @@
-﻿using System;
-using Otter.Core;
+﻿using Otter.Core;
 using Otter.Graphics;
 using Otter.Graphics.Drawables;
+using System;
 using WormGame.Core;
-using WormGame.Static;
 using WormGame.Pooling;
+using WormGame.Static;
 
 namespace WormGame.Entities
 {

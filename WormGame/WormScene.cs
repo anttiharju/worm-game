@@ -1,12 +1,12 @@
-﻿using System.Collections;
-using Otter.Core;
-using Otter.Utility;
-using Otter.Utility.MonoGame;
+﻿using Otter.Core;
 using Otter.Graphics;
 using Otter.Graphics.Drawables;
+using Otter.Utility;
+using Otter.Utility.MonoGame;
+using System.Collections;
 using WormGame.Core;
-using WormGame.Static;
 using WormGame.Entities;
+using WormGame.Static;
 
 namespace WormGame
 {
@@ -150,7 +150,7 @@ namespace WormGame
         {
             yield return Coroutine.Instance.WaitForSeconds(updateInterval);
             currentStep += step;
-            if (FastMath.Round(currentStep, step / 2) >= size)
+            if (SimpleMath.Round(currentStep, step / 2) >= size)
                 Move();
             foreach (Worm worm in worms)
                 if (worm.Active)
