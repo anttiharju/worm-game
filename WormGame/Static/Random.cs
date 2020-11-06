@@ -1,6 +1,6 @@
-﻿using Otter.Utility;
+﻿using Otter.Graphics;
+using Otter.Utility;
 using Otter.Utility.MonoGame;
-using Otter.Graphics;
 using WormGame.Core;
 
 namespace WormGame.Static
