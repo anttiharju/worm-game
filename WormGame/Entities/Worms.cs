@@ -2,8 +2,8 @@
 using Otter.Graphics.Drawables;
 using Otter.Utility.MonoGame;
 using WormGame.Core;
-using WormGame.Static;
 using WormGame.Pooling;
+using WormGame.Static;
 
 namespace WormGame.Entities
 {
@@ -292,8 +292,8 @@ namespace WormGame.Entities
             {
                 firstModule.PositionFollow();
                 head.SetPosition(firstModule.Position);
-                eraser.ScaledHeight += FastMath.Abs(lastModule.Direction.Y) * step;
-                eraser.ScaledWidth += FastMath.Abs(lastModule.Direction.X) * step;
+                eraser.ScaledHeight += SimpleMath.Abs(lastModule.Direction.Y) * step;
+                eraser.ScaledWidth += SimpleMath.Abs(lastModule.Direction.X) * step;
             }
         }
 
@@ -317,7 +317,7 @@ namespace WormGame.Entities
     /// @author Antti Harju
     /// @version 14.08.2020
     /// <summary>
-    /// WormModule. Worm has one these per length.
+    /// WormModule. Worm has one these per length unit.
     /// </summary>
     public class WormModule : Poolable
     {

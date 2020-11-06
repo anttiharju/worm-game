@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Otter.Core;
+using System;
 using System.Collections;
-using Otter.Core;
 using WormGame.Core;
 using WormGame.Static;
 

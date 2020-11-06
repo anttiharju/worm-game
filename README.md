@@ -27,7 +27,7 @@ Educational project. I learned a lot about what to avoid when making a game. It'
     - Turn into blocks when stuck
 - Blocks
     - Can't move
-    - Disappear if in next to another block of the same color.
+    - Disappear if next to another block of the same color.
    
 # Setup
 - Follow the guide on [otter2d.com](http://otter2d.com/example.php?p=3).

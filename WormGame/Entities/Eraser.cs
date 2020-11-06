@@ -1,10 +1,10 @@
-﻿using System.Collections;
-using Otter.Core;
-using Otter.Utility;
+﻿using Otter.Core;
 using Otter.Graphics.Drawables;
+using Otter.Utility;
+using System.Collections;
 using WormGame.Core;
-using WormGame.Static;
 using WormGame.Pooling;
+using WormGame.Static;
 
 namespace WormGame.Entities
 {
@@ -55,7 +55,7 @@ namespace WormGame.Entities
 
 
         /// <summary>
-        /// Erasers have to exists for a frame to actually erase.
+        /// Erasers have to exist for a frame to actually erase.
         /// </summary>
         IEnumerator EraseEraser()
         {

@@ -3,12 +3,12 @@
     /// @author Antti Harju
     /// @version v0.5
     /// <summary>
-    /// Fast math library.
+    /// Simple math library.
     /// </summary>
-    public static class FastMath
+    public static class SimpleMath
     {
         /// <summary>
-        /// Lite version of Math.Abs().
+        /// Simple version of Math.Abs().
         /// </summary>
         /// <param name="number">Number</param>
         /// <returns>Absolute value of number</returns>
@@ -27,7 +27,7 @@
 
 
         /// <summary>
-        /// Function to convert whole number floats to integers. Lite version of Math.Round().
+        /// Function to convert whole number floats to integers. Simple version of Math.Round().
         /// </summary>
         /// <param name="number">float</param>
         /// <returns>int</returns>
