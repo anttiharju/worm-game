@@ -1,6 +1,32 @@
 # Changelog
 I use changelog as a brain dump where I explain future plans and further explain commit messages. I hope it shows my enthusiasm for programming and the amount of thought and care put into the project.
 
+# 29.12.2020
+- More cleanup
+    - Added Otter to the project as it is no longer supported
+        - It has some warnings, but I set them to be ignored
+    - Settings.cfg is now included in build
+    - It's my birthday, yay! :D, random blabbering:
+        - Onto more relevant matters:
+            - Otter is no longer supported (discord server was closed and a note added to the website)
+            - I got some code review done on the repo
+                - I should add otter to the repo now that it's no longer supported and it even has a MIT license so there's no problem
+                    - Should've added it to the repo from the beginning
+                - Settings / config desperately needs some restructuring / cleanup
+                - Overall the project needs some restructuring
+                    - The way things are is not the smart way to have them and they are the way they are due to what the project was planned to be instead of what it is
+                        - For example, blocks are not really needed.
+                        - Worms should be able to erase themselves
+                            - I'll solve both of these problems by building worms out many circles
+                                - look into otter components?
+                            - and instead of turning worms into blocks I'll make them gray
+                    - Poolers / managers have become bloated
+                    - Joining the game is confusing (unclear instructions)
+                - I took notes during the review but unfortunately I've somehow managed to lose them. Heck.
+                    - I think I still remember most of the stuff, mostly syntax / semantic related fixes
+                    - paths should be modified to be relative instead of absolute
+    - **Overall I don't think it's worth it to continue working on this project. There's a lot to fix, but I'll just take what I learned and apply it to my next project**
+
 # 06.11.2020
 - Cleanup
     - Ran Visual Studio's automatic code cleanup

@@ -7,7 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\dev\Otter\Otter\Otter.csproj" />
+    <None Remove="settings.cfg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="settings.cfg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Otter\Otter.csproj" />
   </ItemGroup>
 
 </Project>
